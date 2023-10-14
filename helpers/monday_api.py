@@ -147,6 +147,33 @@ class MondayBoard:
                 r = json_normalize(self.mondayApi.query(query, return_items_as=return_items_as)['boards'][0]['items'])
             return r
 
+    def get_items_by_column_values(self, column_id, column_value, return_items_as='dataframe', page_size=500, page=1,
+                                      group_id=None, group_title=None):
+        QUERY_TEMPLATE = '''
+                {{
+                items_by_column_values(board_id:{board_id}, column_id: "{column_id}", column_value: "{column_value}", limit:{page_size} page:{page_num}){{
+                    id
+                    name,
+                    group {{
+                        title
+                    }}
+                    column_values {{
+                        title
+                        text
+                        type
+                    }}
+                }}
+                }}
+                '''
+
+        query = QUERY_TEMPLATE.format(board_id=str(self.board_id), column_id=column_id, column_value=column_value, page_size=page_size, page_num=page)
+        if return_items_as == 'json':
+            return self.mondayApi.query(query, return_items_as=return_items_as).json()
+        else:
+            r = json_normalize(self.mondayApi.query(query, return_items_as=return_items_as)['items_by_column_values'])
+            return r
+
+
     def write_update(self, item_id, update_text):
         QUERY_TEMPLATE = '''
               mutation {{

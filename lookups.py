@@ -1,8 +1,5 @@
 from helpers.monday_api import MondayApi, MondayBoard
-PRODUCT_BOARD_ID = 1289515521
-ORDERS_BOARD = 1289582579
-BI_MONDAY_API_KEY = 'eyJhbGciOiJIUzI1NiJ9.eyJ0aWQiOjI4ODIwMzA4MSwiYWFpIjoxMSwidWlkIjo1MDEyNDQ2NywiaWFkIjoiMjAyMy0xMC0xMlQwODo0OTowMC4wMDBaIiwicGVyIjoibWU6d3JpdGUiLCJhY3RpZCI6MTkyNjA2MDEsInJnbiI6ImV1YzEifQ.2yE5g-JP2gcLiwBjVfMkiLZe7UZTo2vjm768yF9rcIA'
-BI_MONDAY_API_URL = 'https://api.monday.com/v2'
+from consts import BI_MONDAY_API_KEY, BI_MONDAY_API_URL, PRODUCT_BOARD_ID, ORDERS_BOARD
 
 def get_products():
     monday_api = MondayApi(BI_MONDAY_API_KEY, BI_MONDAY_API_URL)
@@ -37,11 +34,5 @@ def get_products_and_categories():
 def get_order(order_id):
     monday_api = MondayApi(BI_MONDAY_API_KEY, BI_MONDAY_API_URL)
     monday_board = MondayBoard(monday_api, id=ORDERS_BOARD)
-    items = monday_board.get_items(return_items_as='json').get('data').get('boards')[0].get('items')
-    for item in items:
-        for column_value in item.get('column_values'):
-            if column_value.get('title') == 'מספר הזמנה':
-                if column_value.get('text') == str(order_id):
-                    return item
-    return None
-
+    order = monday_board.get_items_by_column_values('text5' , str(order_id) , return_items_as='json').get('data').get('items_by_column_values')
+    return order
