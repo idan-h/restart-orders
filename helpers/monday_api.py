@@ -8,7 +8,7 @@ SUPPORTED_RETURN_TYPES = ['json', 'dataframe']
 
 class MondayApi:
     def __init__(self, api_key, api_url):
-        self.headers = {"Authorization": api_key}
+        self.headers = {"Authorization": api_key, "Api-Version": "2023-10"}
         self.apiUrl = api_url
 
     def query(self, query, variables=None, return_items_as='dataframe'):
@@ -89,8 +89,6 @@ class MondayBoard:
                     return df['id'].values
         return []
 
-
-
     def list_groups(self):
         return pd.DataFrame(self.get_board_details()['groups'][0])
 
@@ -108,24 +106,52 @@ class MondayBoard:
         vars = {'ItemName': item_name, 'columnVals': json.dumps(columnVals)}
         return self.mondayApi.query(query, vars)
 
-    def get_items(self, return_items_as='dataframe', page_size=500, page=1, group_id=None,
-                  group_title=None):
+    def insert_subitem(self, item_name, columnVals, item_id):
+        query = 'mutation ($ItemName: String!, $columnVals: JSON!, $ItemId: ID!) { ' \
+                'create_subitem (parent_item_id:$ItemId,' \
+                'item_name:$ItemName, column_values:$columnVals) { id } } '
+        vars = {'ItemName': item_name, 'columnVals': json.dumps(columnVals), 'ItemId': item_id}
+        return self.mondayApi.query(query, vars)
+
+    def change_multiple_column_values(self, columnVals, item_id):
+        query = '''
+            mutation ($columnVals: JSON!, $ItemId: ID!, $BoardId: ID!) {
+              change_multiple_column_values(board_id: $BoardId, item_id: $ItemId, column_values: $columnVals) {
+                id
+              }
+            }
+            '''
+        vars = {'columnVals': json.dumps(columnVals), 'ItemId': item_id, 'BoardId': self.board_id}
+        return self.mondayApi.query(query, vars)
+
+    def delete_item(self, item_id):
+        QUERY_TEMPLATE = '''
+         mutation {{
+             delete_item (item_id: {item_id}) {{ 
+                 id
+             }}
+         }}'''
+        self.mondayApi.query(QUERY_TEMPLATE.format(item_id=item_id))
+
+    def get_items(self, return_items_as='dataframe', limit=500, group_id=None, group_title=None):
         QUERY_TEMPLATE = '''
               {{
               boards(ids:{board_id})
               {{
                 {filter_group_id[0]}
-                items (limit:{page_size} page:{page_num}){{
-                  id
-                  name,
-                  group {{
-                    title
-                  }}
-                  column_values {{
-                    title
-                    text
-                    type
-                  }}
+                items_page (limit:{limit}){{
+                    items {{
+                      id
+                      name,
+                      group {{
+                        title
+                      }}
+                      column_values {{
+                        id
+                        text
+                        type
+                      }}
+                    }}
                 }}
                 {filter_group_id[1]}
                 }}
@@ -134,7 +160,7 @@ class MondayBoard:
         groups_ids = [self.get_group_id(group)[0] for group in group_title] if group_title else group_id
         # join groups id to support graphql format
         filter_group_ids = (f'groups(ids:[' + ', '.join(groups_ids) + '])' ' {', '}') if groups_ids else ('', '')
-        query = QUERY_TEMPLATE.format(board_id=str(self.board_id), page_size=page_size, page_num=page,
+        query = QUERY_TEMPLATE.format(board_id=str(self.board_id), limit=limit,
                                       filter_group_id=filter_group_ids)
 
         if return_items_as == 'json':
@@ -147,32 +173,41 @@ class MondayBoard:
                 r = json_normalize(self.mondayApi.query(query, return_items_as=return_items_as)['boards'][0]['items'])
             return r
 
-    def get_items_by_column_values(self, column_id, column_value, return_items_as='dataframe', page_size=500, page=1,
-                                      group_id=None, group_title=None):
+    def get_items_by_column_values(self, column_id, column_value, return_items_as='dataframe', limit=1):
         QUERY_TEMPLATE = '''
                 {{
-                items_by_column_values(board_id:{board_id}, column_id: "{column_id}", column_value: "{column_value}", limit:{page_size} page:{page_num}){{
-                    id
-                    name,
-                    group {{
-                        title
+                items_page_by_column_values(board_id:{board_id}, limit: {limit}, columns: [{{column_id: "{column_id}",
+                column_values: ["{column_value}"]}}]) {{
+                    items {{
+                        id
+                        name
+                        column_values {{
+                            id
+                            text
+                            type
+                        }}
+                        subitems {{
+                            id
+                            name
+                            column_values {{
+                                id
+                                value
+                                type
+                            }}
+                        }}
+                      }}
                     }}
-                    column_values {{
-                        title
-                        text
-                        type
-                    }}
-                }}
                 }}
                 '''
 
-        query = QUERY_TEMPLATE.format(board_id=str(self.board_id), column_id=column_id, column_value=column_value, page_size=page_size, page_num=page)
+        query = QUERY_TEMPLATE.format(board_id=str(self.board_id), column_id=column_id, column_value=column_value,
+                                      limit=limit)
+
         if return_items_as == 'json':
             return self.mondayApi.query(query, return_items_as=return_items_as).json()
         else:
-            r = json_normalize(self.mondayApi.query(query, return_items_as=return_items_as)['items_by_column_values'])
+            r = json_normalize(self.mondayApi.query(query, return_items_as=return_items_as))
             return r
-
 
     def write_update(self, item_id, update_text):
         QUERY_TEMPLATE = '''

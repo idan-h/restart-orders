@@ -1,4 +1,4 @@
 PRODUCT_BOARD_ID = 1289515521
-ORDERS_BOARD = 1289582579
-BI_MONDAY_API_KEY = ''
-BI_MONDAY_API_URL = 'https://api.monday.com/v2'
+ORDERS_BOARD_ID = 1289582579
+API_KEY = ''
+API_URL = 'https://api.monday.com/v2'
