@@ -1,4 +1,4 @@
-from monday_functions import create_order, update_order, get_order, get_products
+from functions import create_order, update_order, get_order, get_products
 
 API_KEY = ''
 
