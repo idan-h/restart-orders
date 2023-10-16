@@ -1,3 +1,5 @@
+import time
+import re
 import requests
 import json
 import pandas as pd
@@ -19,7 +21,14 @@ class MondayApi:
         req = requests.post(url=self.apiUrl, json=data, headers=self.headers)
         if req.status_code == 200:
             if "errors" in req.json().keys():
-                raise Exception(f"ERROR! - please see the errors in the response.\n{req.json()}")
+                req_json = req.json()
+                if req_json['error_code'] == 'ComplexityException':
+                    match = re.search(r"reset in (\d+) seconds", req_json['error_message'])
+                    seconds = int(match.group(1)) if match else 20
+                    time.sleep(seconds + 5)
+                    return self.query(query, variables, return_items_as)
+                else:
+                    raise Exception(f"ERROR! - please see the errors in the response.\n{req_json}")
             elif "data" in req.json().keys():
                 if return_items_as.lower() == 'json':
                     return req
@@ -133,45 +142,32 @@ class MondayBoard:
          }}'''
         self.mondayApi.query(QUERY_TEMPLATE.format(item_id=item_id))
 
-    def get_items(self, return_items_as='dataframe', limit=500, group_id=None, group_title=None):
+    def get_items(self, return_items_as='dataframe', limit=500, cursor=None):
         QUERY_TEMPLATE = '''
               {{
               boards(ids:{board_id})
               {{
-                {filter_group_id[0]}
-                items_page (limit:{limit}){{
+                items_page (limit:{limit}{cursor}) {{
+                    cursor
                     items {{
                       id
                       name,
-                      group {{
-                        title
-                      }}
                       column_values {{
                         id
                         text
-                        type
                       }}
                     }}
-                }}
-                {filter_group_id[1]}
-                }}
-                }}'''
+                  }}
+              }}
+              }}'''
 
-        groups_ids = [self.get_group_id(group)[0] for group in group_title] if group_title else group_id
-        # join groups id to support graphql format
-        filter_group_ids = (f'groups(ids:[' + ', '.join(groups_ids) + '])' ' {', '}') if groups_ids else ('', '')
         query = QUERY_TEMPLATE.format(board_id=str(self.board_id), limit=limit,
-                                      filter_group_id=filter_group_ids)
+                                      cursor=f', cursor: "{cursor}"' if cursor else '')
 
         if return_items_as == 'json':
             return self.mondayApi.query(query, return_items_as=return_items_as).json()
         else:
-            if any(filter_group_ids):
-                r = json_normalize(
-                    self.mondayApi.query(query, return_items_as=return_items_as)['boards'][0]['groups'][0]['items'])
-            else:
-                r = json_normalize(self.mondayApi.query(query, return_items_as=return_items_as)['boards'][0]['items'])
-            return r
+            return json_normalize(self.mondayApi.query(query, return_items_as=return_items_as)['boards'][0]['items'])
 
     def get_items_by_column_values(self, column_id, column_value, return_items_as='dataframe', limit=1):
         QUERY_TEMPLATE = '''
