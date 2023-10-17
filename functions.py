@@ -135,7 +135,7 @@ def handle_duplicates(api_key):
 
     # Data frame manipulations
     json_df = pd.json_normalize(all_items, record_path='column_values', meta=['id'], meta_prefix='meta_')
-    df_filtered = json_df[json_df['id'].isin(['text8', 'text0', 'text42'])]
+    df_filtered = json_df[json_df['id'].isin(['text8', 'text0', 'text42', 'status'])]
     df = df_filtered.pivot(index='meta_id', columns='id', values='text').reset_index()
     df.columns.name = None
 
@@ -147,7 +147,7 @@ def handle_duplicates(api_key):
     df.loc[mask, 'similar_id'] = df[mask].groupby('text0')['meta_id'].transform(
         lambda x: x.iloc[0] if len(x) > 1 else None)
 
-    df_has_similar_id = df[df['similar_id'].notna() & df['text42'].isna()]
+    df_has_similar_id = df[df['similar_id'].notna() & df['text42'].isna() & df['status'] == 'ממתין']
 
     for index, row in df_has_similar_id.iterrows():
         result = monday_board.change_multiple_column_values({
