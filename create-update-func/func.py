@@ -1,19 +1,35 @@
 import io
 import json
 import logging
-import os
 
 from fdk import response
 from fdk import context
+import oci
 
 from library.functions import create_order, update_order
 
 
+API_KEY_SECRET_OCID = "ocid1.vaultsecret.oc1.il-jerusalem-1.amaaaaaad7jh6nqagozrecoqlbygczbjllj5n3sq6bpb3qqu3xnbrlopmfta"
+API_KEY = None
+
+
+def get_secret_from_vault(secret_ocid):
+    signer = oci.auth.signers.get_resource_principals_signer()
+    client = oci.secrets.SecretsClient(config={}, signer=signer)
+    secret_content = client.get_secret_bundle(secret_id=secret_ocid).data.secret_bundle_content.content
+    return secret_content
+
+
 def handler(ctx: context, data: io.BytesIO = None):
-    api_key = os.environ.get("API_KEY")
+    global API_KEY
+
     logger = logging.getLogger()
 
-    logger.info(api_key)
+    if API_KEY is None:
+        logger.info('Retrieving secret API_KEY')
+        API_KEY = get_secret_from_vault(API_KEY_SECRET_OCID)
+
+    logger.info(API_KEY)
     logger.info(ctx.RequestURL())
     logger.info(ctx.Config())
 
@@ -24,10 +40,10 @@ def handler(ctx: context, data: io.BytesIO = None):
 
         if 'id' in body.keys():
             logger.info('Update order')
-            update_order(api_key, body)
+            update_order(API_KEY, body)
         else:
             logger.info('Create order')
-            create_order(api_key, body)
+            create_order(API_KEY, body)
     except (Exception,) as ex:
         logging.getLogger().info('error: ' + str(ex))
 
