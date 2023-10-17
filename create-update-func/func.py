@@ -10,7 +10,7 @@ from library.functions import create_order, update_order
 
 
 API_KEY_SECRET_OCID = "ocid1.vaultsecret.oc1.il-jerusalem-1.amaaaaaad7jh6nqagozrecoqlbygczbjllj5n3sq6bpb3qqu3xnbrlopmfta"
-API_KEY = None
+# API_KEY = None
 
 
 def get_secret_from_vault(secret_ocid):
@@ -21,19 +21,19 @@ def get_secret_from_vault(secret_ocid):
 
 
 def handler(ctx: context, data: io.BytesIO = None):
-    global API_KEY
+    # global API_KEY
 
     logger = logging.getLogger()
 
-    if API_KEY is None:
-        logger.info('Retrieving secret API_KEY')
-        API_KEY = get_secret_from_vault(API_KEY_SECRET_OCID)
+    # if API_KEY is None:
+    #     logger.info('Retrieving secret API_KEY')
+    #     API_KEY = get_secret_from_vault(API_KEY_SECRET_OCID)
+    API_KEY = ctx.Config()['API_KEY']
 
     logger.info(API_KEY)
-    logger.info(ctx.RequestURL())
     logger.info(ctx.Config())
 
-    order_id = None
+    response_dict = {}
     try:
         body = json.loads(data.getvalue())
         logger.info(body)
@@ -41,13 +41,15 @@ def handler(ctx: context, data: io.BytesIO = None):
         if 'id' in body.keys():
             logger.info('Update order')
             update_order(API_KEY, body)
+            response_dict['success'] = True
         else:
             logger.info('Create order')
-            create_order(API_KEY, body)
+            order_id = create_order(API_KEY, body)
+            response_dict['success'] = True
+            response_dict['id'] = order_id
     except (Exception,) as ex:
         logging.getLogger().info('error: ' + str(ex))
-
-    response_dict = {'error': 'An error has occurred'} if order_id is None else {'id': order_id}
+        response_dict['error'] = 'An error has occurred'
 
     return response.Response(
         ctx, response_data=json.dumps(response_dict),
