@@ -1,5 +1,5 @@
-from helpers.monday_api import MondayApi, MondayBoard
-from consts.consts import API_URL, PRODUCT_BOARD_ID, ORDERS_BOARD_ID
+from library.monday_api import MondayApi, MondayBoard
+from library.consts import API_URL, PRODUCT_BOARD_ID, ORDERS_BOARD_ID
 import uuid
 import json
 import pandas as pd

@@ -1,5 +1,5 @@
-from helpers.monday_api import MondayApi, MondayBoard
-from consts.consts import API_URL, ORDERS_BOARD_ID
+from library.monday_api import MondayApi, MondayBoard
+from library.consts import API_URL, ORDERS_BOARD_ID
 from main import API_KEY
 
 monday_api = MondayApi(API_KEY, API_URL)
