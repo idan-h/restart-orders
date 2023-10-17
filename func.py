@@ -8,6 +8,8 @@ from fdk import response
 def handler(ctx, data: io.BytesIO = None):
     name = "World"
     try:
+        logging.getLogger().info(ctx)
+
         request_path = ctx.http_request.path
         logging.getLogger().info(str(request_path))
 
