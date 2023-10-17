@@ -30,13 +30,9 @@ def handler(ctx: context, data: io.BytesIO = None):
     #     API_KEY = get_secret_from_vault(API_KEY_SECRET_OCID)
     API_KEY = ctx.Config()['API_KEY']
 
-    logger.info(API_KEY)
-    logger.info(ctx.Config())
-
     response_dict = {}
     try:
         body = json.loads(data.getvalue())
-        logger.info(body)
 
         if 'id' in body.keys():
             logger.info('Update order')
