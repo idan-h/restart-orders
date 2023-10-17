@@ -22,7 +22,7 @@ class MondayApi:
         if req.status_code == 200:
             if "errors" in req.json().keys():
                 req_json = req.json()
-                if req_json['error_code'] == 'ComplexityException':
+                if req_json.get('error_code') == 'ComplexityException':
                     match = re.search(r"reset in (\d+) seconds", req_json['error_message'])
                     seconds = int(match.group(1)) if match else 20
                     time.sleep(seconds + 5)
@@ -66,6 +66,7 @@ class MondayApi:
 class MondayBoard:
     def __init__(self, MondayApi: MondayApi, board_name=None, id=None):
         self.mondayApi = MondayApi
+        self.columns_df = None
         if not (board_name or id):
             raise Exception("at least one argument need to be given. (board name or board id)")
         self.board_id = str(id) if id else self.mondayApi.get_board_id(board_name)['id'].values[0]
@@ -84,7 +85,7 @@ class MondayBoard:
         df = df[df['title'] == column_title]
         return df
 
-    def get_column_id(self, column_title):
+    def get_columns(self):
         res = self.mondayApi.query(
             'query {  boards (ids: ' + self.board_id + ') {columns{id      title    }  }}')
         if 'boards' in res.keys():
@@ -93,10 +94,12 @@ class MondayBoard:
                 res = res[0]
                 if 'columns' in res.keys():
                     res = res['columns']
-                    df = pd.DataFrame(res)
-                    df = df[df['title'] == column_title]
-                    return df['id'].values
-        return []
+                    self.columns_df = pd.DataFrame(res)
+
+    def get_column_id(self, column_title):
+        if self.columns_df is None:
+            self.get_columns()
+        return self.columns_df[self.columns_df['title'] == column_title]['id'].values[0]
 
     def list_groups(self):
         return pd.DataFrame(self.get_board_details()['groups'][0])
@@ -131,6 +134,17 @@ class MondayBoard:
             }
             '''
         vars = {'columnVals': json.dumps(columnVals), 'ItemId': item_id, 'BoardId': self.board_id}
+        return self.mondayApi.query(query, vars)
+
+    def add_column(self , title, column_type):
+        query = '''
+            mutation ($BoardId: ID!, $Title: String!, $ColumnType: ColumnType!) {
+              create_column(board_id: $BoardId, title: $Title, column_type: $ColumnType) {
+                id
+              }
+            }
+            '''
+        vars = {'BoardId': self.board_id, 'Title': title, 'ColumnType': column_type}
         return self.mondayApi.query(query, vars)
 
     def delete_item(self, item_id):
