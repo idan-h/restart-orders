@@ -1,5 +1,5 @@
 from library.monday_api import MondayApi, MondayBoard
-from library.consts import API_URL, PRODUCT_BOARD_ID, ORDERS_BOARD_ID
+from library.consts import API_URL, PRODUCT_BOARD_ID, ORDERS_BOARD_ID , DONATIONS_BOARD_ID
 import uuid
 import json
 import pandas as pd
@@ -135,7 +135,7 @@ def handle_duplicates(api_key):
 
     # Data frame manipulations
     json_df = pd.json_normalize(all_items, record_path='column_values', meta=['id'], meta_prefix='meta_')
-    df_filtered = json_df[json_df['id'].isin(['text8', 'text0', 'text42', 'status'])]
+    df_filtered = json_df[json_df['id'].isin(['text8', 'text0', 'text42'])]
     df = df_filtered.pivot(index='meta_id', columns='id', values='text').reset_index()
     df.columns.name = None
 
@@ -147,7 +147,7 @@ def handle_duplicates(api_key):
     df.loc[mask, 'similar_id'] = df[mask].groupby('text0')['meta_id'].transform(
         lambda x: x.iloc[0] if len(x) > 1 else None)
 
-    df_has_similar_id = df[df['similar_id'].notna() & df['text42'].isna() & df['status'] == 'ממתין']
+    df_has_similar_id = df[df['similar_id'].notna() & df['text42'].isna()]
 
     for index, row in df_has_similar_id.iterrows():
         result = monday_board.change_multiple_column_values({
@@ -155,3 +155,49 @@ def handle_duplicates(api_key):
             'status': 'פוטנציאל לכפילות',  # Status
         }, row['meta_id'])
         print(result)
+
+
+def insert_clearing_transaction(api_key , j):
+    monday_api = MondayApi(api_key, API_URL)
+    monday_board = MondayBoard(monday_api, id=DONATIONS_BOARD_ID)
+
+    # insert the json to monday board
+    new_item = monday_board.insert_item(j['donor']['donor_email'], {
+        monday_board.get_column_id('amount'): j['donation']['amount'],
+        monday_board.get_column_id('norm_anount'): j['donation']['norm_anount'],
+        monday_board.get_column_id('comment'): j['donation']['comment'],
+        monday_board.get_column_id('created_at'): j['donation']['created_at'],
+        monday_board.get_column_id('currency'): j['donation']['currency'],
+        monday_board.get_column_id('charity_id'): j['donation']['charity_id'],
+        monday_board.get_column_id('charity_name_en'): j['donation']['charity_name_en'],
+        monday_board.get_column_id('charity_name_he'): j['donation']['charity_name_he'],
+        monday_board.get_column_id('charity_number'): j['donation']['charity_number'],
+        monday_board.get_column_id('target_id'): j['donation']['target_id'],
+        monday_board.get_column_id('target_name_en'): j['donation']['target_name_en'],
+        monday_board.get_column_id('target_name_he'): j['donation']['target_name_he'],
+        monday_board.get_column_id('id'): j['donation']['id'],
+        monday_board.get_column_id('end_recurring'): j['donation']['end_recurring'],
+        monday_board.get_column_id('recurring'): j['donation']['recurring'],
+        monday_board.get_column_id('recurring_months'): j['donation']['recurring_months'],
+        monday_board.get_column_id('recurring_payment_number'): j['donation']['recurring_payment_number'],
+        monday_board.get_column_id('donated_with_account'): j['donor']['donated_with_account'],
+        monday_board.get_column_id('donor_email'): j['donor']['donor_email'],
+        monday_board.get_column_id('donor_first_name'): j['donor']['donor_first_name'],
+        monday_board.get_column_id('donor_last_name'): j['donor']['donor_last_name'],
+        monday_board.get_column_id('donor_phone'): j['donor']['donor_phone'],
+        monday_board.get_column_id('donor_il_id'): j['donor']['donor_il_id'],
+        monday_board.get_column_id('address'): j['donor']['invoice_information']['address'],
+        monday_board.get_column_id('company_number'): j['donor']['invoice_information']['company_number'],
+        monday_board.get_column_id('recipient_name'): j['donor']['invoice_information']['recipient_name'],
+        monday_board.get_column_id('share_details_with_charities'): j['donor']['invoice_information'][
+            'share_details_with_charities'],
+        monday_board.get_column_id('card_last_4'): j['transfer']['card_last_4'],
+        monday_board.get_column_id('checkout_locale'): j['transfer']['checkout_locale'],
+        monday_board.get_column_id('completed_at'): j['transfer']['completed_at'],
+        monday_board.get_column_id('currency'): j['transfer']['currency'],
+        monday_board.get_column_id('payment_type'): j['transfer']['payment_type'],
+        monday_board.get_column_id('total_amount'): j['transfer']['total_amount'],
+        monday_board.get_column_id('uk_tax_payer'): j['transfer']['uk_tax_payer'],
+    })
+
+    return new_item
