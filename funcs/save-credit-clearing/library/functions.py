@@ -38,21 +38,14 @@ def update_order(api_key, dto):
 
     existing_item = monday_board.get_items_by_column_values('text5', str(dto['id']), return_items_as='json')\
         .get('data').get('items_page_by_column_values').get('items')[0]
+    subitems_ids = [x['id'] for x in existing_item.get('subitems', [])]
     existing_item_id = int(existing_item['id'])
 
-    is_cancel = dto.get('is_cancel', False)
-
-    column_values = {'status': 'בוטל'} if is_cancel else {
+    monday_board.change_multiple_column_values({
         'short_text': dto['note'],  # Note
         'dropdown': dto['location'],  # Location
-    }
-
-    monday_board.change_multiple_column_values(column_values, existing_item_id)
-
-    if is_cancel:
-        return
-
-    subitems_ids = [x['id'] for x in existing_item.get('subitems', [])]
+        **({'status': 'בוטל'} if dto['is_cancel'] else {})  # Order Status
+    }, existing_item_id)
 
     for item_id in subitems_ids:
         monday_board.delete_item(item_id)
@@ -99,6 +92,30 @@ def get_products(api_key):
     products = [{'name': i.get('name'), 'id': i.get('id')} for i in items ]
 
     return products
+
+
+def get_product_categories(api_key):
+    monday_api = MondayApi(api_key, API_URL)
+    monday_board = MondayBoard(monday_api, id=PRODUCT_BOARD_ID)
+    items = monday_board.get_items(return_items_as='json').get('data').get('boards')[0].get('items_page').get('items')
+    categories = []
+    for item in items:
+        for column_value in item.get('column_values'):
+            if column_value.get('title') == 'קטגוריה':
+                categories.append(column_value.get('text'))
+    return list(set(categories))
+
+
+def get_products_and_categories(api_key):
+    monday_api = MondayApi(api_key, API_URL)
+    monday_board = MondayBoard(monday_api, id=PRODUCT_BOARD_ID)
+    items = monday_board.get_items(return_items_as='json').get('data').get('boards')[0].get('items_page').get('items')
+    products_and_categories = []
+    for item in items:
+        for column_value in item.get('column_values'):
+            if column_value.get('title') == 'קטגוריה':
+                products_and_categories.append([item.get('name'), column_value.get('text')])
+    return products_and_categories
 
 
 def handle_duplicates(api_key):
