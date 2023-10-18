@@ -70,6 +70,10 @@ def get_order(api_key, order_id):
     order = monday_board.get_items_by_column_values('text5', str(order_id), return_items_as='json')\
         .get('data').get('items_page_by_column_values').get('items')[0]
     column_values = {v['id']: v['text'] for v in order.get('column_values')}
+
+    if column_values.get('status') == 'בוטל':
+        return {'is_cancel': True}
+
     subitems = order.get('subitems', [])
 
     for item in subitems:
@@ -101,7 +105,7 @@ def get_products(api_key):
     return products
 
 
-def handle_duplicates(api_key):
+def handle_duplicate_orders(api_key):
     monday_api = MondayApi(api_key, API_URL)
     monday_board = MondayBoard(monday_api, id=ORDERS_BOARD_ID)
 
