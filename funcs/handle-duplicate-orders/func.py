@@ -11,7 +11,7 @@ from library.functions import handle_duplicate_orders
 
 def handler(ctx: context, data: io.BytesIO = None):
     logger = logging.getLogger()
-
+    req = json.loads(data.getvalue())
     API_KEY = ctx.Config()['API_KEY']
 
     try:
@@ -20,6 +20,6 @@ def handler(ctx: context, data: io.BytesIO = None):
         logger.info('error: ' + traceback.format_exc().replace('\n', ''))
 
     return response.Response(
-        ctx, response_data=json.dumps({'ok': True}),
+        response_data=json.dumps(req),
         headers={"Content-Type": "application/json"}
     )

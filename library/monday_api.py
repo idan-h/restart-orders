@@ -99,7 +99,10 @@ class MondayBoard:
     def get_column_id(self, column_title):
         if self.columns_df is None:
             self.get_columns()
-        return self.columns_df[self.columns_df['title'] == column_title]['id'].values[0]
+        res = self.columns_df[self.columns_df['title'] == column_title]['id'].values
+        if not len(res.values) :
+            return []
+        return res.values[0]
 
     def list_groups(self):
         return pd.DataFrame(self.get_board_details()['groups'][0])
