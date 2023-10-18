@@ -91,7 +91,7 @@ def get_order(api_key, order_id):
         'subitems': [{
             'name': i['name'],
             'product_number': json.loads(i['connect_boards'])['linkedPulseIds'][0]['linkedPulseId'],
-            'quantity': i['numbers'],
+            'quantity': int(i['numbers'].replace('"', '')),
         } for i in subitems]
     }
 
@@ -100,7 +100,7 @@ def get_products(api_key):
     monday_api = MondayApi(api_key, API_URL)
     monday_board = MondayBoard(monday_api, id=PRODUCT_BOARD_ID)
     items = monday_board.get_items(return_items_as='json').get('data').get('boards')[0].get('items_page').get('items')
-    products = [{'name': i.get('name'), 'id': i.get('id')} for i in items ]
+    products = [{'name': i.get('name'), 'product_number': int(i.get('id'))} for i in items]
 
     return products
 
