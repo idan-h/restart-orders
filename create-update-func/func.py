@@ -1,6 +1,7 @@
 import io
 import json
 import logging
+import traceback
 
 from fdk import response
 from fdk import context
@@ -43,8 +44,8 @@ def handler(ctx: context, data: io.BytesIO = None):
             order_id = create_order(API_KEY, body)
             response_dict['success'] = True
             response_dict['id'] = order_id
-    except (Exception,) as ex:
-        logging.getLogger().info('error: ' + str(ex))
+    except (Exception,):
+        logger.info('error: ' + traceback.format_exc().replace('\n', ''))
         response_dict['error'] = 'An error has occurred'
 
     return response.Response(
