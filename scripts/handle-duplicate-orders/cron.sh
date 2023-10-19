@@ -1,5 +1,7 @@
 #!/bin/bash
 
+source ~/.bashrc
+
 # Variables
 SCRIPT_PATH="$(dirname "$(readlink -f "$0")")"
 VENV_PATH="$SCRIPT_PATH/venv"
