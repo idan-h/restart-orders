@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Variables
-SCRIPT_PATH="$(dirname "$0")"
+SCRIPT_PATH="$(dirname "$(readlink -f "$0")")"
 VENV_PATH="$SCRIPT_PATH/venv"
 LOCK_FILE="$SCRIPT_PATH/cron.lock"
 

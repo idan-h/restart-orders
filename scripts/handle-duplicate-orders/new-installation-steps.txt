@@ -17,7 +17,8 @@ echo "export MONDAY_API_KEY=$API_KEY" >> ~/.profile
 sudo apt update
 sudo apt install git
 sudo apt install python3
-# sudo apt install python3-pip
+sudo apt install python3-pip
+sudo apt install python3-venv
 sudo apt install cron
 sudo systemctl enable cron
 sudo systemctl start cron

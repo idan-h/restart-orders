@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Get the full path of the directory where setup.sh resides
-SCRIPT_PATH="$(dirname "$0")"
+SCRIPT_PATH="$(dirname "$(readlink -f "$0")")"
 
 # Path to the virtual environment and the cron script
 VENV_PATH="$SCRIPT_PATH/venv"
