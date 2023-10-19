@@ -12,7 +12,7 @@ def create_order(api_key, dto):
     order_id = uuid.uuid4().hex
 
     new_item = monday_board.insert_item(dto['name'], {
-        'short_text': dto['note'],  # Note
+        'long_text': dto['note'],  # Note
         'text8': dto['phone'],  # Phone
         'text0': dto['unit'],  # Unit
         'text7': dto['job'],  # Job
@@ -43,7 +43,7 @@ def update_order(api_key, dto):
     is_cancel = dto.get('is_cancel', False)
 
     column_values = {'status': 'בוטל'} if is_cancel else {
-        'short_text': dto['note'],  # Note
+        'long_text': dto['note'],  # Note
         'dropdown': dto['location'],  # Location
     }
 
@@ -82,7 +82,7 @@ def get_order(api_key, order_id):
 
     return {
         'name': order['name'],
-        'note': column_values['short_text'],  # Note
+        'note': column_values['long_text'],  # Note
         'phone': column_values['text8'],  # Phone
         'unit': column_values['text0'],  # Unit
         'job': column_values['text7'],  # Job
