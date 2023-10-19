@@ -29,8 +29,5 @@ pip install -r $SCRIPT_PATH/requirements.txt
 # Run your script
 python $SCRIPT_PATH/script.py
 
-# Deactivate the virtual environment
-deactivate
-
 # Remove lock file
 rm $LOCK_FILE
