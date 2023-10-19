@@ -134,7 +134,8 @@ def handle_duplicate_orders(api_key):
     df.loc[mask, 'similar_id'] = df[mask].groupby('text0')['meta_id'].transform(
         lambda x: x.iloc[0] if len(x) > 1 else None)
 
-    df_has_similar_id = df[df['similar_id'].notna() & df['text42'].isna() & df['status'] == 'ממתין']
+    df_has_similar_id = df[df['similar_id'].notna() & df['text42'].isna()]
+    df_has_similar_id = df_has_similar_id[df_has_similar_id['status'] == 'ממתין']
 
     for index, row in df_has_similar_id.iterrows():
         result = monday_board.change_multiple_column_values({
