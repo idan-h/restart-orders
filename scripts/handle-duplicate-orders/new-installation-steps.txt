@@ -1,0 +1,37 @@
+
+# Generate key, and add to github ssh keys or the repo deploy keys
+
+ssh-keygen -t rsa -b 4096 -C "github"
+cat ~/.ssh/id_rsa.pub
+
+
+# Set the api key (REPALCE WITH ACTUAL API KEY)
+
+API_KEY="<api_key>"
+export MONDAY_API_KEY=$API_KEY
+echo "export MONDAY_API_KEY=$API_KEY" >> ~/.profile
+
+
+# Install dependencies
+
+sudo apt update
+sudo apt install git
+sudo apt install python3
+# sudo apt install python3-pip
+sudo apt install cron
+sudo systemctl enable cron
+sudo systemctl start cron
+
+
+# Setup python symlink
+
+sudo ln -s $(which python3) /usr/bin/python
+
+
+# Clone repo and run setup script
+
+git clone git@github.com:idan-h/restart-orders.git ./repo
+cd ./repo
+chmod +x ./scripts/handle-duplicate-orders/setup.sh
+./scripts/handle-duplicate-orders/setup.sh
+
