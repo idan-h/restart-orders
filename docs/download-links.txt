@@ -1,0 +1,6 @@
+https://help.okta.com/oag/en-us/content/topics/access-gateway/deploy-oci-cli.htm
+
+https://docs.oracle.com/en-us/iaas/Content/Functions/Tasks/functionsquickstartlocalhost.htm#functionsquickstartlocalhosts_topic_set_up_signing_key
+
+https://github.com/fnproject/fn/blob/master/README.md
+
