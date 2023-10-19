@@ -18,7 +18,7 @@ touch $LOCK_FILE
 source $VENV_PATH/bin/activate
 
 # Update the repository
-cd $SCRIPT_PATH && git pull
+cd $SCRIPT_PATH && git reset --hard && git pull
 
 # Install/update dependencies
 pip install -r $SCRIPT_PATH/requirements.txt
