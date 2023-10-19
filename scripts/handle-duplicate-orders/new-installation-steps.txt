@@ -5,13 +5,6 @@ ssh-keygen -t rsa -b 4096 -C "github"
 cat ~/.ssh/id_rsa.pub
 
 
-# Set the api key (REPALCE WITH ACTUAL API KEY)
-
-API_KEY="<api_key>"
-export MONDAY_API_KEY=$API_KEY
-echo "export MONDAY_API_KEY=$API_KEY" >> ~/.profile
-
-
 # Install dependencies
 
 sudo apt update
@@ -35,4 +28,12 @@ git clone git@github.com:idan-h/restart-orders.git ./repo
 cd ./repo
 chmod +x ./scripts/handle-duplicate-orders/setup.sh
 ./scripts/handle-duplicate-orders/setup.sh
+
+
+# Set the api key (REPALCE WITH ACTUAL API KEY)
+
+API_KEY="<api_key>"
+export MONDAY_API_KEY=$API_KEY
+echo "export MONDAY_API_KEY=$API_KEY" >> ~/.profile
+(echo "MONDAY_API_KEY=$API_KEY" && crontab -l ) | crontab -
 
