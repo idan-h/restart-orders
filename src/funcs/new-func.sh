@@ -9,7 +9,7 @@ destination="$(dirname "$0")/$func_name"
 # Check if the directory exists
 if [ ! -d "$destination" ]; then
     # Directory doesn't exist, so copy the folder
-    cp -R ../.example_func "$destination"
+    cp -R ./.example_func "$destination"
     
     # Replace a string inside a file in the copied folder
     # Detect the system and use the appropriate sed command
