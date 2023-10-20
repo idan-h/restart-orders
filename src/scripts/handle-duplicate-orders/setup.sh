@@ -20,4 +20,6 @@ chmod +x $CRON_SCRIPT
 
 # Set up the cron job
 # This command will append the new job to the crontab, preserving existing jobs
-(crontab -l 2>/dev/null; echo "$CRON_SCHEDULE $CRON_SCRIPT") | crontab -
+if ! (crontab -l 2>/dev/null | grep -q "$CRON_SCRIPT"); then
+    (crontab -l 2>/dev/null; echo "MONDAY_API_KEY=$MONDAY_API_KEY"; echo "$CRON_SCHEDULE $CRON_SCRIPT") | crontab -
+fi
