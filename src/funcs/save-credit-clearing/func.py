@@ -16,10 +16,17 @@ def handler(ctx, data: io.BytesIO = None):
     j = json.loads(data.getvalue())
     new_item = insert_clearing_transaction(api_key , j)
 
-    return response.Response(
-        ctx, response_data=json.dumps(
-            {"message": "Successfully created item"  , "id" : str(new_item['create_item']['id'])}),
-        headers={"Content-Type": "application/json"}
-    )
+    if new_item:
+        return response.Response(
+            ctx, response_data=json.dumps(
+                {"message": "Successfully created item"  , "id" : str(new_item['create_item']['id'])}),
+            headers={"Content-Type": "application/json"}
+        )
+    else:
+        return response.Response(
+            ctx, response_data=json.dumps(
+                {"message": "Failed to create item"}),
+            headers={"Content-Type": "application/json"}
+        )
 
 
