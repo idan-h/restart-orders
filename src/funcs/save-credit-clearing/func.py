@@ -27,4 +27,5 @@ def handler(ctx, data: io.BytesIO = None):
             ctx, response_data=json.dumps(
                 {"message": "Failed to create item"}),
             headers={"Content-Type": "application/json"}
+        )
 
