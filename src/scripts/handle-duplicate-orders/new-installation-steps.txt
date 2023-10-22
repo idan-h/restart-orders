@@ -31,5 +31,5 @@ echo "export MONDAY_API_KEY=$MONDAY_API_KEY" >> ~/.profile
 # Clone repo and run setup script
 
 git clone git@github.com:idan-h/restart-orders.git ./repo
-chmod +x ./repo/scripts/handle-duplicate-orders/setup.sh
-./repo/scripts/handle-duplicate-orders/setup.sh
+chmod +x ./repo/src/scripts/handle-duplicate-orders/setup.sh
+./repo/src/scripts/handle-duplicate-orders/setup.sh
