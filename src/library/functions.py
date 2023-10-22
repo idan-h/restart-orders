@@ -153,7 +153,7 @@ def insert_clearing_transaction(api_key , j):
                                                   return_items_as='json')
     if res['data']['items_page_by_column_values']['items']:
         print("item already exists")
-        return
+        return False
 
     # insert the json to monday board
     new_item = monday_board.insert_item(j['donor']['donor_email'], {
@@ -193,4 +193,4 @@ def insert_clearing_transaction(api_key , j):
         monday_board.get_column_id('total_amount'): j['transfer']['total_amount'],
         monday_board.get_column_id('uk_tax_payer'): j['transfer']['uk_tax_payer'],
     })
-    return new_item
+    return True
