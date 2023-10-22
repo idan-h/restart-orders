@@ -151,7 +151,7 @@ def insert_clearing_transaction(api_key , j):
 
     res = monday_board.get_items_by_column_values(monday_board.get_column_id("id"), j['donation']['id'],
                                                   return_items_as='json')
-    if res:
+    if res['data']['items_page_by_column_values']['items']:
         print("item already exists")
         return
 
