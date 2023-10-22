@@ -19,7 +19,7 @@ def handler(ctx, data: io.BytesIO = None):
     if new_item:
         return response.Response(
             ctx, response_data=json.dumps(
-                {"message": "Successfully created item"  , "id" : str(new_item['create_item']['id'])}),
+                {"message": "Successfully created item"}),
             headers={"Content-Type": "application/json"}
         )
     else:
