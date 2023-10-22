@@ -148,6 +148,13 @@ def handle_duplicate_orders(api_key):
 def insert_clearing_transaction(api_key , j):
     monday_api = MondayApi(api_key, API_URL)
     monday_board = MondayBoard(monday_api, id=DONATIONS_BOARD_ID)
+
+    res = monday_board.get_items_by_column_values(monday_board.get_column_id("id"), j['donation']['id'],
+                                                  return_items_as='json')
+    if res:
+        print("item already exists")
+        return
+
     # insert the json to monday board
     new_item = monday_board.insert_item(j['donor']['donor_email'], {
         monday_board.get_column_id('amount'): j['donation']['amount'],
@@ -168,7 +175,7 @@ def insert_clearing_transaction(api_key , j):
         monday_board.get_column_id('recurring_months'): j['donation']['recurring_months'],
         monday_board.get_column_id('recurring_payment_number'): j['donation']['recurring_payment_number'],
         monday_board.get_column_id('donated_with_account'): j['donor']['donated_with_account'],
-        monday_board.get_column_id('donor_email'): j['donor']['donor_email'],
+        monday_board.get_column_id('donor_email'): {"text":j['donor']['donor_email'],"email":j['donor']['donor_email']},
         monday_board.get_column_id('donor_first_name'): j['donor']['donor_first_name'],
         monday_board.get_column_id('donor_last_name'): j['donor']['donor_last_name'],
         monday_board.get_column_id('donor_phone'): j['donor']['donor_phone'],

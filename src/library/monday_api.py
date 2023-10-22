@@ -100,9 +100,9 @@ class MondayBoard:
         if self.columns_df is None:
             self.get_columns()
         res = self.columns_df[self.columns_df['title'] == column_title]['id'].values
-        if not len(res.values) :
+        if not len(res) :
             return []
-        return res.values[0]
+        return res[0]
 
     def list_groups(self):
         return pd.DataFrame(self.get_board_details()['groups'][0])
