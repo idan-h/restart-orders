@@ -253,7 +253,7 @@ const Form = ({ updateForm }) => {
         <div className='header'>
           <img src='/content/Logo.png' alt='LOGO' className='logo' />
           <div className='title'>
-            {updateForm ? 'עדכון טופס' : 'בקשה לתרומה לציוד לחימה '}
+            {updateForm ? 'עדכון הזמנה' : 'בקשה לתרומה לציוד לחימה '}
           </div>
           <div className='description' hidden={updateForm}>
             טופס זה מיועד למשרתים פעילים בצה״ל סדיר ,מילואים וקבע. אם הינך אדם
