@@ -187,41 +187,68 @@ class MondayBoard:
             return json_normalize(self.mondayApi.query(query, return_items_as=return_items_as)['boards'][0]['items'])
 
     def get_items_by_column_values(self, column_id, column_value, return_items_as='dataframe', limit=1):
-        QUERY_TEMPLATE = '''
-                {{
-                items_page_by_column_values(board_id:{board_id}, limit: {limit}, columns: [{{column_id: "{column_id}",
-                column_values: ["{column_value}"]}}]) {{
-                    items {{
-                        id
-                        name
-                        column_values {{
-                            id
-                            text
-                            type
-                        }}
-                        subitems {{
+        if limit < 0:
+            QUERY_TEMPLATE = '''
+                    {{
+                    items_page_by_column_values(board_id:{board_id}, columns: [{{column_id: "{column_id}",
+                    column_values: ["{column_value}"]}}]) {{
+                        items {{
                             id
                             name
                             column_values {{
                                 id
-                                value
+                                text
                                 type
                             }}
+                            subitems {{
+                                id
+                                name
+                                column_values {{
+                                    id
+                                    value
+                                    type
+                                }}
+                            }}
+                          }}
                         }}
-                      }}
                     }}
-                }}
-                '''
+                    '''
+            query = QUERY_TEMPLATE.format(board_id=str(self.board_id), column_id=column_id, column_value=column_value)
+        else:
+            QUERY_TEMPLATE = '''
+                    {{
+                    items_page_by_column_values(board_id:{board_id}, columns: [{{column_id: "{column_id}",
+                    column_values: ["{column_value}"]}}], limit:{limit}) {{
+                        items {{
+                            id
+                            name
+                            column_values {{
+                                id
+                                text
+                                type
+                            }}
+                            subitems {{
+                                id
+                                name
+                                column_values {{
+                                    id
+                                    value
+                                    type
+                                }}
+                            }}
+                          }}
+                        }}
+                    }}
+                    '''
+            query = QUERY_TEMPLATE.format(board_id=str(self.board_id), column_id=column_id, column_value=column_value , limit=limit)
 
-        query = QUERY_TEMPLATE.format(board_id=str(self.board_id), column_id=column_id, column_value=column_value,
-                                      limit=limit)
+
 
         if return_items_as == 'json':
             return self.mondayApi.query(query, return_items_as=return_items_as).json()
         else:
             r = json_normalize(self.mondayApi.query(query, return_items_as=return_items_as))
             return r
-
     def write_update(self, item_id, update_text):
         QUERY_TEMPLATE = '''
               mutation {{
