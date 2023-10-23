@@ -13,10 +13,11 @@ def handler(ctx: context, data: io.BytesIO = None):
     logger = logging.getLogger()
 
     API_KEY = ctx.Config()['API_KEY']
+    formtype = json.loads(data.getvalue()).get('formtype' , 'IDF')
 
     response_dict = {}
     try:
-        response_dict = get_products(API_KEY)
+        response_dict = get_products(API_KEY , formtype)
     except (Exception,):
         logger.info('error: ' + traceback.format_exc().replace('\n', ''))
         response_dict['error'] = 'An error has occurred'
