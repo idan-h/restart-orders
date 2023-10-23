@@ -99,7 +99,10 @@ def get_order(api_key, order_id):
 def get_products(api_key, form_type):
     monday_api = MondayApi(api_key, API_URL)
     monday_board = MondayBoard(monday_api, id=PRODUCT_BOARD_ID)
-    items = monday_board.get_items_by_column_values( PRODUCT_BOARD_FORM_TYPE_ID, form_type, return_items_as='json')\
+    items = monday_board.get_items_by_column_values(
+        PRODUCT_BOARD_FORM_TYPE_ID, form_type,
+        return_items_as='json',
+        limit=50)\
         .get('data').get('items_page_by_column_values').get('items')
     products = [{'name': i.get('name'), 'product_number': int(i.get('id'))} for i in items]
 
