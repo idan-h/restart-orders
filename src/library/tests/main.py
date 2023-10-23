@@ -14,6 +14,7 @@ if __name__ == "__main__":
         'email': "adsf@asdf.com",  # Email
         'location': 'דרום',  # Location
         'tenant': 'example',
+        'type': 'EMR',
         'subitems': [{
             'name': 'lalala',
             'product_number': 1289515528,

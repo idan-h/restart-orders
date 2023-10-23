@@ -28,6 +28,7 @@ const Form = ({ updateForm }) => {
 
   const [isLoading, setIsLoading] = useState(updateForm); // set to true if updateForm is true, else false
   const [errorType, setErrorType] = useState('');
+  const [formType, setFormType] = useState('IDF');
 
   const navigate = useNavigate();
 
@@ -44,10 +45,9 @@ const Form = ({ updateForm }) => {
     defaultValues: defaultValues,
   });
 
-  useEffect(() => {
-    setIsLoading(true);
+  const fetchProducts = (currentType) => {
     fetch(
-      'https://njdfolzzmvnaay5oxqife4tuwy.apigateway.il-jerusalem-1.oci.customer-oci.com/v1/get-products'
+      `https://njdfolzzmvnaay5oxqife4tuwy.apigateway.il-jerusalem-1.oci.customer-oci.com/v1/get-products`
     )
       .then((res) => res.json())
       .then((data) => {
@@ -56,15 +56,22 @@ const Form = ({ updateForm }) => {
           setErrorType('error');
           return;
         }
+
+        data = data.filter(item => item.type.includes(currentType));
+
         setAvailableItems([...data]);
       })
       .catch((error) => {
         setIsLoading(false);
 
-        console.error('There was an error fetching the data:', error);
+        console.error(`There was an error fetching the data: ${error}`);
         setErrorType('error');
         return;
       });
+  }
+
+  useEffect(() => {
+    setIsLoading(true);
 
     if (updateForm) {
       fetch(
@@ -92,16 +99,25 @@ const Form = ({ updateForm }) => {
             );
           });
 
+          let type = data.type ?? 'IDF';
+          setFormType(type);
           reset(data);
+          fetchProducts(type)
 
           setIsLoading(false);
         })
         .catch((error) => {
           setIsLoading(false);
           setErrorType('error');
-          console.error('There was an error fetching the data:', error);
+          console.error(`There was an error fetching the data: ${error}`);
           return;
         });
+    }
+    else {
+      let params = new URLSearchParams(window.location.search);
+      let type = params.get('type') ?? 'IDF';
+      setFormType(type);
+      fetchProducts(type)
     }
   }, []);
 
@@ -140,11 +156,10 @@ const Form = ({ updateForm }) => {
           setIsLoading(false);
 
           if ('error' in data) {
-            console.log(data.error);
             toast.error('תקלה בעת שליחת הטופס, אנא נסו שוב במועד מאוחר יותר');
             return;
           }
-          toast.success('הבקשה שלך בוטלה בהצלה!');
+          toast.success('הבקשה שלך בוטלה בהצלחה!');
 
           window.location.reload(false);
         })
@@ -165,6 +180,7 @@ const Form = ({ updateForm }) => {
       let params = new URLSearchParams(window.location.search);
       let tenant = params.get('tenant');
       formData.tenant = tenant;
+      formData.type = formType;
     }
     setIsLoading(true);
 
@@ -253,12 +269,16 @@ const Form = ({ updateForm }) => {
         <div className='header'>
           <img src='/content/Logo.png' alt='LOGO' className='logo' />
           <div className='title'>
-            {updateForm ? 'עדכון הזמנה' : 'בקשה לתרומה לציוד לחימה '}
+            {updateForm ? 'עדכון הזמנה' : (formType == 'EMR' ? 'דרישת ציוד לכח כוננות' : 'בקשה לתרומה לציוד לחימה ')}
           </div>
-          <div className='description' hidden={updateForm}>
+          <div className='description' hidden={updateForm || formType != 'IDF'}>
             טופס זה מיועד למשרתים פעילים בצה״ל סדיר ,מילואים וקבע. אם הינך אדם
             פרטי וברצונך לסייע לכח לוחם בהשלמת ציוד , אנא הפנה טופס זה לקצין
             האמל״ח או לגורם רלוונטי ביחידה. נא לרכז את כל הפריטים בטופס אחד
+          </div>
+          <div className='description' hidden={updateForm || formType != 'EMR'}>
+            טופס זה מיועד לכחות כוננות קיימים ובהתהוות.
+            אנו מבקשים שהטופס ימולא רק בידי איש הקשר הרלוונטי שאחראי באופן רשמי על הצטיידות כח הכוננות
           </div>
         </div>
         <form className='form' onSubmit={handleSubmit(onSubmit)}>
@@ -329,7 +349,7 @@ const Form = ({ updateForm }) => {
             </div>
             <div className='field-container'>
               <div className='field-title'>
-                <label>יחידה</label>
+                <label>{formType == 'EMR' ? "ישוב" : "יחידה"}</label>
                 <span className='required'>*</span>
                 <div className='error-message'>{errors.unit?.message}</div>
               </div>
@@ -337,7 +357,7 @@ const Form = ({ updateForm }) => {
                 disabled={updateForm}
                 className='text-field'
                 type='text'
-                placeholder='יחידה'
+                placeholder={formType == 'EMR' ? "ישוב" : "יחידה"}
                 {...register('unit', { required: 'חובה' })}
               />
             </div>
@@ -372,7 +392,11 @@ const Form = ({ updateForm }) => {
 
                 <option value='צפון'>צפון</option>
                 <option value='דרום'>דרום</option>
-                <option value='אחר'>אחר</option>
+                {
+                  formType == 'EMR'
+                  ? <option value='מרכז'>מרכז</option>
+                  : <option value='אחר'>אחר</option>
+                }
               </select>
             </div>
           </div>

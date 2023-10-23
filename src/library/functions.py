@@ -20,6 +20,7 @@ def create_order(api_key, dto):
         'dropdown': dto['location'],  # Location
         'color': {"label": dto['tenant']},  # Tenant Code
         'text5': order_id,  # Custom Id
+        'status4': {"label": dto.get('type', 'IDF')},  # Form Type
     })
     new_item_id = int(new_item['create_item']['id'])
 
@@ -88,6 +89,7 @@ def get_order(api_key, order_id):
         'job': column_values['text7'],  # Job
         'email': column_values['email'],  # Email
         'location': column_values['dropdown'],  # Location
+        'type': column_values['status4'],  # From Type
         'subitems': [{
             'name': i['name'],
             'product_number': json.loads(i['connect_boards'])['linkedPulseIds'][0]['linkedPulseId'],
@@ -96,11 +98,16 @@ def get_order(api_key, order_id):
     }
 
 
-def get_products(api_key, form_type):
+def get_products(api_key):
     monday_api = MondayApi(api_key, API_URL)
     monday_board = MondayBoard(monday_api, id=PRODUCT_BOARD_ID)
-    items = monday_board.get_items_by_column_values( PRODUCT_BOARD_FORM_TYPE_ID, formtype , return_items_as='json' , limit= -1).get('data').get('items_page_by_column_values').get('items')
-    products = [{'name': i.get('name'), 'product_number': int(i.get('id'))} for i in items]
+    items = monday_board.get_items(return_items_as='json').get('data').get('boards')[0].get('items_page').get('items')
+
+    products = [{
+        'name': i.get('name'),
+        'product_number': int(i.get('id')),
+        'type': next((z['text'] for z in i.get('column_values') if z['id'] == 'dropdown'), None)
+    } for i in items]
 
     return products
 
