@@ -75,11 +75,15 @@ def get_order(api_key, order_id):
     if column_values.get('status') == 'בוטל':
         return {'is_cancel': True}
 
+    products = get_products(api_key)
+
     subitems = order.get('subitems', [])
 
     for item in subitems:
         item.update({v['id']: v['value'] for v in item.get('column_values')})
         del item['column_values']
+
+
 
     return {
         'name': order['name'],
@@ -91,12 +95,11 @@ def get_order(api_key, order_id):
         'location': column_values['dropdown'],  # Location
         'type': column_values['status4'],  # From Type
         'subitems': [{
-            'name': i['name'],
+            'name': list(filter(lambda product: product['product_number'] == json.loads(i['connect_boards'])['linkedPulseIds'][0]['linkedPulseId'] , products))[0]['name'],
             'product_number': json.loads(i['connect_boards'])['linkedPulseIds'][0]['linkedPulseId'],
             'quantity': int(i['numbers'].replace('"', '')),
         } for i in subitems]
     }
-
 
 def get_products(api_key):
     monday_api = MondayApi(api_key, API_URL)
