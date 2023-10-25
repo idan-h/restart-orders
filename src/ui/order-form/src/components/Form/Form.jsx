@@ -9,6 +9,7 @@ import ConfirmationModal from '../ConfirmationModal/ConfirmationModal';
 import ErrorPage from '../ErrorPage/ErrorPage';
 import Loader from '../Loader/Loader';
 import './form.css';
+import {fixCorruptResponse} from "../../utils/fixCorruptResponse";
 
 const defaultValues = {
   name: '',
@@ -88,6 +89,7 @@ const Form = ({ updateForm }) => {
             setErrorType('cancel');
             return;
           }
+          fixCorruptResponse(data, availableItems);
           setSelectedItems([...data.subitems]);
 
           setAvailableItems((currentAvailableItems) => {
@@ -312,7 +314,7 @@ const Form = ({ updateForm }) => {
                   pattern: {
                     message: 'מספר טלפון זה אינו תקין',
                     value:
-                      /^[+]?[(]?[0-9]{3}[)]?[-\s.]?[0-9]{3}[-\s.]?[0-9]{4,6}$/,
+                      /^[+]?[(]?[0-9]{3}[)]?[-\s.]?[0-9]{3}[-\s.]?[0-9]{4,7}$/,
                   },
                   required: 'חובה',
                   minLength: {
@@ -320,7 +322,7 @@ const Form = ({ updateForm }) => {
                     message: 'מספר טלפון זה אינו תקין',
                   },
                   maxLength: {
-                    value: 12,
+                    value: 14,
                     message: 'מספר טלפון זה אינו תקין',
                   },
                 })}
@@ -330,7 +332,6 @@ const Form = ({ updateForm }) => {
             <div className='field-container'>
               <div className='field-title'>
                 <label>כתובת מייל</label>
-                <span className='required'>*</span>
                 <div className='error-message'>{errors.email?.message}</div>
               </div>
               <input
@@ -339,7 +340,6 @@ const Form = ({ updateForm }) => {
                 type='email'
                 placeholder='כתובת מייל'
                 {...register('email', {
-                  required: 'חובה',
                   pattern: {
                     value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
                     message: 'כתובת מייל אינה תקינה',
