@@ -9,7 +9,6 @@ import ErrorPage from '../ErrorPage/ErrorPage';
 import Loader from '../Loader/Loader';
 import ChooseItem from '../ChooseItem/ChooseItem';
 import './form.css';
-import {fixCorruptResponse} from "../../utils/fixCorruptResponse";
 
 const defaultValues = {
   name: '',
@@ -34,15 +33,10 @@ const Form = ({ updateForm }) => {
 
   const [isLoading, setIsLoading] = useState(updateForm); // set to true if updateForm is true, else false
   const [errorType, setErrorType] = useState('');
-  const [formType, setFormType] = useState('IDF'); //noaa
+  const [formType, setFormType] = useState('IDF');
   const navigate = useNavigate();
 
   const { id } = useParams();
-
-  const itemTypes = [
-    { type: 'equipment', setSelectedItems: setSelectedEquipmentItems, setAvailableItems: setAvailableEquipmentItems },
-    { type: 'sewing', setSelectedItems: setSelectedSewingItems, setAvailableItems: setAvailableSewingItems }
-  ];
 
   const {
     register,
@@ -55,7 +49,7 @@ const Form = ({ updateForm }) => {
     defaultValues: defaultValues,
   });
 
-  const fetchProducts = (currentType) => { //noaa
+  const fetchProducts = (currentType, afterItemsFetched = null) => {
     fetch(
       `https://njdfolzzmvnaay5oxqife4tuwy.apigateway.il-jerusalem-1.oci.customer-oci.com/v1/get-products`
     )
@@ -67,11 +61,15 @@ const Form = ({ updateForm }) => {
           return;
         }
 
-        data = data.filter(item => item.type.includes(currentType));
+        let equipment = data.filter(item => item.type.includes(currentType));
+        let sewing = data.filter(item => item.type.includes("SEW"));
 
-        itemTypes.forEach(({ type, setSelectedItems, setAvailableItems }) => {
-          setAvailableItems([...data]);
-        });
+        setAvailableEquipmentItems([...equipment]);
+        setAvailableSewingItems([...sewing]);
+
+        if (afterItemsFetched) {
+          afterItemsFetched(data);
+        }
       })
       .catch((error) => {
         setIsLoading(false);
@@ -100,28 +98,37 @@ const Form = ({ updateForm }) => {
             setErrorType('cancel');
             return;
           }
-          fixCorruptResponse(data, availableItems);
-          const subitems = [...data.subitems];
-
-          itemTypes.forEach(({ type, setSelectedItems, setAvailableItems }) => {
-            setSelectedItems(subitems);
-
-            setAvailableItems((currentAvailableItems) => {
-              return currentAvailableItems.filter(
-                (item) =>
-                !data.subitems.some(
-                  (subitem) => subitem.product_number === item.product_number
-                )
-            );
-            });
-          });
 
           let type = data.type ?? 'IDF';
           setFormType(type);
           reset(data);
-          fetchProducts(type)
+          fetchProducts(type, (allProducts) => {
+            let subitems = data.subitems.map((subItem) => {
+                let product = allProducts.find((item) => {
+                    return item.product_number === subItem.product_number
+                });
 
-          setIsLoading(false);
+                return {
+                    ...subItem,
+                    name: product?.name || '',
+                    type: product?.type || '',
+                }
+            })
+
+            setSelectedEquipmentItems(subitems.filter((item) => item.type != 'SEW'));
+            setSelectedSewingItems(subitems.filter(item => item.type == 'SEW'));
+
+            for (let setAvailableItems of [setAvailableEquipmentItems, setAvailableSewingItems]) {
+                setAvailableItems(currentAvailableItems => {
+                    return currentAvailableItems.filter(item => 
+                        !data.subitems.some(subitem => subitem.product_number === item.product_number)
+                    );
+                });
+            }
+
+            setIsLoading(false);
+
+          });
         })
         .catch((error) => {
           setIsLoading(false);
@@ -190,6 +197,7 @@ const Form = ({ updateForm }) => {
 
   const onSubmit = (formData) => {
     formData.subitems = [...selectedEquipmentItems, ...selectedSewingItems];
+    formData.email = ''
 
     if (updateForm) {
       formData.id = id;
@@ -215,7 +223,7 @@ const Form = ({ updateForm }) => {
         res.json().then((data) => {
           setIsLoading(false);
 
-          if ('error' in data) {
+          if ('error' in data || 'message' in data) {
             toast.error('תקלה בעת שליחת הטופס, אנא נסו שוב במועד מאוחר יותר');
             return;
           }
@@ -302,24 +310,6 @@ const Form = ({ updateForm }) => {
 
             <div className='field-container'>
               <div className='field-title'>
-                <label>כתובת מייל</label>
-                <div className='error-message'>{errors.email?.message}</div>
-              </div>
-              <input
-                disabled={updateForm}
-                className='text-field'
-                type='email'
-                placeholder='כתובת מייל'
-                {...register('email', {
-                  pattern: {
-                    value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-                    message: 'כתובת מייל אינה תקינה',
-                  },
-                })}
-              />
-            </div>
-            <div className='field-container'>
-              <div className='field-title'>
                 <label>{formType == 'EMR' ? "ישוב" : "יחידה"}</label>
                 <span className='required'>*</span>
                 <div className='error-message'>{errors.unit?.message}</div>
@@ -338,7 +328,8 @@ const Form = ({ updateForm }) => {
                 <span className='required'>*</span>
                 <div className='error-message'>{errors.job?.message}</div>
               </div>
-              <select
+              {formType == 'EMR'
+              ? (<select
                 className='select-field'
                 defaultValue={watch('job')}
                 {...register('job', { required: 'חובה' })}
@@ -350,7 +341,14 @@ const Form = ({ updateForm }) => {
                 <option value='רבש"צ'>רבש"צ</option>
                 <option value='קמב"צ'>קמב"צ</option>
                 <option value='אחר'>אחר</option>
-              </select>
+              </select>)
+              : (<input
+                disabled={updateForm}
+                className='text-field'
+                type='text'
+                placeholder='תפקיד'
+                {...register('job', { required: 'חובה' })}
+              />)}              
             </div>
             <div className='field-container'>
               <div className='field-title'>
