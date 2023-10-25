@@ -303,7 +303,6 @@ const Form = ({ updateForm }) => {
             <div className='field-container'>
               <div className='field-title'>
                 <label>כתובת מייל</label>
-                <span className='required'>*</span>
                 <div className='error-message'>{errors.email?.message}</div>
               </div>
               <input
@@ -311,8 +310,7 @@ const Form = ({ updateForm }) => {
                 className='text-field'
                 type='email'
                 placeholder='כתובת מייל'
-                {...register('email', updateForm? {} : {
-                  required: 'חובה',
+                {...register('email', {
                   pattern: {
                     value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
                     message: 'כתובת מייל אינה תקינה',
