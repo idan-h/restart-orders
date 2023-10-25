@@ -1,13 +1,14 @@
 /* eslint-disable react/prop-types */
 // eslint-disable-next-line react/prop-types
 import Modal from 'react-modal';
+import Select from 'react-select';
 import { useEffect, useState } from 'react';
 import './add-item-modal.css';
 
 const AddItemModal = ({
   selectedItems,
-  onAddItem,
-  onEditItem,
+  setSelectedItems,
+  setAvailableItems,
   availableItems,
   isModalOpen,
   onRequestClose,
@@ -23,6 +24,33 @@ const AddItemModal = ({
       setInputQuantity(itemToEdit.quantity);
     }
   }, [itemToEdit]);
+
+  const onAddItem = (newItem, availableItems, setAvailableItems, setSelectedItems) => {
+    setAvailableItems(
+      availableItems.filter((i) => i.product_number !== newItem.product_number)
+    );
+    setSelectedItems((currnet) => [...currnet, newItem]);
+    setItemToEdit(null);
+  };
+
+  const onEditItem = (updatedItem, selectedItems, setSelectedItems, availableItems, setAvailableItems) => {
+    setSelectedItems(
+      selectedItems.map((item) =>
+        item.product_number === itemToEdit.product_number ? updatedItem : item
+      )
+    );
+
+    setAvailableItems(
+      availableItems.filter(
+        (i) => i.product_number !== updatedItem.product_number
+      )
+    );
+    if (itemToEdit.product_number !== updatedItem.product_number) {
+      setAvailableItems((currnet) => [...currnet, itemToEdit]);
+    }
+
+    setItemToEdit(null);
+  };
 
   const closeModal = () => {
     setInputQuantity(1);
@@ -42,7 +70,7 @@ const AddItemModal = ({
       ...selectedItem,
       quantity: inputQuantity <= 0 ? 1 : inputQuantity,
     };
-    itemToEdit ? onEditItem(finalItem) : onAddItem(finalItem);
+    itemToEdit ? onEditItem(finalItem, selectedItems, setSelectedItems, availableItems, setAvailableItems) : onAddItem(finalItem, availableItems, setAvailableItems, setSelectedItems);
     setInputQuantity(1);
     setSelectedItem(null);
     onRequestClose();
@@ -51,6 +79,28 @@ const AddItemModal = ({
   const updateQuantity = (quanity) => {
     setInputQuantity(quanity);
   };
+
+  const itemOptions = [
+    {
+      label: 'בחר פריט',
+      value: '',
+      isDisabled: true,
+    },
+    itemToEdit
+      ? {
+          label: itemToEdit.name,
+          value: itemToEdit.name,
+        }
+      : null,
+    ...availableItems.map((item) => ({
+      label: item.name,
+      value: item.name,
+      className: 'option',
+      key: item.product_number,
+    })),
+  ].filter((option) => option !== null);
+  
+
   return (
     <Modal
       isOpen={isModalOpen}
@@ -63,28 +113,17 @@ const AddItemModal = ({
         <div className='title'>הוספת/עדכון פריט</div>
         <div className='modal-form'>
           <div className='fields'>
-            <select
-              required={selectedItems.length === 0}
-              className='select-field'
-              value={selectedItem?.name ? selectedItem.name : ''}
-              onChange={(e) => handleOnChange(e.target.value)}
-            >
-              <option disabled={true} value=''>
-                בחר פריט
-              </option>
-              {itemToEdit ? (
-                <option value={itemToEdit.name}>{itemToEdit.name}</option>
-              ) : null}
-              {availableItems.map((item) => (
-                <option
-                  className='option'
-                  key={item.product_number}
-                  value={item.name}
-                >
-                  {item.name}
-                </option>
-              ))}
-            </select>
+          <Select
+            required={selectedItems.length === 0}
+            className="select-field"
+            value={itemOptions.find((item) => item.value === (selectedItem?.name || ''))}
+            onChange={(selectedOption) => handleOnChange(selectedOption.value)}
+            options={itemOptions}
+            isSearchable={true}
+            isClearable={false}
+            placeholder="בחר פריט"
+          />
+
             {selectedItem ? (
               <input
                 type='number'

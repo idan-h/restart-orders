@@ -1,13 +1,13 @@
 /* eslint-disable react/prop-types */
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { Edit, Plus, X } from 'react-feather';
 import { toast } from 'react-toastify';
 import { useNavigate, useParams } from 'react-router-dom';
 import AddItemModal from '../AddItemModal/AddItemModal';
 import ConfirmationModal from '../ConfirmationModal/ConfirmationModal';
 import ErrorPage from '../ErrorPage/ErrorPage';
 import Loader from '../Loader/Loader';
+import ChooseItem from '../ChooseItem/ChooseItem';
 import './form.css';
 import {fixCorruptResponse} from "../../utils/fixCorruptResponse";
 
@@ -22,18 +22,27 @@ const defaultValues = {
   subitems: [],
 };
 const Form = ({ updateForm }) => {
-  const [selectedItems, setSelectedItems] = useState([]);
-  const [availableItems, setAvailableItems] = useState([]);
+  const equipmentItems = 'equipmentItems'
+  const sewingItems = 'sewingItems'
+  const confirmation = 'confirmation'
+  const [selectedEquipmentItems, setSelectedEquipmentItems] = useState([]);
+  const [selectedSewingItems, setSelectedSewingItems] = useState([]);
+  const [availableEquipmentItems, setAvailableEquipmentItems] = useState([]);
+  const [availableSewingItems, setAvailableSewingItems] = useState([]);
   const [modalToOpen, setModalToOpen] = useState(null);
   const [itemToEdit, setItemToEdit] = useState(null);
 
   const [isLoading, setIsLoading] = useState(updateForm); // set to true if updateForm is true, else false
   const [errorType, setErrorType] = useState('');
-  const [formType, setFormType] = useState('IDF');
-
+  const [formType, setFormType] = useState('IDF'); //noaa
   const navigate = useNavigate();
 
   const { id } = useParams();
+
+  const itemTypes = [
+    { type: 'equipment', setSelectedItems: setSelectedEquipmentItems, setAvailableItems: setAvailableEquipmentItems },
+    { type: 'sewing', setSelectedItems: setSelectedSewingItems, setAvailableItems: setAvailableSewingItems }
+  ];
 
   const {
     register,
@@ -46,7 +55,7 @@ const Form = ({ updateForm }) => {
     defaultValues: defaultValues,
   });
 
-  const fetchProducts = (currentType) => {
+  const fetchProducts = (currentType) => { //noaa
     fetch(
       `https://njdfolzzmvnaay5oxqife4tuwy.apigateway.il-jerusalem-1.oci.customer-oci.com/v1/get-products`
     )
@@ -60,7 +69,9 @@ const Form = ({ updateForm }) => {
 
         data = data.filter(item => item.type.includes(currentType));
 
-        setAvailableItems([...data]);
+        itemTypes.forEach(({ type, setSelectedItems, setAvailableItems }) => {
+          setAvailableItems([...data]);
+        });
       })
       .catch((error) => {
         setIsLoading(false);
@@ -90,15 +101,19 @@ const Form = ({ updateForm }) => {
             return;
           }
           fixCorruptResponse(data, availableItems);
-          setSelectedItems([...data.subitems]);
+          const subitems = [...data.subitems];
 
-          setAvailableItems((currentAvailableItems) => {
-            return currentAvailableItems.filter(
-              (item) =>
+          itemTypes.forEach(({ type, setSelectedItems, setAvailableItems }) => {
+            setSelectedItems(subitems);
+
+            setAvailableItems((currentAvailableItems) => {
+              return currentAvailableItems.filter(
+                (item) =>
                 !data.subitems.some(
                   (subitem) => subitem.product_number === item.product_number
                 )
             );
+            });
           });
 
           let type = data.type ?? 'IDF';
@@ -174,7 +189,7 @@ const Form = ({ updateForm }) => {
   };
 
   const onSubmit = (formData) => {
-    formData.subitems = selectedItems;
+    formData.subitems = [...selectedEquipmentItems, ...selectedSewingItems];
 
     if (updateForm) {
       formData.id = id;
@@ -217,50 +232,6 @@ const Form = ({ updateForm }) => {
 
         toast.error('תקלה בעת שליחת הטופס, אנא נסו שוב במועד מאוחר יותר');
       });
-  };
-
-  const toggleModal = (editItem) => {
-    if (editItem) {
-      setItemToEdit(editItem);
-    } else {
-      setItemToEdit(null);
-    }
-    return setModalToOpen('items');
-  };
-
-  const onAddItem = (newItem) => {
-    setAvailableItems(
-      availableItems.filter((i) => i.product_number !== newItem.product_number)
-    );
-    setSelectedItems((currnet) => [...currnet, newItem]);
-    setItemToEdit(null);
-  };
-
-  const onEditItem = (updatedItem) => {
-    setSelectedItems(
-      selectedItems.map((item) =>
-        item.product_number === itemToEdit.product_number ? updatedItem : item
-      )
-    );
-
-    setAvailableItems(
-      availableItems.filter(
-        (i) => i.product_number !== updatedItem.product_number
-      )
-    );
-    if (itemToEdit.product_number !== updatedItem.product_number) {
-      setAvailableItems((currnet) => [...currnet, itemToEdit]);
-    }
-
-    setItemToEdit(null);
-  };
-
-  const onRemoveItem = (newItem) => {
-    setItemToEdit(null);
-    setSelectedItems(
-      selectedItems.filter((i) => i.product_number !== newItem.product_number)
-    );
-    setAvailableItems((currnet) => [...currnet, newItem]);
   };
 
   return (
@@ -357,7 +328,7 @@ const Form = ({ updateForm }) => {
                 disabled={updateForm}
                 className='text-field'
                 type='text'
-                placeholder={formType == 'EMR' ? "ישוב" : "יחידה"}
+                placeholder={formType == 'EMR' ? "פרטים מלאים של הישוב" : "פרטים מלאים של היחידה"}
                 {...register('unit', { required: 'חובה' })}
               />
             </div>
@@ -367,13 +338,19 @@ const Form = ({ updateForm }) => {
                 <span className='required'>*</span>
                 <div className='error-message'>{errors.job?.message}</div>
               </div>
-              <input
-                disabled={updateForm}
-                className='text-field'
-                type='text'
-                placeholder='תפקיד'
+              <select
+                className='select-field'
+                defaultValue={watch('job')}
                 {...register('job', { required: 'חובה' })}
-              />
+              >
+                <option disabled={true} value=''>
+                  תפקיד
+                </option>
+
+                <option value='רבש"צ'>רבש"צ</option>
+                <option value='קמב"צ'>קמב"צ</option>
+                <option value='אחר'>אחר</option>
+              </select>
             </div>
             <div className='field-container'>
               <div className='field-title'>
@@ -401,33 +378,26 @@ const Form = ({ updateForm }) => {
             </div>
           </div>
 
-          <label>בחירת פריטים:</label>
-          <div className='items-container'>
-            {selectedItems.map((item) => (
-              <div key={item.product_number} className='item'>
-                <div>{item.name}</div>
-                <div className='options-container'>
-                  <div className='quantity'>{item.quantity}</div>
-                  <div className='option-buttons'>
-                    <Edit
-                      className='edit-btn'
-                      onClick={() => toggleModal(item)}
-                    />
+          <ChooseItem
+            lable="בחירת פריטי ציוד:"
+            itemType={equipmentItems}
+            selectedItems={selectedEquipmentItems}
+            setSelectedItems={setSelectedEquipmentItems}
+            setAvailableItems={setAvailableEquipmentItems}
+            setModalToOpen={setModalToOpen}
+            setItemToEdit={setItemToEdit}
+          />
 
-                    <X
-                      className='remove-btn'
-                      onClick={() => onRemoveItem(item)}
-                    />
-                  </div>
-                </div>
-              </div>
-            ))}
-            <div className='add-button-container'>
-              <button type='button' onClick={() => setModalToOpen('items')}>
-                <Plus />
-              </button>
-            </div>
-          </div>
+          <ChooseItem
+            lable={"בחירת פריטי מתפרה:"}
+            itemType={sewingItems}
+            selectedItems={selectedSewingItems}
+            setSelectedItems={setSelectedSewingItems}
+            setAvailableItems={setAvailableSewingItems}
+            setModalToOpen={setModalToOpen}
+            setItemToEdit={setItemToEdit}
+          />
+
           <div className='field-container'>
             <div className='field-title'>
               <label>הערות</label>
@@ -449,7 +419,7 @@ const Form = ({ updateForm }) => {
               <button
                 type='button'
                 className='cancel-button'
-                onClick={() => setModalToOpen('confirmation')}
+                onClick={() => setModalToOpen(confirmation)}
               >
                 ביטול בקשה
               </button>
@@ -458,18 +428,29 @@ const Form = ({ updateForm }) => {
         </form>
       </div>
       <ConfirmationModal
-        isModalOpen={modalToOpen === 'confirmation'}
+        isModalOpen={modalToOpen === confirmation}
         onRequestClose={() => setModalToOpen(null)}
         onCancelForm={onCancelForm}
       />
 
       <AddItemModal
-        isModalOpen={modalToOpen === 'items'}
+        isModalOpen={modalToOpen === equipmentItems}
         onRequestClose={() => setModalToOpen(null)}
-        selectedItems={selectedItems}
-        onAddItem={onAddItem}
-        onEditItem={onEditItem}
-        availableItems={availableItems}
+        selectedItems={selectedEquipmentItems}
+        setSelectedItems={setSelectedEquipmentItems}
+        setAvailableItems={setAvailableEquipmentItems}
+        availableItems={availableEquipmentItems}
+        itemToEdit={itemToEdit}
+        setItemToEdit={setItemToEdit}
+      />
+
+      <AddItemModal
+        isModalOpen={modalToOpen === sewingItems}
+        onRequestClose={() => setModalToOpen(null)}
+        selectedItems={selectedSewingItems}
+        setSelectedItems={setSelectedSewingItems}
+        setAvailableItems={setAvailableSewingItems}
+        availableItems={availableSewingItems}
         itemToEdit={itemToEdit}
         setItemToEdit={setItemToEdit}
       />
