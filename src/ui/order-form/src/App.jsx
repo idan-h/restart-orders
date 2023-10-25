@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import './App.css';
+import ThankYouMessage from "./components/ThankYouMessage/ThankYouMessage";
 
 export default function App() {
   return (
@@ -21,6 +22,7 @@ export default function App() {
       <Routes>
         <Route path='/' element={<Form />} />
         <Route path='/:id' element={<Form updateForm={true} />} />
+        <Route path='/thank-you' element={<ThankYouMessage />} />
       </Routes>
     </BrowserRouter>
   );
