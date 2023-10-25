@@ -9,6 +9,7 @@ import ErrorPage from '../ErrorPage/ErrorPage';
 import Loader from '../Loader/Loader';
 import ChooseItem from '../ChooseItem/ChooseItem';
 import './form.css';
+import {fixCorruptResponse} from "../../utils/fixCorruptResponse";
 
 const defaultValues = {
   name: '',
@@ -99,6 +100,7 @@ const Form = ({ updateForm }) => {
             setErrorType('cancel');
             return;
           }
+          fixCorruptResponse(data, availableItems);
           const subitems = [...data.subitems];
 
           itemTypes.forEach(({ type, setSelectedItems, setAvailableItems }) => {
@@ -279,11 +281,11 @@ const Form = ({ updateForm }) => {
                 className='text-field'
                 type='tel'
                 placeholder='מספר טלפון'
-                {...register('phone', updateForm? {} : {
+                {...register('phone', {
                   pattern: {
                     message: 'מספר טלפון זה אינו תקין',
                     value:
-                      /^[+]?[(]?[0-9]{3}[)]?[-\s.]?[0-9]{3}[-\s.]?[0-9]{4,6}$/,
+                      /^[+]?[(]?[0-9]{3}[)]?[-\s.]?[0-9]{3}[-\s.]?[0-9]{4,7}$/,
                   },
                   required: 'חובה',
                   minLength: {
@@ -291,7 +293,7 @@ const Form = ({ updateForm }) => {
                     message: 'מספר טלפון זה אינו תקין',
                   },
                   maxLength: {
-                    value: 12,
+                    value: 14,
                     message: 'מספר טלפון זה אינו תקין',
                   },
                 })}
