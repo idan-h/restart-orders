@@ -231,7 +231,9 @@ const Form = ({ updateForm }) => {
           toast.success('הבקשה נשלחה בהצלחה');
 
           if (!updateForm) {
-            return navigate(`/${data.id}`, { replace: true });
+            return navigate(`/thank-you?id=${data.id}`, { replace: true });
+          } else {
+            return navigate(`/thank-you?id=${id}`, { replace: true });
           }
         })
       )

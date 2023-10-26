@@ -3,6 +3,7 @@ from .consts import API_URL, PRODUCT_BOARD_ID, ORDERS_BOARD_ID, DONATIONS_BOARD_
 import uuid
 import json
 import pandas as pd
+from datetime import datetime
 
 
 def create_order(api_key, dto):
@@ -21,6 +22,7 @@ def create_order(api_key, dto):
         'color': {"label": dto['tenant']},  # Tenant Code
         'text5': order_id,  # Custom Id
         'status4': {"label": dto.get('type', 'IDF')},  # Form Type
+        'date_11': datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S') + " UTC",  # Modified Date
     })
     new_item_id = int(new_item['create_item']['id'])
 
@@ -46,6 +48,7 @@ def update_order(api_key, dto):
     column_values = {'status': 'בוטל'} if is_cancel else {
         'long_text': dto['note'],  # Note
         'dropdown': dto['location'],  # Location
+        'date_11': datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S') + " UTC",  # Modified Date
     }
 
     monday_board.change_multiple_column_values(column_values, existing_item_id)
