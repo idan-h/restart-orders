@@ -1,0 +1,30 @@
+Need more excel samples
+Need to ask Idan questions regarding create order
+Some fields that are empty while using create_order should be default blank
+
+
+
+
+name
+subitems
+priority
+long_text 
+status
+text8
+text0
+text7
+email
+dropdown
+text70
+date
+creation_log
+text9
+date5
+status7
+formula5
+color
+text5
+text42
+date2
+status75
+status4

@@ -3,7 +3,7 @@ import re
 import requests
 import json
 import pandas as pd
-from pandas.io.json import json_normalize
+from pandas import json_normalize
 
 SUPPORTED_RETURN_TYPES = ['json', 'dataframe']
 
