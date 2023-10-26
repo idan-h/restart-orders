@@ -73,17 +73,19 @@ class MondayBoard:
 
     def get_board_details(self):
         query = '{boards(ids:' + str(
-            self.board_id) + ') { name id description groups {id title}  items (limit:1){ name column_values{title id type value} } } }'
-        r = json_normalize(self.mondayApi.query(query)['boards'])
+            self.board_id) + ') {  columns{ id title settings_str } name id description groups {id title}   } }'
+        r = self.mondayApi.query(query , return_items_as = 'json').json()['data']['boards'][0]
         return r
 
     def list_columns(self):
-        return pd.DataFrame(list(self.get_board_details()['items'])[0][0]['column_values'])
+        return list(self.get_board_details()['columns'])
 
     def get_column_details(self, column_title):
-        df = self.list_columns()
-        df = df[df['title'] == column_title]
-        return df
+        columns = self.list_columns()
+        for column in columns:
+            if column['title'] == column_title:
+                return column
+        return []
 
     def get_columns(self):
         res = self.mondayApi.query(
