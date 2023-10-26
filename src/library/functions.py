@@ -1,5 +1,5 @@
 from .monday_api import MondayApi, MondayBoard
-from .consts import API_URL, PRODUCT_BOARD_ID, ORDERS_BOARD_ID, DONATIONS_BOARD_ID , PRODUCT_BOARD_FORM_TYPE_ID
+from .consts import API_URL, PRODUCT_BOARD_ID, ORDERS_BOARD_ID, DONATIONS_BOARD_ID , SUPPLIERS_BOARD_ID
 import uuid
 import json
 import pandas as pd
@@ -204,3 +204,13 @@ def insert_clearing_transaction(api_key , j):
         monday_board.get_column_id('uk_tax_payer'): j['transfer']['uk_tax_payer'],
     })
     return True
+
+
+def get_suppliers_sectors(api_key):
+    monday_api = MondayApi(api_key, API_URL)
+    monday_board = MondayBoard(monday_api, id=SUPPLIERS_BOARD_ID)
+    sector_field_labels = json.loads(monday_board.get_column_details("תחום")['settings_str'])['labels']
+
+    return [{"name" : v , "id" : k } for k , v in sector_field_labels.items()]
+
+

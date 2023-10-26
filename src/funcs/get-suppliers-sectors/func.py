@@ -6,8 +6,7 @@ import traceback
 from fdk import response
 from fdk import context
 
-from library.functions import get_order
-from urllib.parse import urlparse
+from library.functions import get_suppliers_sectors
 
 
 def handler(ctx: context, data: io.BytesIO = None):
@@ -15,15 +14,9 @@ def handler(ctx: context, data: io.BytesIO = None):
 
     API_KEY = ctx.Config()['API_KEY']
 
-    parsed_url = urlparse(ctx.RequestURL())
-
     response_dict = {}
     try:
-        order_id = parsed_url.query.split('=')[1]
-        if not order_id:
-            raise Exception('order id is none')
-
-        response_dict = get_order(API_KEY, order_id)
+        response_dict = get_suppliers_sectors(API_KEY)
     except (Exception,):
         logger.info('error: ' + traceback.format_exc().replace('\n', ''))
         response_dict['error'] = 'An error has occurred'
