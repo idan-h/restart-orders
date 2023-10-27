@@ -46,7 +46,10 @@ class suppliers:
             .get('data').get('items_page_by_column_values').get('items')[0]
         existing_item_id = int(existing_item['id'])
 
-        column_values = {
+        # cancel supplier if needed
+        is_cancel = dto.get('is_cancel', False)
+
+        column_values = {"status" : "בוטל"} if is_cancel else {
             'status_1': {"label": dto['sector']},
             'text': dto['contact_name'],
             'phone': dto['phone'],
@@ -55,6 +58,9 @@ class suppliers:
         }
 
         self.monday_board.change_multiple_column_values(column_values, existing_item_id)
+
+        if is_cancel:
+            return
 
         subitems_ids = [x['id'] for x in existing_item.get('subitems', [])]
 
@@ -93,7 +99,7 @@ class suppliers:
             'subitems': [{
                 'name': i['name'],
                 'product_number': json.loads(i['connect_boards'])['linkedPulseIds'][0]['linkedPulseId'],
-                'inventory': int(i['numbers'].replace('"', '')),
+                'inventory': int(i['numbers'].replace('"', '')) if i['numbers'] else 0,
                 'note': json.loads(i['long_text'])['text']
             } for i in subitems]
         }

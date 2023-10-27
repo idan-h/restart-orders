@@ -1,6 +1,6 @@
 schema_version: 20180708
 name: get-supplier
-version: 0.0.16
+version: 0.0.19
 runtime: python
 build_image: fnproject/python:3.9-dev
 run_image: fnproject/python:3.9
