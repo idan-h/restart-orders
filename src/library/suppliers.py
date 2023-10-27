@@ -93,9 +93,8 @@ class suppliers:
             'subitems': [{
                 'name': i['name'],
                 'product_number': json.loads(i['connect_boards'])['linkedPulseIds'][0]['linkedPulseId'],
-                'inventory': i['numbers'],
-                'note': i['long_text']
+                'inventory': int(i['numbers'].replace('"', '')),
+                'note': json.loads(i['long_text'])['text']
             } for i in subitems]
         }
-
 
