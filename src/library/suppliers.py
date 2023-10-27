@@ -34,7 +34,7 @@ class suppliers:
         for subitem in dto.get('subitems', []):
             self.monday_board.insert_subitem(subitem['name'], {
                 'connect_boards': {"linkedPulseIds": [{"linkedPulseId": subitem['product_number']}]},  # Product
-                'numbers': subitem['quantity'],  # Quantity
+                'numbers': subitem['inventory'],  # inventory
                 'long_text' : subitem['note'] # Note
             }, new_item_id)
 
@@ -64,7 +64,7 @@ class suppliers:
         for subitem in dto.get('subitems', []):
             self.monday_board.insert_subitem(subitem['name'], {
                 'connect_boards': {"linkedPulseIds": [{"linkedPulseId": subitem['product_number']}]},  # Product
-                'numbers': subitem['quantity'],  # Quantity
+                'numbers': subitem['inventory'],  # inventory
                 'long_text' : subitem['note'] # Note
             }, existing_item_id)
 
@@ -93,7 +93,7 @@ class suppliers:
             'subitems': [{
                 'name': i['name'],
                 'product_number': json.loads(i['connect_boards'])['linkedPulseIds'][0]['linkedPulseId'],
-                'quantity': i['numbers'],
+                'inventory': i['numbers'],
                 'note': i['long_text']
             } for i in subitems]
         }
