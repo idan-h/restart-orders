@@ -1,0 +1,231 @@
+.suppliers-form {
+  background-color: gainsboro;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+.suppliers-form .bg {
+  background-color: gainsboro;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+.suppliers-form .bg .form-container {
+  height: fit-content;
+  border-radius: 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background-color: white;
+  box-shadow: 0px 4px 12px 5px rgba(0, 0, 0, 0.1);
+  margin: 3em;
+  padding: 1em 0;
+  width: 45%;
+}
+.suppliers-form .bg .form-container .header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 1em;
+  padding: 1em;
+}
+.suppliers-form .bg .form-container .header .logo {
+  width: 100%;
+}
+.suppliers-form .bg .form-container .header .title {
+  font-size: 1.3em;
+  font-weight: 500;
+}
+.suppliers-form .bg .form-container .header .description {
+  padding: 0 1em;
+  text-align: right;
+  font-size: 0.8em;
+}
+.suppliers-form .bg .form-container .grid-container {
+  width: 100%;
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  grid-template-rows: repeat(2, auto);
+  column-gap: 0.5em;
+}
+.suppliers-form .bg .form-container .grid-container :nth-child(1) {
+  grid-column: span 3;
+}
+.suppliers-form .bg .form-container .grid-container :nth-child(2) {
+  grid-column: span 3;
+}
+.suppliers-form .bg .form-container .grid-container :nth-child(3) {
+  grid-column: span 6;
+}
+.suppliers-form .bg .form-container .grid-container :nth-child(4) {
+  grid-column: span 6;
+}
+.suppliers-form .bg .form-container .grid-container :nth-child(5) {
+  grid-column: span 6;
+}
+.suppliers-form .bg .form-container .grid-container :nth-child(6) {
+  grid-column: span 6;
+}
+.suppliers-form .bg .form-container .form {
+  padding: 1em;
+  min-width: 70%;
+}
+.suppliers-form .bg .form-container .form .field-container {
+  padding: 0.5em 0;
+  gap: 0.1em;
+  display: flex;
+  flex-direction: column;
+  text-align: right;
+}
+.suppliers-form .bg .form-container .form .field-container .field-title {
+  font-size: 0.9em;
+  width: max-content;
+  display: flex;
+  flex-direction: row;
+  padding-right: 0.2em;
+}
+.suppliers-form .bg .form-container .form .field-container .field-title .required {
+  color: red;
+}
+.suppliers-form .bg .form-container .form .field-container .field-title .error-message {
+  margin-right: 0.5em;
+  color: red;
+  font-size: 0.8em;
+}
+.suppliers-form .bg .form-container .form .field-container .select-field {
+  width: 100%;
+  border: 1px solid #00b7c3;
+  border-radius: 18px;
+  padding: 0.7em;
+  font-size: 1em;
+  font-weight: 400;
+}
+.suppliers-form .bg .form-container .form .field-container .select-field:focus-visible {
+  outline: none;
+}
+.suppliers-form .bg .form-container .form .field-container .option {
+  overflow-y: scroll;
+  color: #00b7c3;
+  background-color: #00b7c3;
+}
+.suppliers-form .bg .form-container .form .field-container .text-field {
+  border: 1px solid #00b7c3;
+  border-radius: 18px;
+  padding: 0.7em;
+  outline: none;
+  font-size: 1em;
+  font-weight: 400;
+}
+.suppliers-form .bg .form-container .form .field-container .text-field:disabled {
+  background: gainsboro;
+}
+.suppliers-form .bg .form-container .form .field-container .text-field::placeholder {
+  color: gray;
+  font-weight: 400;
+}
+.suppliers-form .bg .form-container .form .field-container .text-field:focus {
+  border-color: #00b7c3;
+  box-shadow: 0 0 2px 0 #00b7c3;
+}
+.suppliers-form .bg .form-container .items-container {
+  border-color: #00b7c3;
+  border: 1px solid #00b7c3;
+  border-radius: 18px;
+  display: flex;
+  flex-direction: column;
+}
+.suppliers-form .bg .form-container .items-container .item {
+  padding: 0.5em;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  border-bottom: 1px solid #00b7c3;
+  font-weight: 500;
+}
+.suppliers-form .bg .form-container .items-container .item .options-container {
+  display: flex;
+  gap: 0.7em;
+  flex-direction: row;
+  align-items: center;
+}
+.suppliers-form .bg .form-container .items-container .item .options-container .quantity {
+  font-size: 1.2em;
+}
+.suppliers-form .bg .form-container .items-container .item .options-container .option-buttons {
+  align-items: center;
+  display: flex;
+  gap: 0.5em;
+}
+.suppliers-form .bg .form-container .items-container .item .options-container .option-buttons .edit-btn {
+  height: 1.2em;
+  align-items: center;
+  cursor: pointer;
+}
+.suppliers-form .bg .form-container .items-container .item .options-container .option-buttons .remove-btn {
+  cursor: pointer;
+  height: 1.2em;
+  color: red;
+}
+.suppliers-form .bg .form-container .items-container .add-button-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.suppliers-form .bg .form-container .items-container .add-button-container button {
+  background: #00b7c3;
+  border: none;
+  margin: 0.5em;
+  padding: 0 0.5em;
+  border-radius: 18px;
+  width: 50%;
+}
+.suppliers-form .bg .form-container .form-btns {
+  margin-top: 1em;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1em;
+}
+.suppliers-form .bg .form-container .form-btns .submit-button {
+  font-family: inherit;
+  align-self: center;
+  background: #00b7c3;
+  color: white;
+  border: none;
+  padding: 0.8em;
+  border-radius: 18px;
+  width: 50%;
+  font-size: 1.2em;
+}
+.suppliers-form .bg .form-container .form-btns .cancel-button {
+  font-family: inherit;
+  align-self: center;
+  background: rgb(255, 2, 2);
+  color: white;
+  border: none;
+  padding: 0.8em;
+  border-radius: 18px;
+  width: 50%;
+  font-size: 1.2em;
+}
+@media (max-width: 768px) {
+  .suppliers-form .form-container {
+    min-width: 90%;
+  }
+}
+@media (max-width: 375px) {
+  .suppliers-form .form-container {
+    min-width: 95%;
+    font-size: 0.9em;
+  }
+}
+
+/*# sourceMappingURL=SuppliersForm.css.map */

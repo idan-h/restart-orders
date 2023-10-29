@@ -14,14 +14,17 @@ const AddItemModal = ({
   onRequestClose,
   itemToEdit,
   setItemToEdit,
+  includeNoteField = false,
 }) => {
   const [selectedItem, setSelectedItem] = useState(null);
   const [inputQuantity, setInputQuantity] = useState(1);
+  const [note, setNote] = useState('');
 
   useEffect(() => {
     if (itemToEdit) {
       setSelectedItem(itemToEdit);
       setInputQuantity(itemToEdit.quantity);
+      includeNoteField && setNote(itemToEdit.note);
     }
   }, [itemToEdit]);
 
@@ -69,10 +72,12 @@ const AddItemModal = ({
     const finalItem = {
       ...selectedItem,
       quantity: inputQuantity <= 0 ? 1 : inputQuantity,
+      note: includeNoteField ? note : undefined,
     };
     itemToEdit ? onEditItem(finalItem, selectedItems, setSelectedItems, availableItems, setAvailableItems) : onAddItem(finalItem, availableItems, setAvailableItems, setSelectedItems);
     setInputQuantity(1);
     setSelectedItem(null);
+    setNote('');
     onRequestClose();
   };
 
@@ -99,7 +104,6 @@ const AddItemModal = ({
       key: item.product_number,
     })),
   ].filter((option) => option !== null);
-  
 
   return (
     <Modal
@@ -113,17 +117,16 @@ const AddItemModal = ({
         <div className='title'>הוספת/עדכון פריט</div>
         <div className='modal-form'>
           <div className='fields'>
-          <Select
-            required={selectedItems.length === 0}
-            className="select-field"
-            value={itemOptions.find((item) => item.value === (selectedItem?.name || ''))}
-            onChange={(selectedOption) => handleOnChange(selectedOption.value)}
-            options={itemOptions}
-            isSearchable={true}
-            isClearable={false}
-            placeholder="בחר פריט"
-          />
-
+            <Select
+              required={selectedItems.length === 0}
+              className="select-field"
+              value={itemOptions.find((item) => item.value === (selectedItem?.name || ''))}
+              onChange={(selectedOption) => handleOnChange(selectedOption.value)}
+              options={itemOptions}
+              isSearchable={true}
+              isClearable={false}
+              placeholder="בחר פריט"
+            />
             {selectedItem ? (
               <input
                 type='number'
@@ -134,7 +137,16 @@ const AddItemModal = ({
                 className='quantity-input'
               />
             ) : null}
+
           </div>
+          {selectedItem && includeNoteField ? (
+              <textarea
+                  placeholder={'הערות לגבי המוצר שבחרתם'}
+                  className={'note-input'}
+                  value={note}
+                  onChange={(e) => setNote(e.target.value)}
+              />
+          ) : null}
           <button
             onClick={handleConfirm}
             disabled={!selectedItem}

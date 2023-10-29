@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './ThankYouMessage.css'
 
-const ThankYouMessage = () => {
+const ThankYouMessage = ({ isSupplier = false }) => {
     const [orderId, setOrderId] = useState('');
     const navigate = useNavigate();
 
@@ -14,7 +14,11 @@ const ThankYouMessage = () => {
     }, []);
 
     const goToEdit = () => {
-        navigate(`/${orderId}`, { replace: true });
+        if (isSupplier) {
+            navigate(`/suppliers-form/${orderId}`, { replace: true });
+        } else {
+            navigate(`/${orderId}`, { replace: true });
+        }
     }
 
     return (
