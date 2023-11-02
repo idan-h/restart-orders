@@ -12,7 +12,7 @@ import { TextExpand24Regular, TextCollapse24Filled } from "@fluentui/react-icons
 import { assignTask, fetchOrders } from "../../api.ts";
 import { useEffect, useState } from "react";
 import { Order, SubItem } from "../../types.ts";
-import { SubItems } from "./Products.tsx";
+import { SubItems } from "./SubItems.tsx";
 
 const useStyles = makeStyles({
   card: {
@@ -23,7 +23,7 @@ const useStyles = makeStyles({
   },
 });
 
-export const Catalog = () => {
+export const Orders = () => {
   const styles = useStyles();
 
   const [orders, setOrders] = useState<Order[] | undefined>();
@@ -61,7 +61,7 @@ export const Catalog = () => {
       <h2 style={{ textAlign: "center", margin: "20px auto" }}>בקשות</h2>
       {orders.map(({ id, unit, subItems, comment }) => {
         return (
-          <Card key={id} className={styles.card}>
+          <Card key={id} className={styles.card} >
             <CardHeader
               header={
                 <Body1 style={{ textAlign: "left" }}>

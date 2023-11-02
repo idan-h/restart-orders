@@ -12,6 +12,12 @@ function post(url: string) {
     return Promise.resolve();
 }
 
+export async function fetchAssignedOrders(): Promise<Order[]> {
+    const tasks= await get('assigned-orders');
+    console.log(tasks);
+    return orders;
+}
+
 export async function fetchOrders(): Promise<Order[]> {
     const tasks= await get('orders');
     console.log(tasks);
