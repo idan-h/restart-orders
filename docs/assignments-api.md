@@ -79,6 +79,7 @@ type Request = {
 
 ```ts
 type Request = {
+  subItemBoardId: string;
   orderId: string;
   subItemId: string;
   status: string;

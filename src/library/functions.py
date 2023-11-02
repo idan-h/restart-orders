@@ -274,3 +274,17 @@ def unassign_product(api_key , order_id , subitem_id ,subitem_board_id ):
     except Exception as e:
         print(e)
         return False
+
+def update_order_status(api_key , order_id , subitem_id ,subitem_board_id, subitem_status ):
+    try:
+        monday_api = MondayApi(api_key, API_URL)
+        monday_board = MondayBoard(monday_api, id=subitem_board_id)
+        columnVals = {
+            "status" : { "label": subitem_status }
+        }
+        monday_board.change_multiple_column_values( columnVals ,subitem_id )
+
+        return True
+    except Exception as e:
+        print(e)
+        return False
