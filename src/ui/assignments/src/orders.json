@@ -1,0 +1,90 @@
+[
+  {
+    "id": "123",
+    "unit": "87",
+    "region": "דרום",
+    "comment": "מדים רגילים לא טאקטיים מידה ב",
+    "subItems": [
+      {
+        "id": "11",
+        "productId": "1",
+        "productName": "מדים טקטיים",
+        "quantity": 140,
+        "requestedQuantity": 0,
+        "status": "בביצוע"
+      },
+      {
+        "id": "22",
+        "productId": "2",
+        "productName": "פנס ראש",
+        "quantity": 200,
+        "requestedQuantity": 0,
+        "status": "בוטל"
+      },
+      {
+        "id": "33",
+        "productId": "3",
+        "productName": "לדרמן",
+        "quantity": 51,
+        "requestedQuantity": 0,
+        "status": "ממתין"
+      }
+    ]
+  },
+  {
+    "id": "1234",
+    "unit": "חרוב",
+    "region": "צפון",
+    "comment": "נעלי הרים מידות 43-47",
+    "subItems": [
+      {
+        "id": "11",
+        "productId": "1",
+        "productName": "תיקי לאו",
+        "quantity": 20,
+        "requestedQuantity": 0,
+        "status": "בוצע"
+      },
+      {
+        "id": "22",
+        "productId": "2",
+        "productName": "קסדות טקטיות",
+        "quantity": 56,
+        "requestedQuantity": 0,
+        "status": "במשלוח"
+      },
+      {
+        "id": "33",
+        "productId": "3",
+        "productName": "נעלי הרים",
+        "quantity": 35,
+        "requestedQuantity": 0,
+        "status": "ממתין"
+      }
+    ]
+  },
+  {
+    "id": "12345",
+    "unit": "איסוף קרבי",
+    "region": "דרום",
+    "comment": "כפפות ממידות גדולות בלבד",
+    "subItems": [
+      {
+        "id": "11",
+        "productId": "1",
+        "productName": "שלוקרים",
+        "quantity": 47,
+        "requestedQuantity": 0,
+        "status": "בביצוע"
+      },
+      {
+        "id": "22",
+        "productId": "2",
+        "productName": "כפפות טקטיות",
+        "quantity": 47,
+        "requestedQuantity": 0,
+        "status": "ממתין"
+      }
+    ]
+  }
+]

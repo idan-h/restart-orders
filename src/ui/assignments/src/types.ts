@@ -1,12 +1,18 @@
-export type Product = {
+export type Order = {
     id: string;
-    type: string;
-    amount: number;
-    requestedAmount: number;
-}
-
-export type Task = {
-    id: string;
+    region: string;
     unit: string;
-    products: Product[]
-}
+    subItems: Array<SubItem>;
+    comment: string
+  };
+
+export type SubItem = {
+  id: string;
+  productId: string;
+  productName: string;
+  quantity: number;
+  status: string | undefined; // if `undefined`, then the subitem is unassigned
+
+  // Hack!
+  requestedQuantity?: number;
+};
