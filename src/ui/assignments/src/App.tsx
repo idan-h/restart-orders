@@ -16,15 +16,16 @@ import "./App.css";
 import { makeFakeAuthenticationService } from "./services/fake-authentication.ts";
 import { makeFakeOrdersService } from "./services/fake-orders.ts";
 import React from "react";
-import { AuthenticationService, useAuthenticationService } from "./services/authentication.ts";
+import {
+  AuthenticationService,
+  useAuthenticationService,
+} from "./services/authentication.ts";
 import { OrdersService } from "./services/orders.ts";
 
 function App() {
   return (
     <AuthenticationService.Provider value={makeFakeAuthenticationService()}>
-      <OrdersService.Provider
-        value={makeFakeOrdersService("this-is-good-userid")}
-      >
+      <OrdersServiceComponent>
         <FluentProvider theme={webLightTheme} dir="rtl">
           <Router>
             <Routes>
@@ -44,7 +45,7 @@ function App() {
                 path="/edit-order/:orderId"
                 Component={OnlyIfAuthenticated(() => {
                   // eslint-disable-next-line react-hooks/rules-of-hooks
-                  const {orderId} = useParams();
+                  const { orderId } = useParams();
 
                   return <EditOrder orderId={orderId ?? ""} />;
                 })}
@@ -52,7 +53,7 @@ function App() {
             </Routes>
           </Router>
         </FluentProvider>
-      </OrdersService.Provider>
+      </OrdersServiceComponent>
     </AuthenticationService.Provider>
   );
 }
@@ -69,5 +70,21 @@ function OnlyIfAuthenticated(originalComponent: React.FC) {
     );
   };
 }
+
+const OrdersServiceComponent: React.FC<{ children?: React.ReactNode }> = ({
+  children,
+}) => {
+  const { userId } = useAuthenticationService();
+
+  if (!userId()) {
+    return children;
+  } else {
+    return (
+      <OrdersService.Provider value={makeFakeOrdersService(userId()!)}>
+        {children}
+      </OrdersService.Provider>
+    );
+  }
+};
 
 export default App;
