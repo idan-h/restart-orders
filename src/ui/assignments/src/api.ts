@@ -23,6 +23,15 @@ export async function fetchTasks(): Promise<Task[]> {
                     amount: 200
                 }
             ]
+        },
+        {
+            id: '12345',
+            items: [
+                {
+                    type: 'shoes',
+                    amount: 300
+                }
+            ]
         }
     ]
 }
