@@ -114,3 +114,16 @@ type Response = {
 };
 
 ```
+
+
+
+# `GET /get-products`
+
+```ts
+type Response = 
+  Array<{
+    name: string;
+    product_number: number;
+    type: string;
+  }>;
+```

@@ -8,11 +8,15 @@ import {
   CardHeader,
   CardPreview,
 } from "@fluentui/react-components";
-import { TextExpand24Regular, TextCollapse24Filled } from "@fluentui/react-icons"
+import {
+  TextExpand24Regular,
+  TextCollapse24Filled,
+} from "@fluentui/react-icons";
 import { useEffect, useState } from "react";
 import { Order } from "../../types.ts";
 import { SubItems } from "./SubItems.tsx";
-import { useOrdersService } from '../../services/orders.ts';
+import { useOrdersService } from "../../services/orders.ts";
+import { Link, useNavigate } from "react-router-dom";
 
 const useStyles = makeStyles({
   card: {
@@ -24,18 +28,20 @@ const useStyles = makeStyles({
 });
 
 export const AssignedOrders = () => {
-  const {fetchAssignedOrders} = useOrdersService()
+  const navigate = useNavigate();
+  const { fetchAssignedOrders } = useOrdersService();
   const styles = useStyles();
 
   const [orders, setOrders] = useState<Order[] | undefined>();
   const [openNoteIds, setOpenNoteIds] = useState<string[]>([]);
 
   const toggleOpenNote = (id: string) => {
-    setOpenNoteIds(openNoteIds => openNoteIds.includes(id)
-        ? openNoteIds.filter(openNoteId => openNoteId !== id)
+    setOpenNoteIds((openNoteIds) =>
+      openNoteIds.includes(id)
+        ? openNoteIds.filter((openNoteId) => openNoteId !== id)
         : [...openNoteIds, id]
     );
-  }
+  };
 
   useEffect(() => {
     fetchAssignedOrders().then((items) => setOrders(items.orders));
@@ -47,6 +53,9 @@ export const AssignedOrders = () => {
 
   return (
     <div style={{ margin: "auto" }}>
+      <p>
+        <Link to="/">חזרה</Link>
+      </p>
       <h2 style={{ textAlign: "center", margin: "20px auto" }}>הזמנות</h2>
       {orders.map(({ id, unit, subItems, comment }) => {
         return (
@@ -60,29 +69,32 @@ export const AssignedOrders = () => {
             />
 
             <CardPreview>
-              <SubItems
-                items={subItems}
-              />
-              {
-                  comment && <a
-                  style={{ display: 'flex', alignItems: 'center', margin: 10 }}
-                    onClick={()=> toggleOpenNote(id)}>
-                הערות
-                    {
-                    openNoteIds.includes(id)
-                      ? <TextCollapse24Filled />
-                      : <TextExpand24Regular />
-                  }
-                  </a>
-              }
-              {
-                openNoteIds.includes(id)
-                    ? <p style={{ margin: 10 }}>{comment}</p>
-                    : null
-              }
-              </CardPreview>
+              <SubItems items={subItems} />
+              {comment && (
+                <a
+                  style={{ display: "flex", alignItems: "center", margin: 10 }}
+                  onClick={() => toggleOpenNote(id)}
+                >
+                  הערות
+                  {openNoteIds.includes(id) ? (
+                    <TextCollapse24Filled />
+                  ) : (
+                    <TextExpand24Regular />
+                  )}
+                </a>
+              )}
+              {openNoteIds.includes(id) ? (
+                <p style={{ margin: 10 }}>{comment}</p>
+              ) : null}
+            </CardPreview>
             <CardFooter>
-              <Button>עדכן</Button>
+              <Button
+                onClick={() =>
+                  navigate(`/edit-order/${encodeURIComponent(id)}`)
+                }
+              >
+                עדכן
+              </Button>
             </CardFooter>
           </Card>
         );
