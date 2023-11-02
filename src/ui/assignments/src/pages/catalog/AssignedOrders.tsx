@@ -9,10 +9,10 @@ import {
   CardPreview,
 } from "@fluentui/react-components";
 import { TextExpand24Regular, TextCollapse24Filled } from "@fluentui/react-icons"
-import {fetchAssignedOrders} from "../../api.ts";
 import { useEffect, useState } from "react";
 import { Order } from "../../types.ts";
 import { SubItems } from "./SubItems.tsx";
+import { useOrdersService } from '../../services/orders.ts';
 
 const useStyles = makeStyles({
   card: {
@@ -24,6 +24,7 @@ const useStyles = makeStyles({
 });
 
 export const AssignedOrders = () => {
+  const {fetchAssignedOrders} = useOrdersService()
   const styles = useStyles();
 
   const [orders, setOrders] = useState<Order[] | undefined>();
@@ -37,7 +38,7 @@ export const AssignedOrders = () => {
   }
 
   useEffect(() => {
-    fetchAssignedOrders().then((items) => setOrders(items));
+    fetchAssignedOrders().then((items) => setOrders(items.orders));
   }, []);
 
   if (!orders) {
