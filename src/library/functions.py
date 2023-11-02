@@ -3,6 +3,7 @@ from .consts import API_URL, PRODUCT_BOARD_ID, ORDERS_BOARD_ID, DONATIONS_BOARD_
 import uuid
 import json
 import pandas as pd
+import json
 from datetime import datetime
 
 
@@ -234,3 +235,12 @@ def validate_user_login(api_key, email, password):
         return True
     else:
         return False
+    
+def get_subitem_statuses(api_key):
+    monday_api = MondayApi(api_key, API_URL)
+    monday_board = MondayBoard(monday_api, id=ORDERS_BOARD_ID)
+    sub_items = monday_board.get_subitem_statuses(limit=1)
+    column_values = {column['column']['id']: column['column']['settings_str'] for column in sub_items['column_values'][0]}
+
+    return list(json.loads(column_values['status'])['labels'].values())
+
