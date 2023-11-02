@@ -61,6 +61,7 @@ type Response = {
 type Request = {
   orderId: string;
   subItemId: string;
+  subItemBoardId: string;
 };
 ```
 
@@ -70,6 +71,7 @@ type Request = {
 type Request = {
   orderId: string;
   subItemId: string;
+  subItemBoardId: string;
 };
 ```
 
@@ -93,6 +95,7 @@ type Response = {
     unit: string;
     subItems: Array<{
       id: string;
+      subItemBoardId: string;
       productId: string;
       quantity: number;
       userId: string | null;

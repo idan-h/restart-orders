@@ -244,3 +244,33 @@ def get_subitem_statuses(api_key):
 
     return list(json.loads(column_values['status'])['labels'].values())
 
+def assign_product(api_key , order_id , subitem_id ,subitem_board_id ,  user_id ):
+    try:
+        monday_api = MondayApi(api_key, API_URL)
+        monday_board = MondayBoard(monday_api, id=subitem_board_id)
+        columnVals = {
+            "text4": user_id,
+            "status" : {"label": "בטיפול"}
+        }
+        monday_board.change_multiple_column_values( columnVals ,subitem_id )
+
+        return True
+    except Exception as e:
+        print(e)
+        return False
+
+
+def unassign_product(api_key , order_id , subitem_id ,subitem_board_id ):
+    try:
+        monday_api = MondayApi(api_key, API_URL)
+        monday_board = MondayBoard(monday_api, id=subitem_board_id)
+        columnVals = {
+            "text4": "",
+            "status" : {"label": "ממתין"}
+        }
+        monday_board.change_multiple_column_values( columnVals ,subitem_id )
+
+        return True
+    except Exception as e:
+        print(e)
+        return False
