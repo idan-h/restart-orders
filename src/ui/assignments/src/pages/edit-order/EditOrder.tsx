@@ -9,12 +9,12 @@ import {
 } from "@fluentui/react-components";
 import React, { useEffect } from "react";
 import {
-  fetchOrder,
-  fetchOrderStatuses as fetchOrderStatusNames,
+  useOrdersService,
 } from "../../services/orders";
 import { Order } from "../../types";
 
 export const EditOrder: React.FC<{ orderId: string }> = ({ orderId }) => {
+  const {fetchOrder, fetchOrderStatusNames} = useOrdersService()
   const [order, setOrder] = React.useState<Order | undefined>(undefined);
   const [orderStatusNames, setOrderStatusNames] = React.useState<
     string[] | undefined

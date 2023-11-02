@@ -30,6 +30,8 @@ type Response = {
       id: string;
       productId: string;
       quantity: number;
+      userId: string | null;
+      status: string | null; // if `null`, then the subitem is unassigned
     }>;
   }>;
 };
@@ -47,6 +49,7 @@ type Response = {
       id: string;
       productId: string;
       quantity: number;
+      userId: string | null;
       status: string | null; // if `null`, then the subitem is unassigned
     }>
 }
@@ -95,8 +98,18 @@ type Response = {
       subItemBoardId: string;
       productId: string;
       quantity: number;
+      userId: string | null;
       status: string | null; // if `null`, then the subitem is unassigned
     }
 }
+
+```
+
+# `GET /get_subitem_statuses`
+
+```ts
+type Response = {
+  statuses: Array<string>;
+};
 
 ```
