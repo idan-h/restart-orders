@@ -13,7 +13,7 @@ export function makeOrdersService(userId: string) {
     async fetchOrderStatusNames(): Promise<string[]> {
       const response = await fetch(
         new URL(
-          `get_subitem_statuses?userId=${encodeURIComponent(userId)}`,
+          `get-subitem-statuses?userId=${encodeURIComponent(userId)}`,
           baseUrl
         )
       );
@@ -68,7 +68,7 @@ export function makeOrdersService(userId: string) {
       if (!productNames) productNames = await fetchProductNames();
       const response = await fetch(
         new URL(
-          `get-order/${encodeURIComponent(orderId)}?userId=${encodeURIComponent(
+          `get-user-order/${encodeURIComponent(orderId)}?userId=${encodeURIComponent(
             userId
           )}`,
           baseUrl

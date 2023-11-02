@@ -13,18 +13,19 @@ import { Orders } from "./pages/catalog/Orders.tsx";
 import { AssignedOrders } from "./pages/catalog/AssignedOrders.tsx";
 import { AboutUs } from "./pages/about/AboutUs.tsx";
 import "./App.css";
-import { makeFakeAuthenticationService } from "./services/fake-authentication.ts";
-import { makeFakeOrdersService } from "./services/fake-orders.ts";
+// import { makeFakeAuthenticationService } from "./services/fake-authentication.ts";
+// import { makeFakeOrdersService } from "./services/fake-orders.ts";
 import React from "react";
 import {
   AuthenticationService,
+  makeAuthenticationService,
   useAuthenticationService,
 } from "./services/authentication.ts";
-import { OrdersService } from "./services/orders.ts";
+import { OrdersService, makeOrdersService } from "./services/orders.ts";
 
 function App() {
   return (
-    <AuthenticationService.Provider value={makeFakeAuthenticationService()}>
+    <AuthenticationService.Provider value={makeAuthenticationService()}>
       <OrdersServiceComponent>
         <FluentProvider theme={webLightTheme} dir="rtl">
           <Router>
@@ -80,7 +81,7 @@ const OrdersServiceComponent: React.FC<{ children?: React.ReactNode }> = ({
     return children;
   } else {
     return (
-      <OrdersService.Provider value={makeFakeOrdersService(userId()!)}>
+      <OrdersService.Provider value={makeOrdersService(userId()!)}>
         {children}
       </OrdersService.Provider>
     );

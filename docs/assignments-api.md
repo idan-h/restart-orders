@@ -88,7 +88,7 @@ type Request = {
 };
 ```
 
-# `GET /get-order/:orderId`
+# `GET /get-user-order/:orderId`
 
 ```ts
 type Response = {
@@ -108,7 +108,7 @@ type Response = {
 
 ```
 
-# `GET /get_subitem_statuses`
+# `GET /get-subitem-statuses`
 
 ```ts
 type Response = {
