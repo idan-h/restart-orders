@@ -27,7 +27,7 @@ export const LoginForm = () => {
 
   return (
     <Card style={{ width: "100%" }}>
-      <CardHeader header={<h3>פורטל לעמותות</h3>} />
+      <CardHeader header={<h3>פורטל Restart לעמותות</h3>} />
       <CardPreview style={{ padding: "10px" }}>
         <form onSubmit={handleSubmit}>
           <Field label="שם משתמש" orientation="vertical">
