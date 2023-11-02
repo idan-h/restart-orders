@@ -12,7 +12,7 @@ def handler(ctx: context, data: io.BytesIO = None):
     logger = logging.getLogger()
  
     API_KEY = ctx.Config()['API_KEY']
- 
+
     try:
         body = json.loads(data.getvalue())
  
@@ -22,13 +22,13 @@ def handler(ctx: context, data: io.BytesIO = None):
         else:
             email = body["username"]
             is_valid = validate_user_login(API_KEY, email, body["password"])
-            if(is_valid):
+            if is_valid:
                 response_dict = {"userId": email}
             else:
                 response_dict = {"error": "Invalid username or password"}
     except (Exception,):
         logger.info('error: ' + traceback.format_exc().replace('\n', ''))
-        response_dict['error'] = 'An error has occurred'
+        response_dict = {'error': 'An error has occurred'}
  
     return response.Response(
         ctx, response_data=json.dumps(response_dict),

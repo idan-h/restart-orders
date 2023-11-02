@@ -220,7 +220,12 @@ def validate_user_login(api_key, email, password):
     password_column_id = monday_board.get_column_id("Password")
     print(password_column_id)
     users =  monday_board.get_items_by_column_values(monday_board.get_column_id("Email"), email, return_items_as='json')
-    user = users.get('data').get('items_page_by_column_values').get('items')[0]
+    users = users.get('data').get('items_page_by_column_values').get('items')
+    if not users:
+        print("user not found")
+        return False
+
+    user = users[0]
  
     column_values = {v['id']: v['text'] for v in user.get('column_values')}
  
@@ -228,4 +233,37 @@ def validate_user_login(api_key, email, password):
     if column_values.get(password_column_id) == password:
         return True
     else:
+        return False
+
+
+
+def assign_product(api_key , order_id , subitem_id ,subitem_board_id ,  user_id ):
+    try:
+        monday_api = MondayApi(api_key, API_URL)
+        monday_board = MondayBoard(monday_api, id=subitem_board_id)
+        columnVals = {
+            "text4": user_id,
+            "status" : {"label": "בטיפול"}
+        }
+        monday_board.change_multiple_column_values( columnVals ,subitem_id )
+
+        return True
+    except Exception as e:
+        print(e)
+        return False
+
+
+def unassign_product(api_key , order_id , subitem_id ,subitem_board_id ):
+    try:
+        monday_api = MondayApi(api_key, API_URL)
+        monday_board = MondayBoard(monday_api, id=subitem_board_id)
+        columnVals = {
+            "text4": "",
+            "status" : {"label": "ממתין"}
+        }
+        monday_board.change_multiple_column_values( columnVals ,subitem_id )
+
+        return True
+    except Exception as e:
+        print(e)
         return False
