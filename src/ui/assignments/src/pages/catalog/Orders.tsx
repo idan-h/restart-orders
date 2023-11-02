@@ -45,8 +45,13 @@ export const Orders = () => {
       orders
         ?.find((order) => order.id === orderId)
         ?.subItems.filter((subItem) => !!subItem.userId)
-        .map((subItem) => assignSubItem({ orderId, subItemId: subItem.id })) ??
-        []
+        .map((subItem) =>
+          assignSubItem({
+            orderId,
+            subItemId: subItem.id,
+            subItemBoardId: subItem.subItemBoardId,
+          })
+        ) ?? []
     );
   };
 

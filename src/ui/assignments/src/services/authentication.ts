@@ -1,13 +1,23 @@
 import React, { useContext } from "react";
 
-export function makeFakeAuthenticationService() {
+const baseUrl =
+  "https://njdfolzzmvnaay5oxqife4tuwy.apigateway.il-jerusalem-1.oci.customer-oci.com/v1/";
+
+export function makeAuthenticationService() {
   let userId: string | undefined = localStorage.getItem("userId") ?? undefined;
 
   return {
-    async login(_userName: string, _password: string) {
-      userId = "this-is-good-userid";
-      localStorage.setItem("userId", userId);
-      return userId;
+    async login(userName: string, password: string): Promise<void> {
+      const response = await fetch(new URL("login", baseUrl), {
+        method: "POST",
+        body: JSON.stringify({ username: userName, password }),
+      });
+
+      const { userId: newUserId } = await response.json();
+
+      userId = newUserId;
+
+      localStorage.setItem("userId", newUserId);
     },
     userId() {
       return userId;
@@ -20,7 +30,7 @@ export function makeFakeAuthenticationService() {
 }
 
 export const AuthenticationService = React.createContext<
-  ReturnType<typeof makeFakeAuthenticationService>
+  ReturnType<typeof makeAuthenticationService>
 >(
   //@ts-expect-error error
   undefined

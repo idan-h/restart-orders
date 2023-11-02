@@ -31,9 +31,10 @@ export const EditOrder: React.FC<{ orderId: string }> = ({ orderId }) => {
   async function handleStatusChange(
     orderId: string,
     subItemId: string,
+    subItemBoardId: string,
     newStatus: string
   ) {
-    await changeStatus({ orderId, subItemId, status: newStatus });
+    await changeStatus({ orderId, subItemId, subItemBoardId, status: newStatus });
     setOrder(
       order && {
         ...order,
@@ -48,8 +49,8 @@ export const EditOrder: React.FC<{ orderId: string }> = ({ orderId }) => {
     );
   }
 
-  async function handleUnassign(orderId: string, subItemId: string) {
-    await unAssignSubItem({ orderId, subItemId });
+  async function handleUnassign(orderId: string, subItemId: string, subItemBoardId: string) {
+    await unAssignSubItem({ orderId, subItemId, subItemBoardId });
     setOrder(
       order && {
         ...order,
@@ -88,6 +89,7 @@ export const EditOrder: React.FC<{ orderId: string }> = ({ orderId }) => {
                       handleStatusChange(
                         order.id,
                         subItem.id,
+                        subItem.subItemBoardId,
                         data.optionValue ?? ""
                       )
                     }
@@ -96,7 +98,7 @@ export const EditOrder: React.FC<{ orderId: string }> = ({ orderId }) => {
                       <Option key={status}>{status}</Option>
                     ))}
                   </Combobox>
-                  <Button onClick={() => handleUnassign(order.id, subItem.id)}>
+                  <Button onClick={() => handleUnassign(order.id, subItem.id, subItem.subItemBoardId)}>
                     לא יכול לספק
                   </Button>
                 </DataGridCell>

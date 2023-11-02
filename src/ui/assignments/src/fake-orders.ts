@@ -9,6 +9,7 @@ export default [
     subItems: [
       {
         id: "11",
+        subItemBoardId: 'sibi',
         productId: "1",
         productName: "מדים טקטיים",
         quantity: 140,
@@ -18,6 +19,7 @@ export default [
       },
       {
         id: "22",
+        subItemBoardId: 'sibi',
         productId: "2",
         productName: "פנס ראש",
         quantity: 200,
@@ -27,6 +29,7 @@ export default [
       },
       {
         id: "33",
+        subItemBoardId: 'sibi',
         productId: "3",
         productName: "לדרמן",
         quantity: 51,
@@ -44,6 +47,7 @@ export default [
     subItems: [
       {
         id: "11",
+        subItemBoardId: 'sibi',
         productId: "1",
         productName: "תיקי לאו",
         quantity: 20,
@@ -53,6 +57,7 @@ export default [
       },
       {
         id: "22",
+        subItemBoardId: 'sibi',
         productId: "2",
         productName: "קסדות טקטיות",
         quantity: 56,
@@ -62,6 +67,7 @@ export default [
       },
       {
         id: "33",
+        subItemBoardId: 'sibi',
         productId: "3",
         productName: "נעלי הרים",
         quantity: 35,
@@ -79,6 +85,7 @@ export default [
     subItems: [
       {
         id: "11",
+        subItemBoardId: 'sibi',
         productId: "1",
         productName: "שלוקרים",
         quantity: 47,
@@ -88,6 +95,7 @@ export default [
       },
       {
         id: "22",
+        subItemBoardId: 'sibi',
         productId: "2",
         productName: "כפפות טקטיות",
         quantity: 47,

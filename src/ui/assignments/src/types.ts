@@ -15,6 +15,7 @@ export type MondayOrder = BaseOrder & {
 
 export type BaseSubItem = {
   id: string;
+  subItemBoardId: string;
   productId: string;
   quantity: number;
   userId: string | undefined; // if `undefined`, then the subitem is unassigned

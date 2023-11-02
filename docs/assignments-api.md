@@ -122,7 +122,7 @@ type Response = {
 # `GET /get-products`
 
 ```ts
-type Response = 
+type Response =
   Array<{
     name: string;
     product_number: number;
