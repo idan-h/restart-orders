@@ -97,3 +97,12 @@ type Response = {
 }
 
 ```
+
+# `GET /get_subitem_statuses/`
+
+```ts
+type Response = {
+  statuses: Array<string>;
+};
+
+```
