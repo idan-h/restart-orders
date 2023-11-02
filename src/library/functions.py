@@ -220,7 +220,12 @@ def validate_user_login(api_key, email, password):
     password_column_id = monday_board.get_column_id("Password")
     print(password_column_id)
     users =  monday_board.get_items_by_column_values(monday_board.get_column_id("Email"), email, return_items_as='json')
-    user = users.get('data').get('items_page_by_column_values').get('items')[0]
+    users = users.get('data').get('items_page_by_column_values').get('items')
+    if not users:
+        print("user not found")
+        return False
+
+    user = users[0]
  
     column_values = {v['id']: v['text'] for v in user.get('column_values')}
  
