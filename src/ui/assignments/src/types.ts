@@ -11,6 +11,7 @@ export type SubItem = {
   productId: string;
   productName: string;
   quantity: number;
+  userId: string | undefined; // if `undefined`, then the subitem is unassigned
   status: string | undefined; // if `undefined`, then the subitem is unassigned
 
   // Hack!

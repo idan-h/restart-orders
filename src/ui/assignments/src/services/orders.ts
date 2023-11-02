@@ -1,6 +1,6 @@
 import React, { useContext } from "react";
 import { Order, SubItem } from "../types";
-import FAKE_ORDERS from "../orders.json";
+import FAKE_ORDERS from "../fake-orders";
 
 export function makeFakeOrdersService(userId: string) {
   const ordersFromStorage = JSON.parse(
@@ -8,10 +8,10 @@ export function makeFakeOrdersService(userId: string) {
   );
 
   const orders = ordersFromStorage
-    ? ordersFromStorage
+    ? new Map<string, Order>(ordersFromStorage)
     : new Map<string, Order>(FAKE_ORDERS.map((o) => [o.id, o]));
 
-  localStorage.setItem("orders", JSON.stringify(orders));
+  saveOrders(orders);
 
   if (userId !== "this-is-good-userid") throw new Error("bad login!");
 
@@ -20,10 +20,18 @@ export function makeFakeOrdersService(userId: string) {
       return ["מחכה", "בהכנה", "בדרך", "נמסר"];
     },
     async fetchUnassignedOrders(): Promise<{ orders: Order[] }> {
-      return { orders: Object.values(orders) };
+      return {
+        orders: [...orders.values()].filter((order) =>
+          order.subItems.some((si) => !si.status)
+        ),
+      };
     },
     async fetchAssignedOrders(): Promise<{ orders: Order[] }> {
-      return { orders: Object.values(orders) };
+      return {
+        orders: [...orders.values()].filter((order) =>
+          order.subItems.some((si) => si.userId === userId)
+        ),
+      };
     },
     async fetchOrder(orderId: string): Promise<Order | undefined> {
       return orders.get(orderId);
@@ -38,8 +46,9 @@ export function makeFakeOrdersService(userId: string) {
       if (!subItem) throw new Error("subItem not found!!!!!");
 
       subItem.status = "assigned";
+      subItem.userId = userId;
 
-      localStorage.setItem("orders", JSON.stringify(orders));
+      saveOrders(orders);
     },
     async unAssignSubItem(request: { orderId: string; subItemId: string }) {
       const order = orders.get(request.orderId);
@@ -51,8 +60,9 @@ export function makeFakeOrdersService(userId: string) {
       if (!subItem) throw new Error("subItem not found!!!!!");
 
       subItem.status = undefined;
+      subItem.userId = undefined;
 
-      localStorage.setItem("orders", JSON.stringify(orders));
+      saveOrders(orders);
     },
     async changeStatus(request: {
       orderId: string;
@@ -69,7 +79,7 @@ export function makeFakeOrdersService(userId: string) {
 
       subItem.status = request.status;
 
-      localStorage.setItem("orders", JSON.stringify(orders));
+      saveOrders(orders);
     },
   };
 }
@@ -79,3 +89,6 @@ export const OrdersService =
   React.createContext<ReturnType<typeof makeFakeOrdersService>>(undefined);
 
 export const useOrdersService = () => useContext(OrdersService);
+function saveOrders(orders: Map<string, Order>) {
+  localStorage.setItem("orders", JSON.stringify([...orders.entries()]));
+}
