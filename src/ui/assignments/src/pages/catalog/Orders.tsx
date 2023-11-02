@@ -16,6 +16,7 @@ import { useEffect, useState } from "react";
 import { Order, SubItem } from "../../types.ts";
 import { SubItems } from "./SubItems.tsx";
 import { useOrdersService } from "../../services/orders.ts";
+import { Link } from "react-router-dom";
 
 const useStyles = makeStyles({
   card: {
@@ -69,6 +70,9 @@ export const Orders = () => {
 
   return (
     <div style={{ margin: "auto" }}>
+      <p>
+        <Link to="/">חזרה</Link>
+      </p>
       <h2 style={{ textAlign: "center", margin: "20px auto" }}>בקשות</h2>
       {orders.map(({ id, unit, subItems, comment }) => {
         return (

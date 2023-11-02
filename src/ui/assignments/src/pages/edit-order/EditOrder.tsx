@@ -12,6 +12,7 @@ import {
   useOrdersService,
 } from "../../services/orders";
 import { Order } from "../../types";
+import { Link } from 'react-router-dom';
 
 export const EditOrder: React.FC<{ orderId: string }> = ({ orderId }) => {
   const {fetchOrder, fetchOrderStatusNames} = useOrdersService()
@@ -44,6 +45,7 @@ export const EditOrder: React.FC<{ orderId: string }> = ({ orderId }) => {
 
   return order ? (
     <>
+      <p><Link to="/my-orders">חזרה</Link></p>
       <h2>עריכת הזמנה {orderId}</h2>
       <div>
         עבור יחידה <b>{order.unit}</b> ב-<b>{order.region}</b>
