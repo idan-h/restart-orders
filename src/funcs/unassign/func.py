@@ -42,7 +42,7 @@ def handler(ctx: context, data: io.BytesIO = None):
 
     except Exception as e:
         logger.info('error: ' + traceback.format_exc().replace('\n', ''))
-        response_dict['error'] = 'An error has occurred' + str(e)
+        response_dict['error'] = 'An error has occurred ' + str(e)
 
     return response.Response(
         ctx, response_data=json.dumps(response_dict),
