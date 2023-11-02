@@ -1,5 +1,6 @@
 import { Order } from './types'
 import { serverUrl } from './consts.ts'
+import orders from './orders.json'
 
 function get(url: string) {
     console.log(`${serverUrl}/${url}`);
@@ -11,75 +12,16 @@ function post(url: string) {
     return Promise.resolve();
 }
 
-export async function fetchTasks(): Promise<Order[]> {
-    const tasks= await get('tasks');
+export async function fetchAssignedOrders(): Promise<Order[]> {
+    const tasks= await get('assigned-orders');
     console.log(tasks);
-    return [
-        {
-            id: '123',
-            unit: 'תותחנים',
-            region: 'צפון',
-            subItems: [
-                {
+    return orders;
+}
 
-                    id: '11',
-                    productId: '1',
-                    productName: 'מגפיים',
-                    quantity: 200,
-                    requestedQuantity: 0,
-                    status: 'assigned'
-                },
-                {
-                    id: '22',
-                    productId: '2',
-                    productName: 'פגזים',
-                    quantity: 200,
-                    requestedQuantity: 0,
-                   status: 'assigned'
-                },
-                {
-                    id: '33',
-                    productId: '3',
-                    productName: 'חולצות',
-                    quantity: 200,
-                    requestedQuantity: 0,
-                    status: 'assigned'
-                }
-            ]
-        },
-        {
-            id: '1234',
-            unit: 'תותחנים',
-            region: 'צפון',
-            subItems: [
-                {
-
-                    id: '11',
-                    productId: '1',
-                    productName: 'מגפיים',
-                    quantity: 200,
-                    requestedQuantity: 0,
-                    status: 'assigned'
-                },
-                {
-                    id: '22',
-                    productId: '2',
-                    productName: 'פגזים',
-                    quantity: 200,
-                    requestedQuantity: 0,
-                   status: 'assigned'
-                },
-                {
-                    id: '33',
-                    productId: '3',
-                    productName: 'חולצות',
-                    quantity: 200,
-                    requestedQuantity: 0,
-                    status: 'assigned'
-                }
-            ]
-        }
-       ]
+export async function fetchOrders(): Promise<Order[]> {
+    const tasks= await get('orders');
+    console.log(tasks);
+    return orders;
 }
 
 export function assignTask(id: string) {

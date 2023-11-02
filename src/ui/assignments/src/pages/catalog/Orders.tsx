@@ -3,17 +3,16 @@ import {
   Body1,
   Button,
   shorthands,
-} from "@fluentui/react-components";
-import {
   Card,
   CardFooter,
   CardHeader,
   CardPreview,
 } from "@fluentui/react-components";
-import { assignTask, fetchTasks } from "../../api.ts";
+import { TextExpand24Regular, TextCollapse24Filled } from "@fluentui/react-icons"
+import { assignTask, fetchOrders } from "../../api.ts";
 import { useEffect, useState } from "react";
 import { Order, SubItem } from "../../types.ts";
-import { SubItems } from "./Products.tsx";
+import { SubItems } from "./SubItems.tsx";
 
 const useStyles = makeStyles({
   card: {
@@ -24,17 +23,17 @@ const useStyles = makeStyles({
   },
 });
 
-export const Catalog = () => {
+export const Orders = () => {
   const styles = useStyles();
 
   const [orders, setOrders] = useState<Order[] | undefined>();
+  const [openNoteIds, setOpenNoteIds] = useState<string[]>([]);
 
   const handleAssign = (id: string) => {
     assignTask(id);
   };
 
   const handleSubItemsChange = (orderId: string, subItems: SubItem[]) => {
-    debugger;
     setOrders(
       orders?.map((order) =>
         order.id === orderId ? { ...order, subItems } : order
@@ -42,8 +41,15 @@ export const Catalog = () => {
     );
   };
 
+  const toggleOpenNote = (id: string) => {
+    setOpenNoteIds(openNoteIds => openNoteIds.includes(id)
+        ? openNoteIds.filter(openNoteId => openNoteId !== id)
+        : [...openNoteIds, id]
+    );
+  }
+
   useEffect(() => {
-    fetchTasks().then((items) => setOrders(items));
+    fetchOrders().then((items) => setOrders(items));
   }, []);
 
   if (!orders) {
@@ -53,9 +59,9 @@ export const Catalog = () => {
   return (
     <div style={{ margin: "auto" }}>
       <h2 style={{ textAlign: "center", margin: "20px auto" }}>בקשות</h2>
-      {orders.map(({ id, unit, subItems }) => {
+      {orders.map(({ id, unit, subItems, comment }) => {
         return (
-          <Card key={id} className={styles.card}>
+          <Card key={id} className={styles.card} >
             <CardHeader
               header={
                 <Body1 style={{ textAlign: "left" }}>
@@ -69,8 +75,24 @@ export const Catalog = () => {
                 onChange={(subItems) => handleSubItemsChange(id, subItems)}
                 items={subItems}
               />
-            </CardPreview>
-
+              {
+                  comment && <a
+                  style={{ display: 'flex', alignItems: 'center', margin: 10 }}
+                    onClick={()=> toggleOpenNote(id)}>
+                הערות
+                    {
+                    openNoteIds.includes(id)
+                      ? <TextCollapse24Filled />
+                      : <TextExpand24Regular />
+                  }
+                  </a>
+              }
+              {
+                openNoteIds.includes(id)
+                    ? <p style={{ margin: 10 }}>{comment}</p>
+                    : null
+              }
+              </CardPreview>
             <CardFooter>
               <Button onClick={() => handleAssign(id)} disabled={subItems.every(subItem => !subItem?.requestedQuantity)}>שלח</Button>
             </CardFooter>

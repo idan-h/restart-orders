@@ -3,6 +3,7 @@ export type Order = {
     region: string;
     unit: string;
     subItems: Array<SubItem>;
+    comment: string
   };
 
 export type SubItem = {

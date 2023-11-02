@@ -8,7 +8,8 @@ import {
 import { LoginForm } from "./pages/login/LoginForm";
 import { HomePage } from "./pages/home/HomePage";
 import { EditOrder } from "./pages/edit-order/EditOrder";
-import {Catalog} from "./pages/catalog/Catalog.tsx";
+import {Orders} from "./pages/catalog/Orders.tsx";
+import {AssignedOrders} from "./pages/catalog/AssignedOrders.tsx";
 import "./App.css";
 
 function App() {
@@ -16,7 +17,8 @@ function App() {
     <FluentProvider theme={webLightTheme} dir="rtl">
       <Router>
         <Routes>
-          <Route path="/catalog" Component={Catalog}></Route>
+          <Route path="/my-orders" Component={AssignedOrders}></Route>
+          <Route path="/orders" Component={Orders}></Route>
           <Route path="/login" Component={LoginForm}></Route>
           <Route
             path="/edit-order/:orderId"

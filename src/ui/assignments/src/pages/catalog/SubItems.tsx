@@ -11,12 +11,12 @@ import { SubItem } from "../../types.ts";
 
 type Props = {
   items: SubItem[];
-  onChange: (products: SubItem[]) => void;
+  onChange?: (products: SubItem[]) => void;
 };
 
 export const SubItems = ({ items, onChange }: Props) => {
   const handleProductToggle = (id: string, checked: boolean) => {
-    onChange(
+    onChange!(
       items.map((item) =>
         id === item.id
           ? {
@@ -29,7 +29,7 @@ export const SubItems = ({ items, onChange }: Props) => {
   };
 
   const handleSubItemChange = (id: string, value: number) => {
-    onChange(
+    onChange!(
       items.map((item) =>
         id === item.id
           ? {
@@ -44,19 +44,21 @@ export const SubItems = ({ items, onChange }: Props) => {
   console.log(items);
 
   return (
-    <Table arial-label="Default table">
+    <Table>
       <TableBody>
         {items.map(({ id, productName, quantity, requestedQuantity }) => (
           <TableRow key={id}>
             <TableCell>
-              <TableCellLayout>{productName}</TableCellLayout>
+              <TableCellLayout ><div style={{  maxWidth: 200, textOverflow: 'ellipsis', overflow: "hidden", wordWrap: "break-word", whiteSpace: "nowrap" }}>
+                  {productName}</div>
+              </TableCellLayout>
             </TableCell>
             <TableCell>
               <TableCellLayout>{quantity}</TableCellLayout>
             </TableCell>
             <TableCell>
               <Input
-                style={{ width: "80px" }}
+                style={{ width: "60px" }}
                 min={1}
                 max={quantity}
                 onChange={(_, data) =>
@@ -67,6 +69,7 @@ export const SubItems = ({ items, onChange }: Props) => {
                 disabled={!requestedQuantity}
               />
             </TableCell>
+          {onChange &&
             <TableCell>
               <TableCellLayout>
                 <Switch
@@ -74,6 +77,7 @@ export const SubItems = ({ items, onChange }: Props) => {
                 />
               </TableCellLayout>
             </TableCell>
+          }
           </TableRow>
         ))}
       </TableBody>
