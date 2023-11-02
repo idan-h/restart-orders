@@ -18,13 +18,7 @@ export const EditOrder: React.FC<{ orderId: string }> = ({ orderId }) => {
         <Table>
           <TableBody>
             <TableRow>
-              <DataGridCell>1</DataGridCell>
-              <DataGridCell>1</DataGridCell>
-            </TableRow>
-            <TableRow>
-              <DataGridCell>3</DataGridCell>
-              <DataGridCell>4</DataGridCell>
-            </TableRow>
+              </TableRow>
           </TableBody>
 >        </Table>
       </CardPreview>

@@ -25,6 +25,7 @@ type Response = {
   orders: Array<{
     id: string;
     region: string;
+    unit: string;
     subItems: Array<{
       id: string;
       productId: string;
@@ -41,6 +42,7 @@ type Response = {
   orders: Array<{
     id: string;
     region: string;
+    unit: string;
     subItems: Array<{
       id: string;
       productId: string;
@@ -85,6 +87,7 @@ type Response = {
   order: {
     id: string;
     region: string;
+    unit: string;
     subItems: Array<{
       id: string;
       productId: string;

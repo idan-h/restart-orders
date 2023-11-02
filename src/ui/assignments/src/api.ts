@@ -1,66 +1,87 @@
-import { Task } from './types'
+import { Order } from './types'
 import { serverUrl } from './consts.ts'
 
-function get(url) {
+function get(url: string) {
     console.log(`${serverUrl}/${url}`);
     return Promise.resolve();
 }
 
-function post(url) {
+function post(url: string) {
     console.log(`${serverUrl}/${url}`);
     return Promise.resolve();
 }
 
-export async function fetchTasks(): Promise<Task[]> {
+export async function fetchTasks(): Promise<Order[]> {
     const tasks= await get('tasks');
     console.log(tasks);
     return [
         {
             id: '123',
             unit: 'תותחנים',
-            products: [
+            region: 'צפון',
+            subItems: [
                 {
 
                     id: '11',
-                    type: 'מגפיים',
-                    amount: 200,
-                    requestedAmount: 0
+                    productId: '1',
+                    productName: 'מגפיים',
+                    quantity: 200,
+                    requestedQuantity: 0,
+                    status: 'assigned'
                 },
                 {
                     id: '22',
-                    type: 'פגזים',
-                    amount: 200,
-                    requestedAmount: 0
+                    productId: '2',
+                    productName: 'פגזים',
+                    quantity: 200,
+                    requestedQuantity: 0,
+                   status: 'assigned'
                 },
                 {
                     id: '33',
-                    type: 'חולצות',
-                    amount: 200,
-                    requestedAmount: 0
+                    productId: '3',
+                    productName: 'חולצות',
+                    quantity: 200,
+                    requestedQuantity: 0,
+                    status: 'assigned'
                 }
             ]
         },
         {
-            id: '12345',
-            unit: 'שלדג',
-            products: [
+            id: '1234',
+            unit: 'תותחנים',
+            region: 'צפון',
+            subItems: [
                 {
-                    id: '3',
-                    type: 'וסטים',
-                    amount: 300,
-                    requestedAmount: 0
+
+                    id: '11',
+                    productId: '1',
+                    productName: 'מגפיים',
+                    quantity: 200,
+                    requestedQuantity: 0,
+                    status: 'assigned'
                 },
                 {
-                    id: '777',
-                    type: 'טונה',
-                    amount: 10,
-                    requestedAmount: 0
+                    id: '22',
+                    productId: '2',
+                    productName: 'פגזים',
+                    quantity: 200,
+                    requestedQuantity: 0,
+                   status: 'assigned'
+                },
+                {
+                    id: '33',
+                    productId: '3',
+                    productName: 'חולצות',
+                    quantity: 200,
+                    requestedQuantity: 0,
+                    status: 'assigned'
                 }
             ]
         }
-    ]
+       ]
 }
 
-export function assignTask(id) {
+export function assignTask(id: string) {
     return post(id);
 }
