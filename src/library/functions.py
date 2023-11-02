@@ -239,7 +239,7 @@ def validate_user_login(api_key, email, password):
 def get_subitem_statuses(api_key):
     monday_api = MondayApi(api_key, API_URL)
     monday_board = MondayBoard(monday_api, id=ORDERS_BOARD_ID)
-    sub_items = monday_board.get_subitem_statuses(limit=1)
+    sub_items = monday_board.get_subitems(limit=1)
     column_values = {column['column']['id']: column['column']['settings_str'] for column in sub_items['column_values'][0]}
 
     return list(json.loads(column_values['status'])['labels'].values())

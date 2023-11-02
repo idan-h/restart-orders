@@ -188,7 +188,7 @@ class MondayBoard:
         else:
             return json_normalize(self.mondayApi.query(query, return_items_as=return_items_as)['boards'][0]['items'])
 
-    def get_subitem_statuses(self, return_items_as='dataframe', limit=500):
+    def get_subitems(self, return_items_as='dataframe', limit=500):
         QUERY_TEMPLATE = '''
               {{
               boards(ids:{board_id})
