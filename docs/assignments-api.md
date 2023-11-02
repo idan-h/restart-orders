@@ -83,6 +83,7 @@ type Request = {
 type Request = {
   orderId: string;
   subItemId: string;
+  subItemBoardId: string;
   status: string;
 };
 ```
