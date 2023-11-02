@@ -6,16 +6,16 @@ import {
   Table,
   TableBody,
   TableRow,
+  Button,
 } from "@fluentui/react-components";
 import React, { useEffect } from "react";
-import {
-  useOrdersService,
-} from "../../services/orders";
+import { useOrdersService } from "../../services/orders";
 import { Order } from "../../types";
-import { Link } from 'react-router-dom';
+import { Link } from "react-router-dom";
 
 export const EditOrder: React.FC<{ orderId: string }> = ({ orderId }) => {
-  const {fetchOrder, fetchOrderStatusNames} = useOrdersService()
+  const { fetchOrder, fetchOrderStatusNames, unAssignSubItem, changeStatus } =
+    useOrdersService();
   const [order, setOrder] = React.useState<Order | undefined>(undefined);
   const [orderStatusNames, setOrderStatusNames] = React.useState<
     string[] | undefined
@@ -28,7 +28,12 @@ export const EditOrder: React.FC<{ orderId: string }> = ({ orderId }) => {
     []
   );
 
-  function handleStatusChange(subItemId: string, newStatus: string) {
+  async function handleStatusChange(
+    orderId: string,
+    subItemId: string,
+    newStatus: string
+  ) {
+    await changeStatus({ orderId, subItemId, status: newStatus });
     setOrder(
       order && {
         ...order,
@@ -43,9 +48,27 @@ export const EditOrder: React.FC<{ orderId: string }> = ({ orderId }) => {
     );
   }
 
+  async function handleUnassign(orderId: string, subItemId: string) {
+    await unAssignSubItem({ orderId, subItemId });
+    setOrder(
+      order && {
+        ...order,
+        subItems: [
+          ...order.subItems.map((subItem) =>
+            subItem.id === subItemId
+              ? { ...subItem, status: undefined, userId: undefined }
+              : subItem
+          ),
+        ],
+      }
+    );
+  }
+
   return order ? (
     <>
-      <p><Link to="/my-orders">חזרה</Link></p>
+      <p>
+        <Link to="/my-orders">חזרה</Link>
+      </p>
       <h2>עריכת הזמנה {orderId}</h2>
       <div>
         עבור יחידה <b>{order.unit}</b> ב-<b>{order.region}</b>
@@ -60,15 +83,22 @@ export const EditOrder: React.FC<{ orderId: string }> = ({ orderId }) => {
                 <DataGridCell>{subItem.quantity}</DataGridCell>
                 <DataGridCell>
                   <Combobox
-                    value={subItem.status}
+                    value={subItem.status ?? "לא מספק"}
                     onOptionSelect={(_, data) =>
-                      handleStatusChange(subItem.id, data.optionValue ?? "")
+                      handleStatusChange(
+                        order.id,
+                        subItem.id,
+                        data.optionValue ?? ""
+                      )
                     }
                   >
                     {orderStatusNames?.map((status) => (
                       <Option key={status}>{status}</Option>
                     ))}
                   </Combobox>
+                  <Button onClick={() => handleUnassign(order.id, subItem.id)}>
+                    לא יכול לספק
+                  </Button>
                 </DataGridCell>
               </>
             </TableRow>

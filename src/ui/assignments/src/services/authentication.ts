@@ -1,7 +1,7 @@
 import React, { useContext } from "react";
 
 export function makeFakeAuthenticationService() {
-  let userId: string | undefined = localStorage.getItem("orders") ?? undefined;
+  let userId: string | undefined = localStorage.getItem("userId") ?? undefined;
 
   return {
     async login(_userName: string, _password: string) {

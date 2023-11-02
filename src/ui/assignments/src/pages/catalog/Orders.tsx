@@ -35,12 +35,18 @@ export const Orders = () => {
   const { fetchUnassignedOrders, assignSubItem } = useOrdersService();
 
   const handleAssign = (orderId: string) => {
+    console.log(
+      "************************* handleassign",
+      orders
+        ?.find((order) => order.id === orderId)
+        ?.subItems.filter((subItem) => !!subItem.userId)
+    );
     Promise.all(
       orders
         ?.find((order) => order.id === orderId)
-        ?.subItems.map((subItem) =>
-          assignSubItem({ orderId, subItemId: subItem.id })
-        ) ?? []
+        ?.subItems.filter((subItem) => !!subItem.userId)
+        .map((subItem) => assignSubItem({ orderId, subItemId: subItem.id })) ??
+        []
     );
   };
 

@@ -8,6 +8,7 @@ import {
   Input,
 } from "@fluentui/react-components";
 import { SubItem } from "../../types.ts";
+import { useAuthenticationService } from "../../services/authentication.ts";
 
 type Props = {
   items: SubItem[];
@@ -15,6 +16,7 @@ type Props = {
 };
 
 export const SubItems = ({ items, onChange }: Props) => {
+  const { userId } = useAuthenticationService();
   const handleProductToggle = (id: string, checked: boolean) => {
     onChange!(
       items.map((item) =>
@@ -22,6 +24,7 @@ export const SubItems = ({ items, onChange }: Props) => {
           ? {
               ...item,
               requestedQuantity: checked ? item.quantity : 0,
+              userId: userId(),
             }
           : item
       )
@@ -34,23 +37,31 @@ export const SubItems = ({ items, onChange }: Props) => {
         id === item.id
           ? {
               ...item,
-                requestedQuantity: value,
+              requestedQuantity: value,
             }
           : item
       )
     );
   };
 
-  console.log(items);
-
   return (
     <Table>
       <TableBody>
-        {items.map(({ id, productName, quantity, requestedQuantity }) => (
+        {items.map(({ id, productName, quantity, userId, requestedQuantity }) => (
           <TableRow key={id}>
             <TableCell>
-              <TableCellLayout ><div style={{  maxWidth: 200, textOverflow: 'ellipsis', overflow: "hidden", wordWrap: "break-word", whiteSpace: "nowrap" }}>
-                  {productName}</div>
+              <TableCellLayout>
+                <div
+                  style={{
+                    maxWidth: 200,
+                    textOverflow: "ellipsis",
+                    overflow: "hidden",
+                    wordWrap: "break-word",
+                    whiteSpace: "nowrap",
+                  }}
+                >
+                  {productName}
+                </div>
               </TableCellLayout>
             </TableCell>
             <TableCell>
@@ -69,15 +80,18 @@ export const SubItems = ({ items, onChange }: Props) => {
                 disabled={!requestedQuantity}
               />
             </TableCell>
-          {onChange &&
-            <TableCell>
-              <TableCellLayout>
-                <Switch
-                  onChange={(_, data) => handleProductToggle(id, data.checked)}
-                />
-              </TableCellLayout>
-            </TableCell>
-          }
+            {onChange && (
+              <TableCell>
+                <TableCellLayout>
+                  <Switch
+                    onChange={(_, data) =>
+                      handleProductToggle(id, data.checked)
+                    }
+                    checked={!!userId}
+                  />
+                </TableCellLayout>
+              </TableCell>
+            )}
           </TableRow>
         ))}
       </TableBody>
