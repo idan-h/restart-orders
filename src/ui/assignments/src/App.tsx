@@ -2,7 +2,7 @@ import { FluentProvider, webLightTheme } from "@fluentui/react-components";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import { LoginForm } from "./pages/login/LoginForm";
 import { HomePage } from "./pages/home/HomePage";
-import {Catalog} from "./Catalog.tsx";
+import {Catalog} from "./pages/catalog/Catalog.tsx";
 import "./App.css";
 
 function App() {

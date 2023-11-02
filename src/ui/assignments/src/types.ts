@@ -1,9 +1,12 @@
+export type Product = {
+    id: string;
+    type: string;
+    amount: number;
+    requestedAmount: number;
+}
+
 export type Task = {
     id: string;
-    products: [
-        {
-            type: string,
-            amount: number
-        }
-    ]
+    unit: string;
+    products: Product[]
 }
