@@ -28,6 +28,7 @@ type Response = {
     unit: string;
     subItems: Array<{
       id: string;
+      subItemBoardId: number;
       productId: string;
       quantity: number;
       userId: string | null;
@@ -47,6 +48,7 @@ type Response = {
     unit: string;
     subItems: Array<{
       id: string;
+      subItemBoardId: number;
       productId: string;
       quantity: number;
       userId: string | null;
@@ -79,7 +81,6 @@ type Request = {
 
 ```ts
 type Request = {
-  subItemBoardId: string;
   orderId: string;
   subItemId: string;
   status: string;
