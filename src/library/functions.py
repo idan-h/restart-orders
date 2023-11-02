@@ -1,5 +1,5 @@
 from .monday_api import MondayApi, MondayBoard
-from .consts import API_URL, PRODUCT_BOARD_ID, ORDERS_BOARD_ID, DONATIONS_BOARD_ID , SUPPLIERS_BOARD_ID
+from .consts import API_URL, PRODUCT_BOARD_ID, ORDERS_BOARD_ID, DONATIONS_BOARD_ID , SUPPLIERS_BOARD_ID, PLATFORM_REGISTRATION_BOARD_ID
 import uuid
 import json
 import pandas as pd
@@ -214,3 +214,23 @@ def get_suppliers_sectors(api_key):
     return [{"name" : v , "id" : k } for k , v in sector_field_labels.items()]
 
 
+def validate_user_login(api_key, email, password):
+    monday_api = MondayApi(api_key, API_URL)
+    monday_board = MondayBoard(monday_api, id=PLATFORM_REGISTRATION_BOARD_ID)
+    password_column_id = monday_board.get_column_id("Password")
+    print(password_column_id)
+    users =  monday_board.get_items_by_column_values(monday_board.get_column_id("Email"), email, return_items_as='json')
+    users = users.get('data').get('items_page_by_column_values').get('items')
+    if not users:
+        print("user not found")
+        return False
+
+    user = users[0]
+ 
+    column_values = {v['id']: v['text'] for v in user.get('column_values')}
+ 
+    print(column_values)
+    if column_values.get(password_column_id) == password:
+        return True
+    else:
+        return False
