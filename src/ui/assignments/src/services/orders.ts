@@ -1,19 +1,10 @@
-export type Order = {
-  id: string;
-  region: string;
-  subItems: Array<{
-    id: string;
-    productId: string;
-    productName: string;
-    quantity: number;
-    status: string | undefined; // if `undefined`, then the subitem is unassigned
-  }>;
-};
+import { Order } from "../types";
 
 export async function fetchOrder(_orderId: string): Promise<Order> {
   return {
     id: "abc",
     region: "US",
+    unit: "מורן",
     subItems: [
       {
         id: "abc",

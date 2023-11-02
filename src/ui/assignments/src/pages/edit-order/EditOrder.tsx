@@ -1,6 +1,15 @@
-import { Card, CardHeader, CardPreview, DataGridCell, Table, TableBody, TableRow } from "@fluentui/react-components";
+import {
+  Card,
+  CardHeader,
+  CardPreview,
+  DataGridCell,
+  Table,
+  TableBody,
+  TableRow,
+} from "@fluentui/react-components";
 import React, { useEffect } from "react";
-import { type Order, fetchOrder } from "../../services/orders";
+import { fetchOrder } from "../../services/orders";
+import { Order } from '../../types';
 
 export const EditOrder: React.FC<{ orderId: string }> = ({ orderId }) => {
   const [order, setOrder] = React.useState<Order | undefined>(undefined);
@@ -13,14 +22,23 @@ export const EditOrder: React.FC<{ orderId: string }> = ({ orderId }) => {
         <h3>הזמנה {orderId}</h3>
       </CardHeader>
       <CardPreview>
-        <div>מיקום: {order?.region}</div>
+        <div>
+          עבור יחידה {order.unit} ב-{order.region}
+        </div>
         <h4>פריטים</h4>
         <Table>
           <TableBody>
             <TableRow>
-              </TableRow>
+              {order.subItems.map((subItem) => (
+                <>
+                  <DataGridCell>{subItem.productName}</DataGridCell>
+                  <DataGridCell>{subItem.quantity}</DataGridCell>
+                  <DataGridCell>{subItem.status}</DataGridCell>
+                </>
+              ))}
+            </TableRow>
           </TableBody>
->        </Table>
+        </Table>
       </CardPreview>
     </Card>
   ) : null;
