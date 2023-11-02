@@ -45,7 +45,7 @@ export const Products = ({ items, onChange }: Props) => {
                             </TableCellLayout>
                         </TableCell>
                         <TableCell>
-                            <Input style={{ width: '80px' }} min={1} onChange={(_, data) =>  handleProductChange(id, data.value)} value={requestedAmount.toString()} type="number"
+                            <Input style={{ width: '80px' }} min={1} max={amount} onChange={(_, data) =>  handleProductChange(id, data.value)} value={requestedAmount.toString()} type="number"
                                    disabled={!requestedAmount} />
                         </TableCell>
                         <TableCell>

@@ -9,6 +9,7 @@ import { LoginForm } from "./pages/login/LoginForm";
 import { HomePage } from "./pages/home/HomePage";
 import { EditOrder } from "./pages/edit-order/EditOrder";
 import {Catalog} from "./pages/catalog/Catalog.tsx";
+import {AboutUs} from "./pages/about/AboutUs.tsx";
 import "./App.css";
 
 function App() {
@@ -18,6 +19,7 @@ function App() {
         <Routes>
           <Route path="/catalog" Component={Catalog}></Route>
           <Route path="/login" Component={LoginForm}></Route>
+          <Route path="/about-us" Component={AboutUs}></Route>
           <Route
             path="/edit-order/:orderId"
             // eslint-disable-next-line react-hooks/rules-of-hooks
