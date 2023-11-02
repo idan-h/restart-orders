@@ -39,7 +39,7 @@ function App() {
               ></Route>
               <Route
                 path="/login"
-                Component={OnlyIfAuthenticated(LoginForm)}
+                Component={LoginForm}
               ></Route>
               <Route
                 path="/edit-order/:orderId"

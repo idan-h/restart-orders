@@ -5,10 +5,15 @@ export function makeFakeAuthenticationService() {
   return {
     async login(_userName: string, _password: string) {
       userId = "this-is-good-userid";
+      localStorage.setItem("userId", userId);
       return userId;
     },
     userId() {
       return userId;
+    },
+    async logout() {
+      userId = undefined;
+      localStorage.removeItem("userId");
     },
   };
 }
