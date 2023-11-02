@@ -1,4 +1,6 @@
 import {
+  Combobox,
+  Option,
   DataGridCell,
   Spinner,
   Table,
@@ -6,13 +8,39 @@ import {
   TableRow,
 } from "@fluentui/react-components";
 import React, { useEffect } from "react";
-import { fetchOrder } from "../../services/orders";
+import {
+  fetchOrder,
+  fetchOrderStatuses as fetchOrderStatusNames,
+} from "../../services/orders";
 import { Order } from "../../types";
 
 export const EditOrder: React.FC<{ orderId: string }> = ({ orderId }) => {
   const [order, setOrder] = React.useState<Order | undefined>(undefined);
+  const [orderStatusNames, setOrderStatusNames] = React.useState<
+    string[] | undefined
+  >(undefined);
 
   useEffect(() => void (async () => setOrder(await fetchOrder(orderId)))(), []);
+  useEffect(
+    () =>
+      void (async () => setOrderStatusNames(await fetchOrderStatusNames()))(),
+    []
+  );
+
+  function handleStatusChange(subItemId: string, newStatus: string) {
+    setOrder(
+      order && {
+        ...order,
+        subItems: [
+          ...order.subItems.map((subItem) =>
+            subItem.id === subItemId
+              ? { ...subItem, status: newStatus }
+              : subItem
+          ),
+        ],
+      }
+    );
+  }
 
   return order ? (
     <>
@@ -28,7 +56,18 @@ export const EditOrder: React.FC<{ orderId: string }> = ({ orderId }) => {
               <>
                 <DataGridCell>{subItem.productName}</DataGridCell>
                 <DataGridCell>{subItem.quantity}</DataGridCell>
-                <DataGridCell>{subItem.status}</DataGridCell>
+                <DataGridCell>
+                  <Combobox
+                    value={subItem.status}
+                    onOptionSelect={(_, data) =>
+                      handleStatusChange(subItem.id, data.optionValue ?? "")
+                    }
+                  >
+                    {orderStatusNames?.map((status) => (
+                      <Option key={status}>{status}</Option>
+                    ))}
+                  </Combobox>
+                </DataGridCell>
               </>
             </TableRow>
           ))}

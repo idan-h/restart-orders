@@ -23,3 +23,7 @@ export async function fetchOrder(_orderId: string): Promise<Order> {
     ],
   };
 }
+
+export async function fetchOrderStatuses(): Promise<string[]> {
+  return ["מחכה", "בהכנה", "בדרך", "נמסר"];
+}
