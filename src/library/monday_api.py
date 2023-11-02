@@ -25,6 +25,7 @@ class MondayApi:
                 if req_json.get('error_code') == 'ComplexityException':
                     match = re.search(r"reset in (\d+) seconds", req_json['error_message'])
                     seconds = int(match.group(1)) if match else 20
+                    print(f"ERROR! - {req_json['error_message']}\nwaiting {seconds + 5} seconds and retrying...")
                     time.sleep(seconds + 5)
                     return self.query(query, variables, return_items_as)
                 else:
@@ -239,10 +240,14 @@ class MondayBoard:
                             subitems {{
                                 id
                                 name
+                                board {{
+                                    id
+                                }}
                                 column_values {{
                                     id
                                     value
                                     type
+                                    text
                                 }}
                             }}
                           }}
@@ -266,10 +271,14 @@ class MondayBoard:
                             subitems {{
                                 id
                                 name
+                                board {{
+                                    id
+                                }}
                                 column_values {{
                                     id
                                     value
                                     type
+                                    text
                                 }}
                             }}
                           }}
@@ -285,6 +294,7 @@ class MondayBoard:
         else:
             r = json_normalize(self.mondayApi.query(query, return_items_as=return_items_as))
             return r
+        
     def write_update(self, item_id, update_text):
         QUERY_TEMPLATE = '''
               mutation {{

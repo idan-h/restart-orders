@@ -244,3 +244,116 @@ def get_subitem_statuses(api_key):
 
     return list(json.loads(column_values['status'])['labels'].values())
 
+def get_unassigned_orders(api_key):
+    orders = get_valid_orders(api_key)
+
+    orders = [order for order in orders if any(subItem.userId is None or subItem.userId == "None" for subItem in order.subItems)]   
+    return orders_to_json(orders)
+
+def get_assigned_orders_to_user(api_key, user_id):
+    orders = get_valid_orders(api_key)
+
+    orders = [order for order in orders if any(subItem.userId is not None and subItem.userId == user_id for subItem in order.subItems)]   
+    return orders_to_json(orders)
+
+def get_valid_orders(api_key):
+    monday_api = MondayApi(api_key, API_URL)
+    # TODO revert
+    # monday_board = MondayBoard(monday_api, id=ORDERS_BOARD_ID)
+    monday_board = MondayBoard(monday_api, id=1308624313)
+
+    # TODO handle pagination
+    # status7 is the 'בקשה תקינה?' column
+    items = monday_board.get_items_by_column_values('status7', 'בקשה תקינה', return_items_as='json', limit=5)\
+        .get('data').get('items_page_by_column_values').get('items')
+
+    # print(items)
+    orders = convert_to_orders(items)
+    return orders
+
+def convert_to_orders(items):
+    orders = []
+    for item in items:
+        # print(item)
+        id = item['id']
+        name = item['name']
+        region = next((col['text'] for col in item['column_values'] if col['id'] == 'dropdown'), "None") # region
+        unit = next((col['text'] for col in item['column_values'] if col['id'] == 'text0'), "None") # unit
+        phone = next((col['text'] for col in item['column_values'] if col['id'] == 'text8'), "None") # phone
+        # print(f"id: {id} name: {name} phone: {phone} region: {region} unit: {unit}")
+        subItems = []
+        for subitem in item['subitems']:
+            sub_id = subitem['id']
+            board_id = subitem['board']['id']
+            product_id = next((get_product_id_from_connect_boards(col['value']) for col in subitem['column_values'] if col['id'] == 'connect_boards'), "None") # productId / מספר מוצר
+            quantity = next((col['text'] for col in subitem['column_values'] if col['id'] == 'numbers'), "None") # quantity / כמות 
+            user_id = next((col['text'] for col in subitem['column_values'] if col['id'] == 'text4'), "None") # userId / אימייל משויך להזמנה
+            status = next((col['text'] for col in subitem['column_values'] if col['id'] == 'status'), "None")  
+            # print(f"sub_id: {sub_id} board_id: {board_id} product_id: {product_id} quantity: {quantity} user_id: {user_id} status: {status}")
+            subItems.append(SubItem(sub_id, board_id, product_id, quantity, user_id, status))
+        orders.append(Order(id, name, phone, region, unit, subItems))
+    return orders
+
+def orders_to_json(orders):
+    orders_dict = [order.to_dict() for order in orders]
+    return json.dumps(orders_dict)
+
+# get json from connect_boards column and return the product id
+def get_product_id_from_connect_boards(connect_boards_object):
+    if connect_boards_object is None:
+        return "None"
+    connect_boards_object = json.loads(connect_boards_object)
+    if connect_boards_object['linkedPulseIds'] is None:
+        return "None"
+    if connect_boards_object['linkedPulseIds'][0] is None:
+        return "None"
+    if connect_boards_object['linkedPulseIds'][0]['linkedPulseId'] is None:
+        return "None"
+    
+    return connect_boards_object['linkedPulseIds'][0]['linkedPulseId']
+
+class SubItem:
+    def __init__(self, id, boardId, productId, quantity, userId, status=None):
+        self.id = id
+        self.boardId = boardId
+        self.productId = productId
+        self.quantity = quantity
+        self.userId = userId
+        self.status = status
+    
+    def to_json(self):
+        return json.dumps(self.__dict__)
+    
+    def to_dict(self):
+        return self.__dict__
+
+class Order:
+    def __init__(self, id, name, phone, region, unit, subItems):
+        self.id = id
+        self.name = name
+        self.phone = phone
+        self.region = region
+        self.unit = unit
+        self.subItems = subItems
+
+    def to_json(self):
+        return json.dumps({
+            'id': self.id,
+            'name': self.name,
+            'phone': self.phone,
+            'region': self.region,
+            'unit': self.unit,
+            'subItems': [subItem.to_json() for subItem in self.subItems]
+        })
+    
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'name': self.name,
+            'phone': self.phone,
+            'region': self.region,
+            'unit': self.unit,
+            'subItems': [subItem.to_dict() for subItem in self.subItems]
+        }
+
+
