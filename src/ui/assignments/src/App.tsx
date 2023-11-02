@@ -7,7 +7,7 @@ import "./App.css";
 
 function App() {
   return (
-    <FluentProvider theme={webLightTheme}>
+    <FluentProvider theme={webLightTheme} dir='rtl'>
       <Router>
         <Routes>
           <Route path="/catalog" Component={Catalog}></Route>

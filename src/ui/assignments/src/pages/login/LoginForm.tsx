@@ -27,17 +27,17 @@ export const LoginForm = () => {
 
   return (
     <Card style={{ width: "100%" }}>
-      <CardHeader header={<h1>Login</h1>} />
+      <CardHeader header={<h3>פורטל לעמותות</h3>} />
       <CardPreview style={{ padding: "10px" }}>
         <form onSubmit={handleSubmit}>
-          <Field label="Username" orientation="vertical">
+          <Field label="שם משתמש" orientation="vertical">
             <Input
               type="text"
               value={username}
               onChange={handleUsernameChange}
             />
           </Field>
-          <Field label="Password" orientation="vertical">
+          <Field label="סיסמא" orientation="vertical">
             <Input
               type="password"
               value={password}
@@ -47,7 +47,7 @@ export const LoginForm = () => {
         </form>
       </CardPreview>
       <CardFooter>
-        <button type="submit">Login</button>
+        <button type="submit">כניסה</button>
       </CardFooter>
     </Card>
   );
