@@ -1,19 +1,30 @@
-export type Order = {
-    id: string;
-    region: string;
-    unit: string;
-    subItems: Array<SubItem>;
-    comment: string
-  };
+export type BaseOrder = {
+  id: string;
+  region: string;
+  unit: string;
+  comment: string;
+};
 
-export type SubItem = {
+export type Order = BaseOrder & {
+  subItems: Array<SubItem>;
+};
+
+export type MondayOrder = BaseOrder & {
+  subItems: Array<SubItem>;
+};
+
+export type BaseSubItem = {
   id: string;
   productId: string;
-  productName: string;
   quantity: number;
   userId: string | undefined; // if `undefined`, then the subitem is unassigned
   status: string | undefined; // if `undefined`, then the subitem is unassigned
+};
 
+export type MondaySubItem = BaseSubItem
+
+export type SubItem = BaseSubItem & {
+  productName: string;
   // Hack!
   requestedQuantity?: number;
 };

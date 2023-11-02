@@ -59,6 +59,7 @@ function App() {
 
 function OnlyIfAuthenticated(originalComponent: React.FC) {
   return () => {
+    // eslint-disable-next-line react-hooks/rules-of-hooks
     const { userId } = useAuthenticationService();
 
     return userId() ? (

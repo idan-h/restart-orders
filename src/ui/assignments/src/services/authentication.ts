@@ -22,7 +22,7 @@ export function makeFakeAuthenticationService() {
 export const AuthenticationService = React.createContext<
   ReturnType<typeof makeFakeAuthenticationService>
 >(
-  //@ts-expect-error
+  //@ts-expect-error error
   undefined
 );
 

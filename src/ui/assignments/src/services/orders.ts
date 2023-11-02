@@ -85,10 +85,11 @@ export function makeFakeOrdersService(userId: string) {
 }
 
 export const OrdersService =
-  //@ts-expect-error
+  //@ts-expect-error error
   React.createContext<ReturnType<typeof makeFakeOrdersService>>(undefined);
 
 export const useOrdersService = () => useContext(OrdersService);
+
 function saveOrders(orders: Map<string, Order>) {
   localStorage.setItem("orders", JSON.stringify([...orders.entries()]));
 }
