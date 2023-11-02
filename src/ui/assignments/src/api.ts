@@ -17,7 +17,7 @@ export async function fetchTasks(): Promise<Task[]> {
     return [
         {
             id: '123',
-            items: [
+            products: [
                 {
                     type: 'shoes',
                     amount: 200
@@ -26,7 +26,7 @@ export async function fetchTasks(): Promise<Task[]> {
         },
         {
             id: '12345',
-            items: [
+            products: [
                 {
                     type: 'shoes',
                     amount: 300

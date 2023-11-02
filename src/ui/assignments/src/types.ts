@@ -1,6 +1,6 @@
 export type Task = {
     id: string;
-    items: [
+    products: [
         {
             type: string,
             amount: number

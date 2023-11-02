@@ -1,205 +1,87 @@
-import * as React from 'react';
 import {
-    DocumentCard,
-    DocumentCardActivity,
-    DocumentCardDetails,
-    DocumentCardPreview,
-    DocumentCardTitle,
-    IDocumentCardPreviewProps,
-    DocumentCardType,
-    IDocumentCardActivityPerson,
-} from '@fluentui/react/lib/DocumentCard';
-import { Stack, IStackTokens } from '@fluentui/react/lib/Stack';
-import { getTheme } from '@fluentui/react/lib/Styling';
-import { TestImages } from '@fluentui/example-data';
+    makeStyles,
+    Body1,
+    Caption1,
+    Button,
+    shorthands,
+} from "@fluentui/react-components";
+import {
+    Card,
+    CardFooter,
+    CardHeader,
+    CardPreview,
+} from "@fluentui/react-components";
+import {assignTask, fetchTasks} from "./api.ts";
+import {useEffect, useState} from "react";
+import {Task} from "./types.ts";
+import {Products} from "./products.tsx";
 
-const stackTokens: IStackTokens = { childrenGap: 20 };
-const theme = getTheme();
-const { palette, fonts } = theme;
+const resolveAsset = (asset: string) => {
+    const ASSET_URL =
+        "https://raw.githubusercontent.com/microsoft/fluentui/master/packages/react-components/react-card/stories/assets/";
 
-const people: IDocumentCardActivityPerson[] = [
-    { name: 'Annie Lindqvist', profileImageSrc: TestImages.personaFemale },
-    { name: 'Roko Kolar', profileImageSrc: '', initials: 'RK' },
-    { name: 'Aaron Reid', profileImageSrc: TestImages.personaMale },
-    { name: 'Christian Bergqvist', profileImageSrc: '', initials: 'CB' },
-];
-
-const previewPropsUsingIcon: IDocumentCardPreviewProps = {
-    previewImages: [
-        {
-            previewIconProps: {
-                iconName: 'OpenFile',
-                styles: { root: { fontSize: fonts.superLarge.fontSize, color: palette.white } },
-            },
-            width: 144,
-        },
-    ],
-    styles: { previewIcon: { backgroundColor: palette.themePrimary } },
+    return `${ASSET_URL}${asset}`;
 };
 
-const previewProps: IDocumentCardPreviewProps = {
-    getOverflowDocumentCountText: (overflowCount: number) => `+${overflowCount} more`,
-    previewImages: [
-        {
-            name: 'Revenue stream proposal fiscal year 2016 version02.pptx',
-            linkProps: {
-                href: 'http://bing.com',
-                target: '_blank',
-            },
-            previewImageSrc: TestImages.documentPreview,
-            iconSrc: TestImages.iconPpt,
-            width: 144,
-        },
-        {
-            name: 'New Contoso Collaboration for Conference Presentation Draft',
-            linkProps: {
-                href: 'http://bing.com',
-                target: '_blank',
-            },
-            previewImageSrc: TestImages.documentPreviewTwo,
-            iconSrc: TestImages.iconPpt,
-            width: 144,
-        },
-        {
-            name: 'Spec Sheet for design',
-            linkProps: {
-                href: 'http://bing.com',
-                target: '_blank',
-            },
-            previewImageSrc: TestImages.documentPreviewThree,
-            iconSrc: TestImages.iconPpt,
-            width: 144,
-        },
-        {
-            name: 'Contoso Marketing Presentation',
-            linkProps: {
-                href: 'http://bing.com',
-                target: '_blank',
-            },
-            previewImageSrc: TestImages.documentPreview,
-            iconSrc: TestImages.iconPpt,
-            width: 144,
-        },
-    ],
-};
-
-const previewOutlookUsingIcon: IDocumentCardPreviewProps = {
-    previewImages: [
-        {
-            previewIconProps: {
-                iconName: 'OutlookLogo',
-                styles: {
-                    root: {
-                        fontSize: fonts.superLarge.fontSize,
-                        color: '#0078d7',
-                        backgroundColor: palette.neutralLighterAlt,
-                    },
-                },
-            },
-            width: 144,
-        },
-    ],
-    styles: {
-        previewIcon: { backgroundColor: palette.neutralLighterAlt },
+const useStyles = makeStyles({
+    card: {
+        ...shorthands.margin("auto"),
+        textAlign: 'left',
+        width: "720px",
+        maxWidth: "100%",
+        marginBottom: "30px"
     },
-};
+});
 
-export const Catalog: React.FunctionComponent = () => {
+export const Catalog = () => {
+    const styles = useStyles();
+
+    const [items, setItems] = useState<Task[] | undefined>()
+
+    const handleAssign = (id) => {
+        assignTask(id);
+    }
+
+    useEffect(() => {
+        fetchTasks().then(items => setItems(items))
+    }, []);
+
+    if (!items) {
+        return  'Loading...';
+    }
+
     return (
-        <Stack tokens={stackTokens}>
-            <DocumentCard
-                aria-label="Document Card with document preview. Revenue stream proposal fiscal year 2016 version 2.
-      Created by Roko Kolar a few minutes ago"
-                type={DocumentCardType.compact}
-                onClickHref="http://bing.com"
-            >
-                <DocumentCardPreview previewImages={[previewProps.previewImages[0]]} />
-                <DocumentCardDetails>
-                    <DocumentCardTitle title="Revenue stream proposal fiscal year 2016 version02.pptx" shouldTruncate />
-                    <DocumentCardActivity activity="Created a few minutes ago" people={[people[1]]} />
-                </DocumentCardDetails>
-            </DocumentCard>
-            <DocumentCard
-                aria-label={
-                    'Document Card with folder or site activity. 4 files were uploaded. ' +
-                    'Created by Annie Lindqvist a few minutes ago'
-                }
-                type={DocumentCardType.compact}
-                onClickHref="http://bing.com"
-            >
-                <DocumentCardPreview {...previewProps} />
-                <DocumentCardDetails>
-                    <DocumentCardTitle title="4 files were uploaded" shouldTruncate />
-                    <DocumentCardActivity activity="Created a few minutes ago" people={[people[0]]} />
-                </DocumentCardDetails>
-            </DocumentCard>
-            <DocumentCard
-                aria-label="Document Card with icon. View and share files. Created by Aaron Reid a few minutes ago"
-                type={DocumentCardType.compact}
-                onClickHref="http://bing.com"
-            >
-                <DocumentCardPreview {...previewPropsUsingIcon} />
-                <DocumentCardDetails>
-                    <DocumentCardTitle title="View and share files" shouldTruncate />
-                    <DocumentCardActivity activity="Created a few minutes ago" people={[people[2]]} />
-                </DocumentCardDetails>
-            </DocumentCard>
-            <DocumentCard
-                aria-label={
-                    'Document Card with email conversation. Conversation about takeaways from annual SharePoint conference. ' +
-                    'Sent by Christian Bergqvist a few minutes ago'
-                }
-                type={DocumentCardType.compact}
-                onClickHref="http://bing.com"
-            >
-                <DocumentCardPreview {...previewOutlookUsingIcon} />
-                <DocumentCardDetails>
-                    <DocumentCardTitle title="Conversation about takeaways from annual SharePoint conference" shouldTruncate />
-                    <DocumentCardActivity activity="Sent a few minutes ago" people={[people[3]]} />
-                </DocumentCardDetails>
-            </DocumentCard>
-        </Stack>
+        <div style={{ textAlign: 'left' }}>
+            {items.map(({ products }) => {
+                return <Card className={styles.card}>
+                    <CardHeader
+                        image={
+                            <img
+                                src={resolveAsset("avatar_elvia.svg")}
+                                alt="Elvia Atkins avatar picture"
+                            />
+                        }
+                        header={
+                            <Body1>
+                                <b>Elvia Atkins</b> mentioned you
+                            </Body1>
+                        }
+                        description={<Caption1>5h ago · About us - Overview</Caption1>}
+                    />
+
+                    <CardPreview>
+                        Products:
+                        <Products/>
+                        {products.map(({type }) => {
+                          return <div>{type}</div>
+                      })}
+                    </CardPreview>
+
+                    <CardFooter>
+                        <Button onClick={handleAssign}>Assign</Button>
+                    </CardFooter>
+                </Card>
+            })}
+        </div>
     );
 };
-h
-// import {assignTask, fetchTasks} from "./api.ts";
-// import {useEffect, useState} from "react";
-// import {Task} from "./types.ts";
-//
-// export const Catalog = () => {
-//     const [items, setItems] = useState<Task[] | undefined>()
-//
-//     const handleAssign = (id) => {
-//         assignTask(id);
-//     }
-//
-//     useEffect(() => {
-//         fetchTasks().then(items => setItems(items))
-//     }, []);
-//
-//     if (!items) {
-//         return  'Loading...';
-//     }
-//
-//     return <div>
-//         <h3>Tasks :</h3>
-//         <ul>
-//             {items.map(({ id, items  }) =>
-//                 <li>
-//                     Id: {id}
-//                     <div>
-//                         <ul>
-//                             {items.map(({ type, amount }) =>
-//                                 <li>
-//                                     Type: {type}
-//                                     amount: {amount}
-//                                     <button onClick={() => handleAssign(id)}></button>
-//                                 </li>
-//                             )}
-//                         </ul>
-//                     </div>
-//                 </li>
-//             )}
-//         </ul>
-//     </div>
-// }
