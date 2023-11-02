@@ -30,6 +30,8 @@ type Response = {
       id: string;
       productId: string;
       quantity: number;
+      userId: string;
+      status: string | null; // if `null`, then the subitem is unassigned
     }>;
   }>;
 };
@@ -47,6 +49,7 @@ type Response = {
       id: string;
       productId: string;
       quantity: number;
+      userId: string;
       status: string | null; // if `null`, then the subitem is unassigned
     }>
 }
@@ -92,6 +95,7 @@ type Response = {
       id: string;
       productId: string;
       quantity: number;
+      userId: string;
       status: string | null; // if `null`, then the subitem is unassigned
     }
 }
