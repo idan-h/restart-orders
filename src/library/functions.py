@@ -1,5 +1,5 @@
 from .monday_api import MondayApi, MondayBoard
-from .consts import API_URL, PRODUCT_BOARD_ID, ORDERS_BOARD_ID, DONATIONS_BOARD_ID , SUPPLIERS_BOARD_ID, PLATFORM_REGISTRATION_BOARD_ID
+from .consts import API_URL, PRODUCT_BOARD_ID, ORDERS_BOARD_ID, DONATIONS_BOARD_ID , SUPPLIERS_BOARD_ID, PLATFORM_REGISTRATION_BOARD_ID , ORDERS_SUBITEMS_BOARD_ID
 import uuid
 import json
 import pandas as pd
@@ -237,12 +237,63 @@ def validate_user_login(api_key, email, password):
         return False
     
 def get_subitem_statuses(api_key):
-    monday_api = MondayApi(api_key, API_URL)
-    monday_board = MondayBoard(monday_api, id=ORDERS_BOARD_ID)
-    sub_items = monday_board.get_subitems(limit=1)
-    column_values = {column['column']['id']: column['column']['settings_str'] for column in sub_items['column_values'][0]}
+    try :
+        monday_api = MondayApi(api_key, API_URL)
+        monday_board = MondayBoard(monday_api, id=ORDERS_SUBITEMS_BOARD_ID)
+        details = json.loads(monday_board.get_column_details("סטטוס")['settings_str'])['labels']
+        statuses = list(details.values())
+    except Exception as e:
+        print(e)
+        statuses = []
+    return statuses
 
-    return list(json.loads(column_values['status'])['labels'].values())
+
+def assign_product(api_key , order_id , subitem_id ,subitem_board_id ,  user_id ):
+    try:
+        monday_api = MondayApi(api_key, API_URL)
+        monday_board = MondayBoard(monday_api, id=subitem_board_id)
+        columnVals = {
+            "text4": user_id,
+            "status" : {"label": "בטיפול"}
+        }
+        monday_board.change_multiple_column_values( columnVals ,subitem_id )
+
+        return True
+    except Exception as e:
+        print(e)
+        return False
+
+
+def unassign_product(api_key , order_id , subitem_id ,subitem_board_id ):
+    try:
+        monday_api = MondayApi(api_key, API_URL)
+        monday_board = MondayBoard(monday_api, id=subitem_board_id)
+        columnVals = {
+            "text4": "",
+            "status" : {"label": "ממתין"}
+        }
+        monday_board.change_multiple_column_values( columnVals ,subitem_id )
+
+        return True
+    except Exception as e:
+        print(e)
+        return False
+
+def update_order_status(api_key , order_id , subitem_id ,subitem_board_id, subitem_status ):
+    try:
+        monday_api = MondayApi(api_key, API_URL)
+        monday_board = MondayBoard(monday_api, id=subitem_board_id)
+        columnVals = {
+            "status" : { "label": subitem_status }
+        }
+        monday_board.change_multiple_column_values( columnVals ,subitem_id )
+
+        return True
+    except Exception as e:
+        print(e)
+        return False
+
+
 
 def get_unassigned_orders(api_key):
     orders = get_valid_orders(api_key)

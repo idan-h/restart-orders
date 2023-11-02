@@ -1,81 +1,145 @@
 import React, { useContext } from "react";
-import { Order, SubItem } from "../types";
-import FAKE_ORDERS from "../orders.json";
+import { MondayOrder, Order } from "../types";
 
-export function makeFakeOrdersService(userId: string) {
-  const ordersFromStorage = JSON.parse(
-    localStorage.getItem("orders") ?? "null"
-  );
+const baseUrl =
+  "https://njdfolzzmvnaay5oxqife4tuwy.apigateway.il-jerusalem-1.oci.customer-oci.com/v1/";
 
-  const orders = ordersFromStorage
-    ? ordersFromStorage
-    : new Map<string, Order>(FAKE_ORDERS.map((o) => [o.id, o]));
+export function makeOrdersService(userId: string) {
+  if (userId == null) throw new Error("bad login!");
 
-  localStorage.setItem("orders", JSON.stringify(orders));
-
-  if (userId !== "this-is-good-userid") throw new Error("bad login!");
+  let productNames: Map<string, string> | undefined = undefined;
 
   return {
     async fetchOrderStatusNames(): Promise<string[]> {
-      return ["מחכה", "בהכנה", "בדרך", "נמסר"];
+      const response = await fetch(
+        new URL(
+          `get_subitem_statuses?userId=${encodeURIComponent(userId)}`,
+          baseUrl
+        )
+      );
+
+      return (await response.json()).statuses;
     },
     async fetchUnassignedOrders(): Promise<{ orders: Order[] }> {
-      return { orders: Object.values(orders) };
+      if (!productNames) productNames = await fetchProductNames();
+
+      const response = await fetch(
+        new URL(
+          `get-unassigned-orders?userId=${encodeURIComponent(userId)}`,
+          baseUrl
+        )
+      );
+
+      const mondayOrders = (await response.json()) as { orders: MondayOrder[] };
+
+      return {
+        orders: mondayOrders.orders.map((mondayOrders) => ({
+          ...mondayOrders,
+          subItems: mondayOrders.subItems.map((subItem) => ({
+            ...subItem,
+            productName: productNames!.get(subItem.productId)!,
+          })),
+        })),
+      };
     },
     async fetchAssignedOrders(): Promise<{ orders: Order[] }> {
-      return { orders: Object.values(orders) };
+      if (!productNames) productNames = await fetchProductNames();
+
+      const response = await fetch(
+        new URL(
+          `get-assigned-orders?userId=${encodeURIComponent(userId)}`,
+          baseUrl
+        )
+      );
+
+      const mondayOrders = (await response.json()) as { orders: MondayOrder[] };
+
+      return {
+        orders: mondayOrders.orders.map((mondayOrders) => ({
+          ...mondayOrders,
+          subItems: mondayOrders.subItems.map((subItem) => ({
+            ...subItem,
+            productName: productNames!.get(subItem.productId)!,
+          })),
+        })),
+      };
     },
     async fetchOrder(orderId: string): Promise<Order | undefined> {
-      return orders.get(orderId);
-    },
-    async assignSubItem(request: { orderId: string; subItemId: string }) {
-      const order = orders.get(request.orderId);
-      if (!order) throw new Error("order not found!!!!!");
-
-      const subItem = order.subItems.find(
-        (si: SubItem) => si.id === request.subItemId
+      if (!productNames) productNames = await fetchProductNames();
+      const response = await fetch(
+        new URL(
+          `get-order/${encodeURIComponent(orderId)}?userId=${encodeURIComponent(
+            userId
+          )}`,
+          baseUrl
+        )
       );
-      if (!subItem) throw new Error("subItem not found!!!!!");
 
-      subItem.status = "assigned";
+      const mondayOrder = (await response.json()).order as MondayOrder;
 
-      localStorage.setItem("orders", JSON.stringify(orders));
+      return {
+        ...mondayOrder,
+        subItems: mondayOrder.subItems.map((subItem) => ({
+          ...subItem,
+          productName: productNames!.get(subItem.productId)!,
+        })),
+      } as Order;
     },
-    async unAssignSubItem(request: { orderId: string; subItemId: string }) {
-      const order = orders.get(request.orderId);
-      if (!order) throw new Error("order not found!!!!!");
-
-      const subItem = order.subItems.find(
-        (si: SubItem) => si.id === request.subItemId
+    async assignSubItem(request: {
+      orderId: string;
+      subItemId: string;
+      subItemBoardId: string;
+    }) {
+      const response = await fetch(
+        new URL(`assign?userId=${encodeURIComponent(userId)}`, baseUrl),
+        { method: "POST", body: JSON.stringify(request) }
       );
-      if (!subItem) throw new Error("subItem not found!!!!!");
 
-      subItem.status = undefined;
+      await response.json();
+    },
+    async unAssignSubItem(request: {
+      orderId: string;
+      subItemId: string;
+      subItemBoardId: string;
+    }) {
+      const response = await fetch(
+        new URL(`unassign?userId=${encodeURIComponent(userId)}`, baseUrl),
+        { method: "POST", body: JSON.stringify(request) }
+      );
 
-      localStorage.setItem("orders", JSON.stringify(orders));
+      await response.json();
     },
     async changeStatus(request: {
       orderId: string;
       subItemId: string;
+      subItemBoardId: string;
       status: string;
     }) {
-      const order = orders.get(request.orderId);
-      if (!order) throw new Error("order not found!!!!!");
-
-      const subItem = order.subItems.find(
-        (si: SubItem) => si.id === request.subItemId
+      const response = await fetch(
+        new URL(`change-status?userId=${encodeURIComponent(userId)}`, baseUrl),
+        { method: "POST", body: JSON.stringify(request) }
       );
-      if (!subItem) throw new Error("subItem not found!!!!!");
 
-      subItem.status = request.status;
-
-      localStorage.setItem("orders", JSON.stringify(orders));
+      await response.json();
     },
   };
+
+  async function fetchProductNames(): Promise<Map<string, string>> {
+    const response = await fetch(
+      new URL("get-products?userId=" + encodeURIComponent(userId), baseUrl)
+    );
+
+    const mondayProducts = await response.json();
+
+    return new Map<string, string>(
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      mondayProducts.map((mp: any) => [mp.product_number, mp.name])
+    );
+  }
 }
 
 export const OrdersService =
-  //@ts-expect-error
-  React.createContext<ReturnType<typeof makeFakeOrdersService>>(undefined);
+  //@ts-expect-error error
+  React.createContext<ReturnType<typeof makeOrdersService>>(undefined);
 
 export const useOrdersService = () => useContext(OrdersService);

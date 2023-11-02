@@ -25,8 +25,6 @@ export const LoginForm = () => {
   };
 
   const handleSubmit = () => {
-    event.preventDefault();
-
     login(username, password).then(() => navigate('/'))
   };
 

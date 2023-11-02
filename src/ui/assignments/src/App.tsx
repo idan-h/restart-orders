@@ -6,19 +6,18 @@ import {
   useParams,
 } from "react-router-dom";
 import { LoginForm } from "./pages/login/LoginForm";
+import { Logout } from "./pages/login/Logout";
 import { HomePage } from "./pages/home/HomePage";
 import { EditOrder } from "./pages/edit-order/EditOrder";
 import { Orders } from "./pages/catalog/Orders.tsx";
 import { AssignedOrders } from "./pages/catalog/AssignedOrders.tsx";
-import {AboutUs} from "./pages/about/AboutUs.tsx";
+import { AboutUs } from "./pages/about/AboutUs.tsx";
 import "./App.css";
-import {
-  AuthenticationService,
-  makeFakeAuthenticationService,
-  useAuthenticationService,
-} from "./services/authentication.ts";
-import { OrdersService, makeFakeOrdersService } from "./services/orders.ts";
+import { makeFakeAuthenticationService } from "./services/fake-authentication.ts";
+import { makeFakeOrdersService } from "./services/fake-orders.ts";
 import React from "react";
+import { AuthenticationService, useAuthenticationService } from "./services/authentication.ts";
+import { OrdersService } from "./services/orders.ts";
 
 function App() {
   return (
@@ -38,17 +37,17 @@ function App() {
                 path="/orders"
                 Component={OnlyIfAuthenticated(Orders)}
               ></Route>
-              <Route
-                path="/login"
-                Component={LoginForm}
-              ></Route>
+              <Route path="/login" Component={LoginForm}></Route>
+              <Route path="/logout" Component={Logout}></Route>
               <Route path="/about-us" Component={AboutUs}></Route>
-          <Route
+              <Route
                 path="/edit-order/:orderId"
-                // eslint-disable-next-line react-hooks/rules-of-hooks
-                Component={OnlyIfAuthenticated(() => (
-                  <EditOrder orderId={useParams().orderId ?? ""} />
-                ))}
+                Component={OnlyIfAuthenticated(() => {
+                  // eslint-disable-next-line react-hooks/rules-of-hooks
+                  const {orderId} = useParams();
+
+                  return <EditOrder orderId={orderId ?? ""} />;
+                })}
               ></Route>
             </Routes>
           </Router>
@@ -60,6 +59,7 @@ function App() {
 
 function OnlyIfAuthenticated(originalComponent: React.FC) {
   return () => {
+    // eslint-disable-next-line react-hooks/rules-of-hooks
     const { userId } = useAuthenticationService();
 
     return userId() ? (

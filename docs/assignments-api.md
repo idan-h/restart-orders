@@ -28,9 +28,10 @@ type Response = {
     unit: string;
     subItems: Array<{
       id: string;
+      subItemBoardId: number;
       productId: string;
       quantity: number;
-      userId: string;
+      userId: string | null;
       status: string | null; // if `null`, then the subitem is unassigned
     }>;
   }>;
@@ -47,9 +48,10 @@ type Response = {
     unit: string;
     subItems: Array<{
       id: string;
+      subItemBoardId: number;
       productId: string;
       quantity: number;
-      userId: string;
+      userId: string | null;
       status: string | null; // if `null`, then the subitem is unassigned
     }>
 }
@@ -61,6 +63,7 @@ type Response = {
 type Request = {
   orderId: string;
   subItemId: string;
+  subItemBoardId: string;
 };
 ```
 
@@ -70,6 +73,7 @@ type Request = {
 type Request = {
   orderId: string;
   subItemId: string;
+  subItemBoardId: string;
 };
 ```
 
@@ -79,6 +83,7 @@ type Request = {
 type Request = {
   orderId: string;
   subItemId: string;
+  subItemBoardId: string;
   status: string;
 };
 ```
@@ -93,9 +98,10 @@ type Response = {
     unit: string;
     subItems: Array<{
       id: string;
+      subItemBoardId: string;
       productId: string;
       quantity: number;
-      userId: string;
+      userId: string | null;
       status: string | null; // if `null`, then the subitem is unassigned
     }
 }
@@ -109,4 +115,17 @@ type Response = {
   statuses: Array<string>;
 };
 
+```
+
+
+
+# `GET /get-products`
+
+```ts
+type Response =
+  Array<{
+    name: string;
+    product_number: number;
+    type: string;
+  }>;
 ```
