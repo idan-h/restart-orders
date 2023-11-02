@@ -34,6 +34,7 @@ export const Catalog = () => {
   };
 
   const handleSubItemsChange = (orderId: string, subItems: SubItem[]) => {
+    debugger;
     setOrders(
       orders?.map((order) =>
         order.id === orderId ? { ...order, subItems } : order
@@ -71,7 +72,7 @@ export const Catalog = () => {
             </CardPreview>
 
             <CardFooter>
-              <Button onClick={() => handleAssign(id)}>Assign</Button>
+              <Button onClick={() => handleAssign(id)} disabled={subItems.every(subItem => !subItem?.requestedQuantity)}>שלח</Button>
             </CardFooter>
           </Card>
         );

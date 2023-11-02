@@ -21,7 +21,7 @@ export const SubItems = ({ items, onChange }: Props) => {
         id === item.id
           ? {
               ...item,
-              requestedAmount: checked ? item.quantity : 0,
+              requestedQuantity: checked ? item.quantity : 0,
             }
           : item
       )
@@ -34,7 +34,7 @@ export const SubItems = ({ items, onChange }: Props) => {
         id === item.id
           ? {
               ...item,
-              requestedAmount: value,
+                requestedQuantity: value,
             }
           : item
       )
@@ -58,6 +58,7 @@ export const SubItems = ({ items, onChange }: Props) => {
               <Input
                 style={{ width: "80px" }}
                 min={1}
+                max={quantity}
                 onChange={(_, data) =>
                   handleSubItemChange(id, parseInt(data.value))
                 }
