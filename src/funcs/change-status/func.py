@@ -16,19 +16,28 @@ def handler(ctx: context, data: io.BytesIO = None):
     try:
         body = json.loads(data.getvalue())
  
-        if 'username' not in body.keys() or 'password' not in body.keys():
-            logger.info('Login to user ')
-            response_dict = {"error": "username or password wasn't provided"}
-        else:
-            order_id = body["orderId"]
-            subitem_id = body["subItemId"]
-            status = body["status"]
-            subitem_board_id = body["subItemBoardId"]
-            success = update_order_status(API_KEY, order_id, subitem_id, subitem_board_id, status)
-            response_dict = {"status": success}
-    except (Exception,):
+        if 'orderId' not in body.keys():
+            raise Exception('Order id not provided')
+
+        if 'subItemId' not in body.keys():
+            raise Exception('Sub item id not provided')
+
+        if 'subItemBoardId' not in body.keys():
+            raise Exception('Sub item board id not provided')
+
+        if 'status' not in body.keys():
+            raise Exception('Status not provided')
+
+        order_id = body["orderId"]
+        subitem_id = body["subItemId"]
+        status = body["status"]
+        subitem_board_id = body["subItemBoardId"]
+        success = update_order_status(API_KEY, order_id, subitem_id, subitem_board_id, status)
+        response_dict = {"status": success} if success else {"error": "Failed to update status"}
+
+    except (Exception,) as e:
         logger.info('error: ' + traceback.format_exc().replace('\n', ''))
-        response_dict = {'error': 'An error has occurred'}
+        response_dict = {'error': 'An error has occurred ' + str(e)}
  
     return response.Response(
         ctx, response_data=json.dumps(response_dict),
