@@ -1,8 +1,16 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
+import {
+  Card,
+  CardFooter,
+  CardHeader,
+  CardPreview,
+  Field,
+  Input,
+} from "@fluentui/react-components";
 
 export const LoginForm = () => {
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
 
   const handleUsernameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setUsername(event.target.value);
@@ -18,16 +26,29 @@ export const LoginForm = () => {
   };
 
   return (
-    <form onSubmit={handleSubmit}>
-      <label>
-        Username:
-        <input type="text" value={username} onChange={handleUsernameChange} />
-      </label>
-      <label>
-        Password:
-        <input type="password" value={password} onChange={handlePasswordChange} />
-      </label>
-      <button type="submit">Login</button>
-    </form>
+    <Card style={{ width: "100%" }}>
+      <CardHeader header={<h1>Login</h1>} />
+      <CardPreview style={{ padding: "10px" }}>
+        <form onSubmit={handleSubmit}>
+          <Field label="Username" orientation="vertical">
+            <Input
+              type="text"
+              value={username}
+              onChange={handleUsernameChange}
+            />
+          </Field>
+          <Field label="Password" orientation="vertical">
+            <Input
+              type="password"
+              value={password}
+              onChange={handlePasswordChange}
+            />
+          </Field>
+        </form>
+      </CardPreview>
+      <CardFooter>
+        <button type="submit">Login</button>
+      </CardFooter>
+    </Card>
   );
 };
