@@ -363,10 +363,18 @@ def get_product_id_from_connect_boards(connect_boards_object):
     
     return connect_boards_object['linkedPulseIds'][0]['linkedPulseId']
 
+def get_user_order(api_key, item_id):
+    monday_api = MondayApi(api_key, API_URL)
+    monday_board = MondayBoard(monday_api, id=ORDERS_BOARD_ID)
+    items = monday_board.get_item(item_id).get('data').get('items')
+    orders = convert_to_orders(items)
+    return orders_to_json(orders)
+
+
 class SubItem:
-    def __init__(self, id, boardId, productId, quantity, userId, status=None):
+    def __init__(self, id, subItemBoardId, productId, quantity, userId, status=None):
         self.id = id
-        self.boardId = boardId
+        self.subItemBoardId = subItemBoardId
         self.productId = productId
         self.quantity = quantity
         self.userId = userId

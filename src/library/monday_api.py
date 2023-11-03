@@ -294,7 +294,42 @@ class MondayBoard:
         else:
             r = json_normalize(self.mondayApi.query(query, return_items_as=return_items_as))
             return r
-        
+
+    def get_item(self, item_id , return_items_as='json'):
+        query = f'''
+                {{
+                    items(ids: {item_id}) {{
+                        id
+                        name
+                        column_values {{
+                            id
+                            text
+                            type
+                        }}
+                        subitems {{
+                            id
+                            name
+                            board {{
+                                id
+                            }}
+                            column_values {{
+                                id
+                                value
+                                type
+                                text
+                            }}
+                        }}
+                      }}
+                }}
+                '''
+
+        if return_items_as == 'json':
+            return self.mondayApi.query(query, return_items_as=return_items_as).json()
+        else:
+            r = json_normalize(self.mondayApi.query(query, return_items_as=return_items_as))
+            return r
+
+
     def write_update(self, item_id, update_text):
         QUERY_TEMPLATE = '''
               mutation {{
