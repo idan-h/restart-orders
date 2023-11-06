@@ -23,11 +23,14 @@ const defaultValues = {
 const Form = ({ updateForm }) => {
   const equipmentItems = 'equipmentItems'
   const sewingItems = 'sewingItems'
+  const sewingProducts = 'sewingProducts'
   const confirmation = 'confirmation'
   const [selectedEquipmentItems, setSelectedEquipmentItems] = useState([]);
   const [selectedSewingItems, setSelectedSewingItems] = useState([]);
+  const [selectedSewingProducts, setSelectedSewingProducts] = useState([]);
   const [availableEquipmentItems, setAvailableEquipmentItems] = useState([]);
   const [availableSewingItems, setAvailableSewingItems] = useState([]);
+  const [availableSewingProducts, setAvailableSewingProducts] = useState([]);
   const [modalToOpen, setModalToOpen] = useState(null);
   const [itemToEdit, setItemToEdit] = useState(null);
 
@@ -62,10 +65,12 @@ const Form = ({ updateForm }) => {
         }
 
         let equipment = data.filter(item => item.type.includes(currentType));
-        let sewing = data.filter(item => item.type.includes("SEW"));
+        let sewing = data.filter(item => item.type == "SEW");
+        let sewingProducts = data.filter(item => item.type == "SEWMAN");
 
         setAvailableEquipmentItems([...equipment]);
         setAvailableSewingItems([...sewing]);
+        setAvailableSewingProducts([...sewingProducts]);
 
         if (afterItemsFetched) {
           afterItemsFetched(data);
@@ -115,10 +120,11 @@ const Form = ({ updateForm }) => {
                 }
             })
 
-            setSelectedEquipmentItems(subitems.filter((item) => item.type != 'SEW'));
+            setSelectedEquipmentItems(subitems.filter((item) => item.type != 'SEW' && item.type !== 'SEWMAN'));
             setSelectedSewingItems(subitems.filter(item => item.type == 'SEW'));
+            setSelectedSewingProducts(subitems.filter(item => item.type == 'SEWMAN'));
 
-            for (let setAvailableItems of [setAvailableEquipmentItems, setAvailableSewingItems]) {
+            for (let setAvailableItems of [setAvailableEquipmentItems, setAvailableSewingItems, setAvailableSewingProducts]) {
                 setAvailableItems(currentAvailableItems => {
                     return currentAvailableItems.filter(item => 
                         !data.subitems.some(subitem => subitem.product_number === item.product_number)
@@ -196,7 +202,7 @@ const Form = ({ updateForm }) => {
   };
 
   const onSubmit = (formData) => {
-    formData.subitems = [...selectedEquipmentItems, ...selectedSewingItems];
+    formData.subitems = [...selectedEquipmentItems, ...selectedSewingItems, ...selectedSewingProducts];
     formData.email = ''
 
     if (updateForm) {
@@ -252,7 +258,7 @@ const Form = ({ updateForm }) => {
         <div className='header'>
           <img src='/content/Logo.png' alt='LOGO' className='logo' />
           <div className='title'>
-            {updateForm ? 'עדכון הזמנה' : (formType == 'EMR' ? 'דרישת ציוד לכח כוננות' : 'בקשה לתרומה לציוד לחימה ')}
+            {updateForm ? 'עדכון הזמנה' : (formType == 'EMR' ? 'דרישת ציוד לכח כוננות' : 'רכישה ותיקון של ציוד טקטי ')}
           </div>
           <div className='description' hidden={updateForm || formType != 'IDF'}>
             טופס זה מיועד למשרתים פעילים בצה״ל סדיר ,מילואים וקבע. אם הינך אדם
@@ -379,7 +385,7 @@ const Form = ({ updateForm }) => {
           </div>
 
           <ChooseItem
-            lable="בחירת פריטי ציוד:"
+            lable="בחירת פריטי ציוד לרכישה:"
             itemType={equipmentItems}
             selectedItems={selectedEquipmentItems}
             setSelectedItems={setSelectedEquipmentItems}
@@ -389,11 +395,21 @@ const Form = ({ updateForm }) => {
           />
 
           <ChooseItem
-            lable={"בחירת פריטי מתפרה:"}
+            lable={"בחירת פריטי ציוד לתיקון:"}
             itemType={sewingItems}
             selectedItems={selectedSewingItems}
             setSelectedItems={setSelectedSewingItems}
             setAvailableItems={setAvailableSewingItems}
+            setModalToOpen={setModalToOpen}
+            setItemToEdit={setItemToEdit}
+          />
+
+          <ChooseItem
+            lable={"בחירת פריטי ציוד לייצור:"}
+            itemType={sewingProducts}
+            selectedItems={selectedSewingProducts}
+            setSelectedItems={setSelectedSewingProducts}
+            setAvailableItems={setAvailableSewingProducts}
             setModalToOpen={setModalToOpen}
             setItemToEdit={setItemToEdit}
           />
@@ -451,6 +467,17 @@ const Form = ({ updateForm }) => {
         setSelectedItems={setSelectedSewingItems}
         setAvailableItems={setAvailableSewingItems}
         availableItems={availableSewingItems}
+        itemToEdit={itemToEdit}
+        setItemToEdit={setItemToEdit}
+      />
+
+      <AddItemModal
+        isModalOpen={modalToOpen === sewingProducts}
+        onRequestClose={() => setModalToOpen(null)}
+        selectedItems={selectedSewingProducts}
+        setSelectedItems={setSelectedSewingProducts}
+        setAvailableItems={setAvailableSewingProducts}
+        availableItems={availableSewingProducts}
         itemToEdit={itemToEdit}
         setItemToEdit={setItemToEdit}
       />
