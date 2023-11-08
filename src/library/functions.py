@@ -1,8 +1,9 @@
 from .monday_api import MondayApi, MondayBoard
-from .consts import API_URL, PRODUCT_BOARD_ID, ORDERS_BOARD_ID, DONATIONS_BOARD_ID , SUPPLIERS_BOARD_ID
+from .consts import API_URL, PRODUCT_BOARD_ID, ORDERS_BOARD_ID, DONATIONS_BOARD_ID , SUPPLIERS_BOARD_ID, PLATFORM_REGISTRATION_BOARD_ID , ORDERS_SUBITEMS_BOARD_ID
 import uuid
 import json
 import pandas as pd
+import json
 from datetime import datetime
 
 
@@ -214,3 +215,270 @@ def get_suppliers_sectors(api_key):
     return [{"name" : v , "id" : k } for k , v in sector_field_labels.items()]
 
 
+def validate_user_login(api_key, email, password):
+    monday_api = MondayApi(api_key, API_URL)
+    monday_board = MondayBoard(monday_api, id=PLATFORM_REGISTRATION_BOARD_ID)
+    password_column_id = monday_board.get_column_id("Password")
+    print(password_column_id)
+    users =  monday_board.get_items_by_column_values(monday_board.get_column_id("Email"), email, return_items_as='json')
+    users = users.get('data').get('items_page_by_column_values').get('items')
+    if not users:
+        print("user not found")
+        return False
+
+    user = users[0]
+ 
+    column_values = {v['id']: v['text'] for v in user.get('column_values')}
+ 
+    print(column_values)
+    if column_values.get(password_column_id) == password:
+        return True
+    else:
+        return False
+    
+def get_subitem_statuses(api_key):
+    try :
+        monday_api = MondayApi(api_key, API_URL)
+        monday_board = MondayBoard(monday_api, id=ORDERS_SUBITEMS_BOARD_ID)
+        details = json.loads(monday_board.get_column_details("סטטוס")['settings_str'])['labels']
+        statuses = list(details.values())
+    except Exception as e:
+        print(e)
+        statuses = []
+    return statuses
+
+
+def assign_product(api_key , order_id , subitem_id ,subitem_board_id ,  user_id ):
+    try:
+        monday_api = MondayApi(api_key, API_URL)
+        monday_board = MondayBoard(monday_api, id=subitem_board_id)
+        columnVals = {
+            "text4": user_id,
+            "status" : {"label": "בטיפול"}
+        }
+        monday_board.change_multiple_column_values( columnVals ,subitem_id )
+
+        return True
+    except Exception as e:
+        print(e)
+        return False
+
+
+def unassign_product(api_key , order_id , subitem_id ,subitem_board_id ):
+    try:
+        monday_api = MondayApi(api_key, API_URL)
+        monday_board = MondayBoard(monday_api, id=subitem_board_id)
+        columnVals = {
+            "text4": "",
+            "status" : {"label": "ממתין"}
+        }
+        monday_board.change_multiple_column_values( columnVals ,subitem_id )
+
+        return True
+    except Exception as e:
+        print(e)
+        return False
+
+def update_order_status(api_key , order_id , subitem_id ,subitem_board_id, subitem_status ):
+    try:
+        monday_api = MondayApi(api_key, API_URL)
+        monday_board = MondayBoard(monday_api, id=subitem_board_id)
+        columnVals = {
+            "status" : { "label": subitem_status }
+        }
+        monday_board.change_multiple_column_values( columnVals ,subitem_id )
+
+        return True
+    except Exception as e:
+        print(e)
+        return False
+
+
+
+def get_unassigned_orders(api_key):
+    orders = get_valid_orders(api_key)
+
+    orders = [order for order in orders if any(subItem.userId is None or subItem.userId == "None" for subItem in order.subItems)]   
+    return orders_to_json(orders)
+
+def get_assigned_orders_to_user(api_key, user_id):
+    orders = get_valid_orders(api_key)
+
+    orders = [order for order in orders if any(subItem.userId is not None and subItem.userId == user_id for subItem in order.subItems)]   
+    return orders_to_json(orders)
+
+def get_valid_orders(api_key):
+    monday_api = MondayApi(api_key, API_URL)
+    # TODO revert
+    # monday_board = MondayBoard(monday_api, id=ORDERS_BOARD_ID)
+    monday_board = MondayBoard(monday_api, id=1308624313)
+
+    # TODO handle pagination
+    # status7 is the 'בקשה תקינה?' column
+    items = monday_board.get_items_by_column_values('status7', 'בקשה תקינה', return_items_as='json', limit=5)\
+        .get('data').get('items_page_by_column_values').get('items')
+
+    # print(items)
+    orders = convert_to_orders(items)
+    return orders
+
+def convert_to_orders(items):
+    orders = []
+    for item in items:
+        # print(item)
+        id = item['id']
+        name = item['name']
+        region = next((col['text'] for col in item['column_values'] if col['id'] == 'dropdown'), "None") # region
+        unit = next((col['text'] for col in item['column_values'] if col['id'] == 'text0'), "None") # unit
+        phone = next((col['text'] for col in item['column_values'] if col['id'] == 'text8'), "None") # phone
+        # print(f"id: {id} name: {name} phone: {phone} region: {region} unit: {unit}")
+        subItems = []
+        for subitem in item['subitems']:
+            sub_id = subitem['id']
+            board_id = subitem['board']['id']
+            product_id = next((get_product_id_from_connect_boards(col['value']) for col in subitem['column_values'] if col['id'] == 'connect_boards'), "None") # productId / מספר מוצר
+            quantity = next((col['text'] for col in subitem['column_values'] if col['id'] == 'numbers'), "None") # quantity / כמות 
+            user_id = next((col['text'] for col in subitem['column_values'] if col['id'] == 'text4'), "None") # userId / אימייל משויך להזמנה
+            status = next((col['text'] for col in subitem['column_values'] if col['id'] == 'status'), "None")  
+            # print(f"sub_id: {sub_id} board_id: {board_id} product_id: {product_id} quantity: {quantity} user_id: {user_id} status: {status}")
+            subItems.append(SubItem(sub_id, board_id, product_id, quantity, user_id, status))
+        orders.append(Order(id, name, phone, region, unit, subItems))
+    return orders
+
+def orders_to_json(orders):
+    orders_dict = [order.to_dict() for order in orders]
+    return json.dumps(orders_dict)
+
+# get json from connect_boards column and return the product id
+def get_product_id_from_connect_boards(connect_boards_object):
+    if connect_boards_object is None:
+        return "None"
+    connect_boards_object = json.loads(connect_boards_object)
+    if connect_boards_object['linkedPulseIds'] is None:
+        return "None"
+    if connect_boards_object['linkedPulseIds'][0] is None:
+        return "None"
+    if connect_boards_object['linkedPulseIds'][0]['linkedPulseId'] is None:
+        return "None"
+    
+    return connect_boards_object['linkedPulseIds'][0]['linkedPulseId']
+
+def get_user_order(api_key, item_id):
+    monday_api = MondayApi(api_key, API_URL)
+    monday_board = MondayBoard(monday_api, id=ORDERS_BOARD_ID)
+    items = monday_board.get_item(item_id).get('data').get('items')
+    orders = convert_to_orders(items)
+    return orders_to_json(orders)
+
+# TODO pass DB connection details
+def market_place_create_or_update_order(api_key, item_id, board_id):
+    monday_api = MondayApi(api_key, API_URL)
+    monday_board = MondayBoard(monday_api, id=board_id)
+    items = monday_board.get_item_v2(item_id).get('data').get('items')
+
+    print(f"Items: {items}")
+    order = Order.from_monday_item(items[0], board_id)
+    print(f"Order: {order.to_json()}")
+
+    # TODO insert to DB
+
+# TODO pass DB connection details
+def market_place_create_or_update_subitem(api_key, item_id, board_id):
+    monday_api = MondayApi(api_key, API_URL)
+    monday_board = MondayBoard(monday_api, id=board_id)
+    items = monday_board.get_item_v2(item_id).get('data').get('items')
+
+    print(f"Items: {items}")
+    subItem = SubItem.from_monday_item(items[0], board_id)
+    print(f"SubItem: {subItem.to_json()}")
+
+    # TODO insert to DB
+
+
+class SubItem:
+    def __init__(self, id, subItemBoardId, productId, quantity, userId, status=None, order_id="empty", comments = "empty"):
+        self.id = id
+        self.subItemBoardId = subItemBoardId
+        self.productId = productId
+        self.quantity = quantity
+        self.userId = userId
+        self.status = status
+        self.comments = comments
+        self.order_id = order_id
+
+    def from_monday_item(subitem, board_id, order_id):
+        sub_id = subitem['id']
+        product_id = next((get_product_id_from_connect_boards(col['value']) for col in subitem['column_values'] if col['id'] == 'connect_boards'), "None") # productId / מספר מוצר
+        quantity = next((col['text'] for col in subitem['column_values'] if col['id'] == 'numbers'), "None") # quantity / כמות 
+        user_id = next((col['text'] for col in subitem['column_values'] if col['id'] == 'text4'), "None") # userId / אימייל משויך להזמנה
+        status = next((col['text'] for col in subitem['column_values'] if col['id'] == 'status'), "None")  
+        # print(f"sub_id: {sub_id} board_id: {board_id} product_id: {product_id} quantity: {quantity} user_id: {user_id} status: {status}")
+        
+        return SubItem(sub_id, board_id, product_id, quantity, user_id, status, order_id)
+    
+    def to_json(self):
+        return json.dumps(self.__dict__)
+    
+    def to_dict(self):
+        return self.__dict__
+
+class Order:
+    def __init__(self, id, name, phone, region, unit, subItems, board_id, comments = "empty", role = "empty",\
+                orderValidationStatus = "empty", orderStatus = "empty", priority = "empty", email = "empty",\
+                createdAt = "empty", lastUpdated = "empty"):
+        self.id = id
+        self.name = name
+        self.phone = phone
+        self.region = region
+        self.unit = unit
+        self.subItems = subItems
+        self.role = role
+        self.comments = comments
+        self.orderValidationStatus = orderValidationStatus
+        self.orderStatus = orderStatus
+        self.priority = priority
+        self.email = email
+        self.createdAt = createdAt
+        self.lastUpdated = lastUpdated
+        self.board_id = board_id
+
+    def from_monday_item(item, board_id):
+        id = item['id']
+        name = item['name']
+        region = next((col['text'] for col in item['column_values'] if col['id'] == 'dropdown'), "None") # region
+        unit = next((col['text'] for col in item['column_values'] if col['id'] == 'text0'), "None") # unit
+        phone = next((col['text'] for col in item['column_values'] if col['id'] == 'text8'), "None") # phone
+        # print(f"id: {id} name: {name} phone: {phone} region: {region} unit: {unit}")
+
+        subItems = []
+        for subitem in item.get('subitems', []):
+            sub_id = subitem['id']
+            board_id = subitem['board']['id']
+            product_id = next((get_product_id_from_connect_boards(col['value']) for col in subitem['column_values'] if col['id'] == 'connect_boards'), "None") # productId / מספר מוצר
+            quantity = next((col['text'] for col in subitem['column_values'] if col['id'] == 'numbers'), "None") # quantity / כמות 
+            user_id = next((col['text'] for col in subitem['column_values'] if col['id'] == 'text4'), "None") # userId / אימייל משויך להזמנה
+            status = next((col['text'] for col in subitem['column_values'] if col['id'] == 'status'), "None")  
+            # print(f"sub_id: {sub_id} board_id: {board_id} product_id: {product_id} quantity: {quantity} user_id: {user_id} status: {status}")
+            subItems.append(SubItem(sub_id, board_id, product_id, quantity, user_id, status))
+
+        return Order(id, name, phone, region, unit, subItems, board_id)
+
+    def to_json(self):
+        return json.dumps({
+            'id': self.id,
+            'name': self.name,
+            'phone': self.phone,
+            'region': self.region,
+            'unit': self.unit,
+            'subItems': [subItem.to_json() for subItem in self.subItems]
+        })
+    
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'name': self.name,
+            'phone': self.phone,
+            'region': self.region,
+            'unit': self.unit,
+            'subItems': [subItem.to_dict() for subItem in self.subItems]
+        }

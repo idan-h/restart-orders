@@ -25,6 +25,7 @@ class MondayApi:
                 if req_json.get('error_code') == 'ComplexityException':
                     match = re.search(r"reset in (\d+) seconds", req_json['error_message'])
                     seconds = int(match.group(1)) if match else 20
+                    print(f"ERROR! - {req_json['error_message']}\nwaiting {seconds + 5} seconds and retrying...")
                     time.sleep(seconds + 5)
                     return self.query(query, variables, return_items_as)
                 else:
@@ -188,6 +189,40 @@ class MondayBoard:
         else:
             return json_normalize(self.mondayApi.query(query, return_items_as=return_items_as)['boards'][0]['items'])
 
+    def get_subitems(self, return_items_as='dataframe', limit=500):
+        QUERY_TEMPLATE = '''
+              {{
+              boards(ids:{board_id})
+              {{
+                items_page (limit:{limit}) 
+                {{
+                    items
+                    {{
+                        subitems
+                        {{
+                            column_values
+                            {{
+                                column{{
+                                    id
+                                    title
+                                    settings_str
+                                }}
+                            }}
+                        }}
+                    }}
+                }}
+              }}
+              }}'''
+
+        query = QUERY_TEMPLATE.format(board_id=str(self.board_id), limit=limit)
+
+        if return_items_as == 'json':
+            return self.mondayApi.query(query, return_items_as=return_items_as).json()
+        else:
+            result = self.mondayApi.query(query, return_items_as=return_items_as)
+            return json_normalize(self.mondayApi.query(query, return_items_as=return_items_as)['boards'][0]['items_page']['items'][0]['subitems'])
+
+
     def get_items_by_column_values(self, column_id, column_value, return_items_as='dataframe', limit=1):
         if limit < 0:
             QUERY_TEMPLATE = '''
@@ -205,10 +240,14 @@ class MondayBoard:
                             subitems {{
                                 id
                                 name
+                                board {{
+                                    id
+                                }}
                                 column_values {{
                                     id
                                     value
                                     type
+                                    text
                                 }}
                             }}
                           }}
@@ -232,10 +271,14 @@ class MondayBoard:
                             subitems {{
                                 id
                                 name
+                                board {{
+                                    id
+                                }}
                                 column_values {{
                                     id
                                     value
                                     type
+                                    text
                                 }}
                             }}
                           }}
@@ -251,6 +294,42 @@ class MondayBoard:
         else:
             r = json_normalize(self.mondayApi.query(query, return_items_as=return_items_as))
             return r
+
+    def get_item(self, item_id , return_items_as='json'):
+        query = f'''
+                {{
+                    items(ids: {item_id}) {{
+                        id
+                        name
+                        column_values {{
+                            id
+                            text
+                            type
+                        }}
+                        subitems {{
+                            id
+                            name
+                            board {{
+                                id
+                            }}
+                            column_values {{
+                                id
+                                value
+                                type
+                                text
+                            }}
+                        }}
+                      }}
+                }}
+                '''
+
+        if return_items_as == 'json':
+            return self.mondayApi.query(query, return_items_as=return_items_as).json()
+        else:
+            r = json_normalize(self.mondayApi.query(query, return_items_as=return_items_as))
+            return r
+
+
     def write_update(self, item_id, update_text):
         QUERY_TEMPLATE = '''
               mutation {{
@@ -280,3 +359,28 @@ class MondayBoard:
               }}
               }}'''
         self.mondayApi.query(query)
+
+    def get_item_v2(self, item_id , return_items_as='json'):
+        query = f'''
+                {{
+                    items(ids: {item_id}) {{
+                        id
+                        name
+                        parent_item {{
+                            id
+                        }}
+                        column_values {{
+                            id
+                            text
+                            type
+                            value
+                        }}
+                      }}
+                }}
+                '''
+
+        if return_items_as == 'json':
+            return self.mondayApi.query(query, return_items_as=return_items_as).json()
+        else:
+            r = json_normalize(self.mondayApi.query(query, return_items_as=return_items_as))
+            return r
