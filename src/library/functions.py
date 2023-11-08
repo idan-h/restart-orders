@@ -377,7 +377,7 @@ def market_place_create_or_update_order(api_key, item_id, board_id):
     items = monday_board.get_item_v2(item_id).get('data').get('items')
 
     print(f"Items: {items}")
-    order = Order.from_monday_item(items[0])
+    order = Order.from_monday_item(items[0], board_id)
     print(f"Order: {order.to_json()}")
 
     # TODO insert to DB
@@ -396,24 +396,25 @@ def market_place_create_or_update_subitem(api_key, item_id, board_id):
 
 
 class SubItem:
-    def __init__(self, id, subItemBoardId, productId, quantity, userId, status=None):
+    def __init__(self, id, subItemBoardId, productId, quantity, userId, status=None, order_id="empty", comments = "empty"):
         self.id = id
         self.subItemBoardId = subItemBoardId
         self.productId = productId
         self.quantity = quantity
         self.userId = userId
         self.status = status
+        self.comments = comments
+        self.order_id = order_id
 
-    def from_monday_item(subitem, board_id):
+    def from_monday_item(subitem, board_id, order_id):
         sub_id = subitem['id']
-        # board_id = subitem['board']['id']
         product_id = next((get_product_id_from_connect_boards(col['value']) for col in subitem['column_values'] if col['id'] == 'connect_boards'), "None") # productId / מספר מוצר
         quantity = next((col['text'] for col in subitem['column_values'] if col['id'] == 'numbers'), "None") # quantity / כמות 
         user_id = next((col['text'] for col in subitem['column_values'] if col['id'] == 'text4'), "None") # userId / אימייל משויך להזמנה
         status = next((col['text'] for col in subitem['column_values'] if col['id'] == 'status'), "None")  
         # print(f"sub_id: {sub_id} board_id: {board_id} product_id: {product_id} quantity: {quantity} user_id: {user_id} status: {status}")
         
-        return SubItem(sub_id, board_id, product_id, quantity, user_id, status)
+        return SubItem(sub_id, board_id, product_id, quantity, user_id, status, order_id)
     
     def to_json(self):
         return json.dumps(self.__dict__)
@@ -422,15 +423,26 @@ class SubItem:
         return self.__dict__
 
 class Order:
-    def __init__(self, id, name, phone, region, unit, subItems):
+    def __init__(self, id, name, phone, region, unit, subItems, board_id, comments = "empty", role = "empty",\
+                orderValidationStatus = "empty", orderStatus = "empty", priority = "empty", email = "empty",\
+                createdAt = "empty", lastUpdated = "empty"):
         self.id = id
         self.name = name
         self.phone = phone
         self.region = region
         self.unit = unit
         self.subItems = subItems
+        self.role = role
+        self.comments = comments
+        self.orderValidationStatus = orderValidationStatus
+        self.orderStatus = orderStatus
+        self.priority = priority
+        self.email = email
+        self.createdAt = createdAt
+        self.lastUpdated = lastUpdated
+        self.board_id = board_id
 
-    def from_monday_item(item):
+    def from_monday_item(item, board_id):
         id = item['id']
         name = item['name']
         region = next((col['text'] for col in item['column_values'] if col['id'] == 'dropdown'), "None") # region
@@ -449,7 +461,7 @@ class Order:
             # print(f"sub_id: {sub_id} board_id: {board_id} product_id: {product_id} quantity: {quantity} user_id: {user_id} status: {status}")
             subItems.append(SubItem(sub_id, board_id, product_id, quantity, user_id, status))
 
-        return Order(id, name, phone, region, unit, subItems)
+        return Order(id, name, phone, region, unit, subItems, board_id)
 
     def to_json(self):
         return json.dumps({
@@ -470,5 +482,3 @@ class Order:
             'unit': self.unit,
             'subItems': [subItem.to_dict() for subItem in self.subItems]
         }
-
-
