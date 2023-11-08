@@ -1,6 +1,6 @@
 import React from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { Info24Regular } from "@fluentui/react-icons";
+import { Info24Regular, SignOut24Regular } from "@fluentui/react-icons";
 import { Button, tokens } from "@fluentui/react-components";
 import { useAuthenticationService } from "../services/authentication";
 import { ROUTES } from "../routes-const";
@@ -28,15 +28,6 @@ export const Header: React.FunctionComponent = () => {
           <>
             <Button
               appearance="transparent"
-              onClick={() => {
-                logout();
-                navigate("/");
-              }}
-            >
-              התנתק
-            </Button>
-            <Button
-              appearance="transparent"
               onClick={() => navigate(ROUTES.ORDER)}
               style={
                 location.pathname === ROUTES.ORDER ? selectedRouteStyle : {}
@@ -60,14 +51,26 @@ export const Header: React.FunctionComponent = () => {
           </Button>
         )}
       </div>
-      {location.pathname !== ROUTES.ABOUT && (
-        <Button
-          appearance="transparent"
-          onClick={() => navigate(ROUTES.ABOUT)}
-          style={location.pathname === ROUTES.ABOUT ? selectedRouteStyle : {}}
-          icon={<Info24Regular />}
-        />
-      )}
+      <div>
+        {location.pathname !== ROUTES.ABOUT && (
+          <Button
+            appearance="transparent"
+            onClick={() => navigate(ROUTES.ABOUT)}
+            style={location.pathname === ROUTES.ABOUT ? selectedRouteStyle : {}}
+            icon={<Info24Regular />}
+          />
+        )}
+        {isLoggedIn() && (
+          <Button
+            appearance="transparent"
+            onClick={() => {
+              logout();
+              navigate("/");
+            }}
+            icon={<SignOut24Regular />}
+          />
+        )}
+      </div>
     </div>
   );
 };
