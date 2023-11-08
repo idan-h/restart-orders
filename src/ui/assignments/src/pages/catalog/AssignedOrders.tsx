@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import {
   makeStyles,
   Body1,
-  shorthands,
   Card,
   CardHeader,
   CardPreview,
