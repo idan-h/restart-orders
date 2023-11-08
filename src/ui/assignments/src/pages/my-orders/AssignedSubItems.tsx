@@ -10,7 +10,7 @@ import {
 import { Delete24Regular } from "@fluentui/react-icons";
 import { SubItem } from "../../types.ts";
 import { useAuthenticationService } from "../../services/authentication.ts";
-import { makeOrdersService } from "../../services/orders.ts";
+import { makeOrdersService } from "../../services/orders.service.ts";
 
 type Props = {
   orderId: string;
@@ -74,6 +74,7 @@ export const AssignedSubItems = ({ items, orderId, onChange }: Props) => {
       renderCell: (item) => {
         return (
           <TableCellLayout>
+            {/* delete button */}
             <Button
               appearance="transparent"
               onClick={() =>

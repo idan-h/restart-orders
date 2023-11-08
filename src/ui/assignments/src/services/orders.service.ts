@@ -3,25 +3,16 @@ import { MondayOrder, Order } from "../types";
 const baseUrl =
   "https://njdfolzzmvnaay5oxqife4tuwy.apigateway.il-jerusalem-1.oci.customer-oci.com/v1/";
 
+let productNames: Map<string, string>;
+
 export function makeOrdersService(userId: string | null) {
   if (!userId) {
     console.error("ordersService - failed to load, not logged in");
     return null;
   }
 
-  let productNames: Map<string, string> | undefined = undefined;
-
   return {
-    async fetchOrderStatusNames(): Promise<string[]> {
-      const response = await fetch(
-        new URL(
-          `get-subitem-statuses?userId=${encodeURIComponent(userId)}`,
-          baseUrl
-        )
-      );
-
-      return (await response.json()).statuses;
-    },
+    /** Get all orders for the orders page */
     async fetchUnassignedOrders(): Promise<{ orders: Order[] }> {
       if (!productNames) productNames = await fetchProductNames();
 
@@ -52,6 +43,7 @@ export function makeOrdersService(userId: string | null) {
           .filter((order) => order.subItems.length),
       };
     },
+    /** Get all orders for the my-orders page */
     async fetchAssignedOrders(): Promise<{ orders: Order[] }> {
       if (!productNames) productNames = await fetchProductNames();
 
@@ -82,6 +74,7 @@ export function makeOrdersService(userId: string | null) {
           .filter((order) => order.subItems.length),
       };
     },
+    /** no in use */
     async fetchOrder(orderId: string): Promise<Order | undefined> {
       if (!productNames) productNames = await fetchProductNames();
       const response = await fetch(
@@ -103,6 +96,7 @@ export function makeOrdersService(userId: string | null) {
         })),
       } as Order;
     },
+    /** Move item from orders to my-orders  */
     async assignSubItem(request: {
       orderId: string;
       subItemId: string;
@@ -115,6 +109,7 @@ export function makeOrdersService(userId: string | null) {
 
       await response.json();
     },
+    /** (Delete) Move item from my-orders to orders  */
     async unAssignSubItem(request: {
       orderId: string;
       subItemId: string;
@@ -127,6 +122,18 @@ export function makeOrdersService(userId: string | null) {
 
       await response.json();
     },
+    /** Get all statuses for the status dropdown  */
+    async fetchOrderStatusNames(): Promise<string[]> {
+      const response = await fetch(
+        new URL(
+          `get-subitem-statuses?userId=${encodeURIComponent(userId)}`,
+          baseUrl
+        )
+      );
+
+      return (await response.json()).statuses;
+    },
+    /** Change item status  */
     async changeStatus(request: {
       orderId: string;
       subItemId: string;
@@ -142,6 +149,7 @@ export function makeOrdersService(userId: string | null) {
     },
   };
 
+  /** List of all items in the database. */
   async function fetchProductNames(): Promise<Map<string, string>> {
     if (!userId) {
       console.error("ordersService - failed to load, not logged in");

@@ -1,3 +1,4 @@
+// Order - a collection of subitems
 export type BaseOrder = {
   id: string;
   region: string;
@@ -14,6 +15,7 @@ export type MondayOrder = BaseOrder & {
   subItems: Array<SubItem>;
 };
 
+// Single item to deliver
 export type BaseSubItem = {
   id: string;
   subItemBoardId: string;

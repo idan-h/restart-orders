@@ -13,7 +13,7 @@ import {
 
 import { pageStyle, titleStyle } from "../sharedStyles.ts";
 import { Order, SubItem } from "../../types.ts";
-import { makeOrdersService } from "../../services/orders.ts";
+import { makeOrdersService } from "../../services/orders.service.ts";
 import { Header } from "../../components/header.tsx";
 import { Loading } from "../../components/Loading.tsx";
 import { AssignedSubItems } from "./AssignedSubItems.tsx";
@@ -30,7 +30,7 @@ const useStyles = makeStyles({
 export const AssignedOrders = () => {
   const styles = useStyles();
 
-  const [orders, setOrders] = useState<Order[] | undefined>();
+  const [myOrders, setMyOrders] = useState<Order[] | undefined>();
   const [openNoteIds, setOpenNoteIds] = useState<string[]>([]);
 
   const { getUserId } = useAuthenticationService();
@@ -42,14 +42,16 @@ export const AssignedOrders = () => {
       return;
     }
 
-    ordersService
-      .fetchAssignedOrders()
-      .then((items) => setOrders(items.orders));
+    if (!myOrders) {
+      ordersService
+        .fetchAssignedOrders()
+        .then((items) => setMyOrders(items.orders));
+    }
   }, []);
 
   const handleItemsChanges = (orderId: string, subItems: SubItem[]) => {
-    setOrders(
-      orders
+    setMyOrders(
+      myOrders
         ?.map((order) =>
           order.id === orderId ? { ...order, subItems } : order
         )
@@ -70,10 +72,10 @@ export const AssignedOrders = () => {
       <Header />
       <div style={pageStyle}>
         <h2 style={titleStyle}>הזמנות</h2>
-        {!orders ? (
+        {!myOrders ? (
           <Loading />
         ) : (
-          orders.map(({ id, unit, subItems, phone, comment }) => (
+          myOrders.map(({ id, unit, subItems, phone, comment }) => (
             <Card key={id} className={styles.card}>
               <CardHeader
                 header={

@@ -21,7 +21,7 @@ import { Loading } from "../../components/Loading.tsx";
 
 import { ROUTES } from "../../routes-const.ts";
 import { pageStyle, titleStyle } from "../sharedStyles.ts";
-import { makeOrdersService } from "../../services/orders.ts";
+import { makeOrdersService } from "../../services/orders.service.ts";
 import { useAuthenticationService } from "../../services/authentication.ts";
 
 const useStyles = makeStyles({
@@ -47,9 +47,11 @@ export const Orders = () => {
       return;
     }
 
-    ordersService
-      .fetchUnassignedOrders()
-      .then((items) => setOrders(items.orders));
+    if (!orders) {
+      ordersService
+        .fetchUnassignedOrders()
+        .then((items) => setOrders(items.orders));
+    }
   }, [ordersService]);
 
   const handleSubmit = () => {
