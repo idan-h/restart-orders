@@ -1,5 +1,6 @@
 import oracledb
 
+
 class OracleDB:
     def __init__(self, user, password, dsn):
         self.user = user
@@ -25,6 +26,7 @@ class OracleDB:
             
 
     def __del__(self):
-        self.connection.close()
+        if self.connection:
+            self.connection.close()
 
 
