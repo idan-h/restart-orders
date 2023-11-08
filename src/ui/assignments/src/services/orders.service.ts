@@ -5,7 +5,7 @@ const baseUrl =
 
 let productNames: Map<string, string>;
 
-export function makeOrdersService(userId: string | null) {
+export function makeOrdersService(userId?: string) {
   if (!userId) {
     console.error("ordersService - failed to load, not logged in");
     return null;

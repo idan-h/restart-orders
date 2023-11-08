@@ -75,12 +75,30 @@ export const Orders = () => {
     ).then(() => navigate(ROUTES.MY_ORDERS));
   };
 
-  const handleSubItemsChange = (orderId: string, subItems: SubItem[]) => {
-    setOrders(
-      orders?.map((order) =>
-        order.id === orderId ? { ...order, subItems } : order
-      )
+  const handleToggleSubItem = (
+    orderIndex: number,
+    subItem: SubItem,
+    isChecked: boolean
+  ) => {
+    if (!orders) {
+      console.error("handleToggleSubItem: orders empty");
+      return;
+    }
+
+    const subItemsIndex = orders[orderIndex].subItems.findIndex(
+      (_subItem) => _subItem.id === subItem.id
     );
+    if (subItemsIndex === -1) {
+      console.error("handleToggleSubItem: subItem not found");
+      return;
+    }
+
+    orders[orderIndex].subItems[subItemsIndex] = {
+      ...subItem,
+      userId: isChecked ? getUserId() : undefined,
+    };
+
+    setOrders([...orders]);
   };
 
   const toggleOpenNote = (id: string) => {
@@ -99,7 +117,7 @@ export const Orders = () => {
         {!orders ? (
           <Loading />
         ) : (
-          orders.map(({ id, unit, subItems, comment }) => (
+          orders.map(({ id, unit, subItems, comment }, orderIndex) => (
             <Card key={id} className={styles.card}>
               <CardHeader
                 header={
@@ -111,8 +129,10 @@ export const Orders = () => {
 
               <CardPreview>
                 <SubItems
-                  onChange={(subItems) => handleSubItemsChange(id, subItems)}
                   items={subItems}
+                  onToggle={(subItem: SubItem, isChecked: boolean) =>
+                    handleToggleSubItem(orderIndex, subItem, isChecked)
+                  }
                 />
                 {comment && (
                   <a
