@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import { createContext, useContext } from "react";
 
 const baseUrl =
   "https://njdfolzzmvnaay5oxqife4tuwy.apigateway.il-jerusalem-1.oci.customer-oci.com/v1/";
@@ -32,7 +32,7 @@ export function makeAuthenticationService() {
       userId = undefined;
       localStorage.removeItem("userId");
     },
-    userId() {
+    getUserId() {
       return userId;
     },
     isLoggedIn() {
@@ -41,7 +41,7 @@ export function makeAuthenticationService() {
   };
 }
 
-export const AuthenticationService = React.createContext<
+export const AuthenticationService = createContext<
   ReturnType<typeof makeAuthenticationService>
 >(
   //@ts-expect-error error

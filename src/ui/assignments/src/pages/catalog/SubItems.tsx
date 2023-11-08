@@ -15,14 +15,15 @@ type Props = {
 };
 
 export const SubItems = ({ items, onChange }: Props) => {
-  const { userId } = useAuthenticationService();
+  const { getUserId } = useAuthenticationService();
+
   const handleProductToggle = (id: string, checked: boolean) => {
     onChange!(
       items.map((item) =>
         id === item.id
           ? {
               ...item,
-              userId: checked ? userId() : undefined,
+              userId: checked ? getUserId() : undefined,
             }
           : item
       )

@@ -4,11 +4,11 @@ import {
   Route,
   Routes,
   Navigate,
+  useNavigate,
 } from "react-router-dom";
 
 import {
   FluentProvider,
-  Switch,
   webDarkTheme,
   webLightTheme,
 } from "@fluentui/react-components";
@@ -49,7 +49,7 @@ function isDarkMode() {
 function App() {
   return (
     <AuthenticationService.Provider value={makeAuthenticationService()}>
-      <OrdersServiceComponent>
+      <LoginServiceComponent>
         <FluentProvider
           theme={isDarkMode() ? webDarkTheme : webLightTheme}
           dir="rtl"
@@ -60,8 +60,14 @@ function App() {
                 <Route path={ROUTES.LOGIN} Component={LoginForm} />
                 <Route path={ROUTES.ABOUT} Component={AboutUs} />
                 <Route path={ROUTES.MAIN}>
-                  <Route path={ROUTES.ORDER} Component={Orders} />
-                  <Route path={ROUTES.MY_ORDERS} Component={AssignedOrders} />
+                  <Route
+                    path={ROUTES.ORDER}
+                    Component={onlyIfAuthenticated(Orders)}
+                  />
+                  <Route
+                    path={ROUTES.MY_ORDERS}
+                    Component={onlyIfAuthenticated(AssignedOrders)}
+                  />
                   <Route
                     path={ROUTES.MAIN}
                     element={<Navigate to={ROUTES.ORDER} replace />}
@@ -96,35 +102,46 @@ function App() {
             </Router>
           </div>
         </FluentProvider>
-      </OrdersServiceComponent>
+      </LoginServiceComponent>
     </AuthenticationService.Provider>
   );
 }
 
-// function OnlyIfAuthenticated(originalComponent: React.FC) {
-//   return () => {
-//     // eslint-disable-next-line react-hooks/rules-of-hooks
-//     const { userId } = useAuthenticationService();
+function onlyIfAuthenticated(originalComponent: React.FC) {
+  return () => {
+    const navigate = useNavigate();
+    const { isLoggedIn } = useAuthenticationService();
 
-//     return userId() ? (
-//       React.createElement(originalComponent)
-//     ) : (
-//       <div>you are not authenticated</div>
-//     );
-//   };
-// }
+    return isLoggedIn() ? (
+      React.createElement(originalComponent)
+    ) : (
+      <div
+        style={{
+          position: "relative",
+          top: "30%",
+          textAlign: "center",
+        }}
+      >
+        <h3>לא מחובר!</h3>
+        <button onClick={() => navigate("/")}>התחבר</button>
+      </div>
+    );
+  };
+}
 
-const OrdersServiceComponent: React.FC<{ children?: React.ReactNode }> = ({
-  children,
-}) => {
-  const { userId } = useAuthenticationService();
-  // const isLoggedIn = Boolean(userId());
+const LoginServiceComponent: React.FunctionComponent<{
+  children?: React.ReactNode;
+}> = ({ children }) => {
+  const { getUserId } = useAuthenticationService();
+  const userId = getUserId();
 
-  if (!userId()) {
+  if (!userId) {
+    // Not logged in
     return children;
   } else {
+    // Logged in
     return (
-      <OrdersService.Provider value={makeOrdersService(userId()!)}>
+      <OrdersService.Provider value={makeOrdersService(userId!)}>
         {children}
       </OrdersService.Provider>
     );

@@ -11,8 +11,8 @@ const headerStyle: React.CSSProperties = {
 export const Header: React.FunctionComponent = () => {
   const navigate = useNavigate();
   const { pathname } = useLocation();
-  const { logout, userId } = useAuthenticationService();
-  const isLoggedIn = Boolean(userId());
+  const { logout, getUserId } = useAuthenticationService();
+  const isLoggedIn = Boolean(getUserId());
 
   return (
     <div style={headerStyle}>

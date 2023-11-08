@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Button,
   Card,
@@ -30,12 +30,19 @@ const cardContentStyle: React.CSSProperties = {
 };
 
 export const LoginForm = () => {
-  const { login } = useAuthenticationService();
+  const { login, isLoggedIn } = useAuthenticationService();
+  const navigate = useNavigate();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [loginError, setLoginError] = useState<string | undefined>();
   const [isLoading, setIsLoading] = useState(false);
-  const navigate = useNavigate();
+
+  useEffect(() => {
+    // Redirect if already logged in
+    if (isLoggedIn()) {
+      navigate(ROUTES.MAIN);
+    }
+  }, [isLoggedIn, navigate]);
 
   const handleUsernameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setUsername(event.target.value);
