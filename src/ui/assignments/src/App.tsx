@@ -8,6 +8,7 @@ import {
 } from "react-router-dom";
 
 import {
+  Button,
   FluentProvider,
   webDarkTheme,
   webLightTheme,
@@ -123,7 +124,9 @@ function onlyIfAuthenticated(originalComponent: React.FC) {
         }}
       >
         <h3>לא מחובר!</h3>
-        <button onClick={() => navigate("/")}>התחבר</button>
+        <Button appearance="primary" onClick={() => navigate("/")}>
+          התחבר
+        </Button>
       </div>
     );
   };
