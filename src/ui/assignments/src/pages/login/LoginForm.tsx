@@ -13,7 +13,7 @@ import { useNavigate } from "react-router-dom";
 import { useAuthenticationService } from "../../services/authentication";
 import { Header } from "../../components/header";
 import { ROUTES } from "../../routes-const";
-import { pageStyle } from "../utils";
+import { pageStyle } from "../sharedStyles";
 
 const loginCardStyle: React.CSSProperties = {
   top: "35%",

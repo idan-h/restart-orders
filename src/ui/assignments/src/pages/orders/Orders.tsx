@@ -16,12 +16,13 @@ import {
 import { useEffect, useState } from "react";
 import { Order, SubItem } from "../../types.ts";
 import { SubItems } from "./SubItems.tsx";
-import { useOrdersService } from "../../services/orders.ts";
 import { Header } from "../../components/header.tsx";
 import { Loading } from "../../components/Loading.tsx";
 
 import { ROUTES } from "../../routes-const.ts";
-import { pageStyle } from "../utils.ts";
+import { pageStyle, titleStyle } from "../sharedStyles.ts";
+import { makeOrdersService } from "../../services/orders.service.ts";
+import { useAuthenticationService } from "../../services/authentication.ts";
 
 const useStyles = makeStyles({
   card: {
@@ -34,18 +35,37 @@ const useStyles = makeStyles({
 export const Orders = () => {
   const styles = useStyles();
   const navigate = useNavigate();
-
   const [orders, setOrders] = useState<Order[] | undefined>();
   const [openNoteIds, setOpenNoteIds] = useState<string[]>([]);
-  const { fetchUnassignedOrders, assignSubItem } = useOrdersService();
 
-  const submit = () => {
+  const { getUserId } = useAuthenticationService();
+  const ordersService = makeOrdersService(getUserId());
+
+  useEffect(() => {
+    if (!ordersService) {
+      console.error("ordersService not ready");
+      return;
+    }
+
+    if (!orders) {
+      ordersService
+        .fetchUnassignedOrders()
+        .then((items) => setOrders(items.orders));
+    }
+  }, [ordersService]);
+
+  const handleSubmit = () => {
+    if (!ordersService) {
+      console.error("ordersService not ready");
+      return;
+    }
+
     Promise.all(
       orders?.flatMap((order) =>
         order.subItems
           .filter((subItem) => !!subItem.userId)
           .map((subItem) =>
-            assignSubItem({
+            ordersService.assignSubItem({
               orderId: order.id,
               subItemId: subItem.id,
               subItemBoardId: subItem.subItemBoardId,
@@ -71,60 +91,52 @@ export const Orders = () => {
     );
   };
 
-  useEffect(() => {
-    fetchUnassignedOrders().then((items) => setOrders(items.orders));
-  }, []);
-
   return (
     <>
       <Header />
       <div style={pageStyle}>
-        <h2 style={{ textAlign: "center", margin: "20px auto" }}>בקשות</h2>
+        <h2 style={titleStyle}>בקשות</h2>
         {!orders ? (
-          <div style={{ position: "relative", top: "30%" }}>
-            <Loading />
-          </div>
+          <Loading />
         ) : (
-          [...orders, ...orders, ...orders, ...orders].map(
-            ({ id, unit, subItems, comment }) => (
-              <Card key={id} className={styles.card}>
-                <CardHeader
-                  header={
-                    <Body1 style={{ textAlign: "left" }}>
-                      <b>{unit}</b>
-                    </Body1>
-                  }
-                />
+          orders.map(({ id, unit, subItems, comment }) => (
+            <Card key={id} className={styles.card}>
+              <CardHeader
+                header={
+                  <Body1 style={{ textAlign: "left" }}>
+                    <b>{unit}</b>
+                  </Body1>
+                }
+              />
 
-                <CardPreview>
-                  <SubItems
-                    onChange={(subItems) => handleSubItemsChange(id, subItems)}
-                    items={subItems}
-                  />
-                  {comment && (
-                    <a
-                      style={{
-                        display: "flex",
-                        alignItems: "center",
-                        margin: 10,
-                      }}
-                      onClick={() => toggleOpenNote(id)}
-                    >
-                      הערות
-                      {openNoteIds.includes(id) ? (
-                        <TextCollapse24Filled />
-                      ) : (
-                        <TextExpand24Regular />
-                      )}
-                    </a>
-                  )}
-                  {openNoteIds.includes(id) ? (
-                    <p style={{ margin: 10 }}>{comment}</p>
-                  ) : null}
-                </CardPreview>
-              </Card>
-            )
-          )
+              <CardPreview>
+                <SubItems
+                  onChange={(subItems) => handleSubItemsChange(id, subItems)}
+                  items={subItems}
+                />
+                {comment && (
+                  <a
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      margin: 10,
+                    }}
+                    onClick={() => toggleOpenNote(id)}
+                  >
+                    הערות
+                    {openNoteIds.includes(id) ? (
+                      <TextCollapse24Filled />
+                    ) : (
+                      <TextExpand24Regular />
+                    )}
+                  </a>
+                )}
+                {openNoteIds.includes(id) ? (
+                  <p style={{ margin: 10 }}>{comment}</p>
+                ) : null}
+              </CardPreview>
+            </Card>
+          ))
         )}
       </div>
       {orders && (
@@ -141,12 +153,12 @@ export const Orders = () => {
           <Button
             appearance="primary"
             style={{ width: "100%" }}
-            onClick={() => submit()}
+            onClick={handleSubmit}
             disabled={orders.every((order) =>
               order.subItems.every((subItem) => !subItem.userId)
             )}
           >
-            שלח
+            הוסף לבקשות שלי
           </Button>
         </div>
       )}

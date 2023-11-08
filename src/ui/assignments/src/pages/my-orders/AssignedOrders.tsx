@@ -11,13 +11,13 @@ import {
   TextCollapse24Filled,
 } from "@fluentui/react-icons";
 
+import { pageStyle, titleStyle } from "../sharedStyles.ts";
 import { Order, SubItem } from "../../types.ts";
-import { useOrdersService } from "../../services/orders.ts";
-
-import { AssignedSubItems } from "./AssignedSubItems.tsx";
+import { makeOrdersService } from "../../services/orders.service.ts";
 import { Header } from "../../components/header.tsx";
 import { Loading } from "../../components/Loading.tsx";
-import { pageStyle } from "../utils.ts";
+import { AssignedSubItems } from "./AssignedSubItems.tsx";
+import { useAuthenticationService } from "../../services/authentication.ts";
 
 const useStyles = makeStyles({
   card: {
@@ -28,15 +28,30 @@ const useStyles = makeStyles({
 });
 
 export const AssignedOrders = () => {
-  const { fetchAssignedOrders } = useOrdersService();
   const styles = useStyles();
 
-  const [orders, setOrders] = useState<Order[] | undefined>();
+  const [myOrders, setMyOrders] = useState<Order[] | undefined>();
   const [openNoteIds, setOpenNoteIds] = useState<string[]>([]);
 
+  const { getUserId } = useAuthenticationService();
+  const ordersService = makeOrdersService(getUserId());
+
+  useEffect(() => {
+    if (!ordersService) {
+      console.error("ordersService not ready");
+      return;
+    }
+
+    if (!myOrders) {
+      ordersService
+        .fetchAssignedOrders()
+        .then((items) => setMyOrders(items.orders));
+    }
+  }, []);
+
   const handleItemsChanges = (orderId: string, subItems: SubItem[]) => {
-    setOrders(
-      orders
+    setMyOrders(
+      myOrders
         ?.map((order) =>
           order.id === orderId ? { ...order, subItems } : order
         )
@@ -52,30 +67,34 @@ export const AssignedOrders = () => {
     );
   };
 
-  useEffect(() => {
-    fetchAssignedOrders().then((items) => setOrders(items.orders));
-  }, []);
-
-  if (!orders) {
-    return <Loading />;
-  }
-
   return (
     <>
       <Header />
       <div style={pageStyle}>
-        <h2 style={{ textAlign: "center", margin: "20px auto" }}>הזמנות</h2>
-        {orders.map(({ id, unit, subItems, comment }) => {
-          return (
+        <h2 style={titleStyle}>הזמנות</h2>
+        {!myOrders ? (
+          <Loading />
+        ) : (
+          myOrders.map(({ id, unit, subItems, phone, comment }) => (
             <Card key={id} className={styles.card}>
               <CardHeader
                 header={
-                  <Body1 style={{ textAlign: "left" }}>
-                    <b>{unit}</b>
-                  </Body1>
+                  <div
+                    style={{
+                      width: "100%",
+                      display: "flex",
+                      justifyContent: "space-between",
+                    }}
+                  >
+                    <Body1 style={{ textAlign: "left" }}>
+                      <b>{unit}</b>
+                    </Body1>
+                    <Body1>
+                      <b>{phone}</b>
+                    </Body1>
+                  </div>
                 }
               />
-
               <CardPreview>
                 <AssignedSubItems
                   items={subItems}
@@ -104,8 +123,8 @@ export const AssignedOrders = () => {
                 ) : null}
               </CardPreview>
             </Card>
-          );
-        })}
+          ))
+        )}
       </div>
     </>
   );
