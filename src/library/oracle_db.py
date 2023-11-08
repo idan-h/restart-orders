@@ -14,12 +14,15 @@ class OracleDB:
             dsn=self.dsn
         )
 
-    def execute(self, sql , return_rows = False):
+    def execute(self, sql , parms=None, return_rows = False, commit = True):
         with self.connection.cursor() as cursor:
             print("sending sql query ... ")
-            c = cursor.execute(sql)
+            c = cursor.execute(sql) if parms is None else cursor.execute(sql, parms)
+            if commit:
+                self.connection.commit()
             if return_rows:
                 return c.fetchall()
+            
 
     def __del__(self):
         self.connection.close()

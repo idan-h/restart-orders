@@ -9,26 +9,17 @@ import {
 } from "@fluentui/react-components";
 import { Delete24Regular } from "@fluentui/react-icons";
 import { SubItem } from "../../types.ts";
-import { useOrdersService } from "../../services/orders.ts";
 
-type Props = {
-  orderId: string;
+export interface AssignedSubItemsProps {
   items: SubItem[];
-  onChange: (products: SubItem[]) => void;
-};
+  onDelete: (subItem: SubItem) => void;
+}
 
-export const AssignedSubItems = ({ items, orderId, onChange }: Props) => {
-  const { unAssignSubItem } = useOrdersService();
-  const handleProductUnassign = (subItemId: string, subItemBoardId: string) => {
-    unAssignSubItem({
-      orderId,
-      subItemId,
-      subItemBoardId,
-    });
-    onChange(items.filter((item) => item.id !== subItemId));
-  };
-
+export const AssignedSubItems: React.FunctionComponent<
+  AssignedSubItemsProps
+> = ({ items, onDelete }) => {
   const columns = [
+    // Info
     createTableColumn<SubItem>({
       columnId: "file",
       renderCell: (item) => {
@@ -49,18 +40,21 @@ export const AssignedSubItems = ({ items, orderId, onChange }: Props) => {
         );
       },
     }),
+    // Quantity
     createTableColumn<SubItem>({
       columnId: "quantity",
       renderCell: (item) => {
         return <TableCellLayout>{item.quantity}</TableCellLayout>;
       },
     }),
+    // Status
     createTableColumn<SubItem>({
       columnId: "status",
       renderCell: (item) => {
         return <TableCellLayout>{item.status}</TableCellLayout>;
       },
     }),
+    // Delete button
     createTableColumn<SubItem>({
       columnId: "unassign",
       renderCell: (item) => {
@@ -68,9 +62,7 @@ export const AssignedSubItems = ({ items, orderId, onChange }: Props) => {
           <TableCellLayout>
             <Button
               appearance="transparent"
-              onClick={() =>
-                handleProductUnassign(item.id, item.subItemBoardId)
-              }
+              onClick={() => onDelete(item)}
               icon={<Delete24Regular />}
             />
           </TableCellLayout>
@@ -78,6 +70,7 @@ export const AssignedSubItems = ({ items, orderId, onChange }: Props) => {
       },
     }),
   ];
+
   return (
     <DataGrid items={items} columns={columns} getRowId={(item) => item.id}>
       <DataGridBody<SubItem>>

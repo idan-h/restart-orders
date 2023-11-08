@@ -366,9 +366,6 @@ class MondayBoard:
                     items(ids: {item_id}) {{
                         id
                         name
-                        parent_item {{
-                            id
-                        }}
                         column_values {{
                             id
                             text
