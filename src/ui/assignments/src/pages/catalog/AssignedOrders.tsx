@@ -65,17 +65,27 @@ export const AssignedOrders = () => {
       <Header />
       <div style={pageStyle}>
         <h2 style={{ textAlign: "center", margin: "20px auto" }}>הזמנות</h2>
-        {orders.map(({ id, unit, subItems, comment }) => {
+        {orders.map(({ id, unit, subItems, phone, comment }) => {
           return (
             <Card key={id} className={styles.card}>
               <CardHeader
                 header={
-                  <Body1 style={{ textAlign: "left" }}>
-                    <b>{unit}</b>
-                  </Body1>
+                  <div
+                    style={{
+                      width: "100%",
+                      display: "flex",
+                      justifyContent: "space-between",
+                    }}
+                  >
+                    <Body1 style={{ textAlign: "left" }}>
+                      <b>{unit}</b>
+                    </Body1>
+                    <Body1>
+                      <b>{phone}</b>
+                    </Body1>
+                  </div>
                 }
               />
-
               <CardPreview>
                 <AssignedSubItems
                   items={subItems}

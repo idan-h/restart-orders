@@ -1,6 +1,7 @@
 export type BaseOrder = {
   id: string;
   region: string;
+  phone: string;
   unit: string;
   comment: string;
 };
@@ -22,7 +23,7 @@ export type BaseSubItem = {
   status: string | undefined; // if `undefined`, then the subitem is unassigned
 };
 
-export type MondaySubItem = BaseSubItem
+export type MondaySubItem = BaseSubItem;
 
 export type SubItem = BaseSubItem & {
   productName: string;
