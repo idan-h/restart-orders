@@ -4,7 +4,7 @@ export function makeFakeAuthenticationService(): ReturnType<typeof makeAuthentic
   let userId: string | undefined = localStorage.getItem("fakeUserId") ?? undefined;
 
   return {
-    async login(_userName: string, _password: string): Promise<void> {
+    async login(_userName: string, _password: string): Promise<undefined> {
       userId = "this-is-good-userid";
       localStorage.setItem("fakeUserId", userId);
     },
@@ -14,6 +14,9 @@ export function makeFakeAuthenticationService(): ReturnType<typeof makeAuthentic
     logout() {
       userId = undefined;
       localStorage.removeItem("fakeUserId");
+    },
+    isLoggedIn() {
+      return Boolean(userId);
     },
   };
 }

@@ -8,7 +8,6 @@ import {
 
 import {
   FluentProvider,
-  Switch,
   webDarkTheme,
   webLightTheme,
 } from "@fluentui/react-components";
