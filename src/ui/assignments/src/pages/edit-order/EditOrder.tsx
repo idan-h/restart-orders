@@ -2,7 +2,6 @@ import {
   Combobox,
   Option,
   DataGridCell,
-  Spinner,
   Table,
   TableBody,
   TableRow,
@@ -12,6 +11,7 @@ import React, { useEffect } from "react";
 import { useOrdersService } from "../../services/orders";
 import { Order } from "../../types";
 import { Link } from "react-router-dom";
+import { Loading } from "../../components/Loading";
 
 export const EditOrder: React.FC<{ orderId: string }> = ({ orderId }) => {
   const { fetchOrder, fetchOrderStatusNames, unAssignSubItem, changeStatus } =
@@ -109,6 +109,6 @@ export const EditOrder: React.FC<{ orderId: string }> = ({ orderId }) => {
       </Table>
     </>
   ) : (
-    <Spinner />
+    <Loading />
   );
 };

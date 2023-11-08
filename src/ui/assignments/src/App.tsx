@@ -6,7 +6,12 @@ import {
   Navigate,
 } from "react-router-dom";
 
-import { FluentProvider, webDarkTheme } from "@fluentui/react-components";
+import {
+  FluentProvider,
+  Switch,
+  webDarkTheme,
+  webLightTheme,
+} from "@fluentui/react-components";
 
 // import { makeFakeAuthenticationService } from "./services/fake-authentication.ts";
 // import { makeFakeOrdersService } from "./services/fake-orders.ts";
@@ -27,10 +32,19 @@ import { AboutUs } from "./pages/about/AboutUs.tsx";
 import { ROUTES } from "./routes-const.ts";
 
 function App() {
+  const [isDarkMode, setIsDarkMode] = React.useState(false);
   return (
     <AuthenticationService.Provider value={makeAuthenticationService()}>
       <OrdersServiceComponent>
-        <FluentProvider theme={webDarkTheme} dir="rtl">
+        <FluentProvider
+          theme={isDarkMode ? webDarkTheme : webLightTheme}
+          dir="rtl"
+        >
+          <Switch
+            label={"Dark Mode"}
+            checked={isDarkMode}
+            onChange={() => setIsDarkMode((x) => !x)}
+          />
           <Router>
             <Routes>
               <Route path={ROUTES.LOGIN} Component={LoginForm} />

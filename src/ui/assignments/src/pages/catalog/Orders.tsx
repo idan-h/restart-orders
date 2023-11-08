@@ -16,8 +16,9 @@ import { Order, SubItem } from "../../types.ts";
 import { SubItems } from "./SubItems.tsx";
 import { useOrdersService } from "../../services/orders.ts";
 import { Header } from "../../components/header.tsx";
-import {useNavigate} from "react-router-dom";
-import {ROUTES} from "../../routes-const.ts";
+import { useNavigate } from "react-router-dom";
+import { ROUTES } from "../../routes-const.ts";
+import { Loading } from "../../components/Loading.tsx";
 
 const useStyles = makeStyles({
   card: {
@@ -73,7 +74,7 @@ export const Orders = () => {
   }, []);
 
   if (!orders) {
-    return "Loading...";
+    return <Loading />;
   }
 
   return (
