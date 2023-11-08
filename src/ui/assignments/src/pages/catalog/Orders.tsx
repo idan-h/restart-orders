@@ -85,46 +85,44 @@ export const Orders = () => {
             <Loading />
           </div>
         ) : (
-          [...orders, ...orders, ...orders, ...orders].map(
-            ({ id, unit, subItems, comment }) => (
-              <Card key={id} className={styles.card}>
-                <CardHeader
-                  header={
-                    <Body1 style={{ textAlign: "left" }}>
-                      <b>{unit}</b>
-                    </Body1>
-                  }
-                />
+          orders.map(({ id, unit, subItems, comment }) => (
+            <Card key={id} className={styles.card}>
+              <CardHeader
+                header={
+                  <Body1 style={{ textAlign: "left" }}>
+                    <b>{unit}</b>
+                  </Body1>
+                }
+              />
 
-                <CardPreview>
-                  <SubItems
-                    onChange={(subItems) => handleSubItemsChange(id, subItems)}
-                    items={subItems}
-                  />
-                  {comment && (
-                    <a
-                      style={{
-                        display: "flex",
-                        alignItems: "center",
-                        margin: 10,
-                      }}
-                      onClick={() => toggleOpenNote(id)}
-                    >
-                      הערות
-                      {openNoteIds.includes(id) ? (
-                        <TextCollapse24Filled />
-                      ) : (
-                        <TextExpand24Regular />
-                      )}
-                    </a>
-                  )}
-                  {openNoteIds.includes(id) ? (
-                    <p style={{ margin: 10 }}>{comment}</p>
-                  ) : null}
-                </CardPreview>
-              </Card>
-            )
-          )
+              <CardPreview>
+                <SubItems
+                  onChange={(subItems) => handleSubItemsChange(id, subItems)}
+                  items={subItems}
+                />
+                {comment && (
+                  <a
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      margin: 10,
+                    }}
+                    onClick={() => toggleOpenNote(id)}
+                  >
+                    הערות
+                    {openNoteIds.includes(id) ? (
+                      <TextCollapse24Filled />
+                    ) : (
+                      <TextExpand24Regular />
+                    )}
+                  </a>
+                )}
+                {openNoteIds.includes(id) ? (
+                  <p style={{ margin: 10 }}>{comment}</p>
+                ) : null}
+              </CardPreview>
+            </Card>
+          ))
         )}
       </div>
       {orders && (
