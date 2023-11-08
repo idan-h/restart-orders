@@ -26,28 +26,36 @@ import { AssignedOrders } from "./pages/catalog/AssignedOrders.tsx";
 import { AboutUs } from "./pages/about/AboutUs.tsx";
 import { ROUTES } from "./routes-const.ts";
 
+const appStyle: React.CSSProperties = {
+  height: "100vh",
+  width: "100vw",
+  display: "flex",
+  flexDirection: "column",
+};
+
 function App() {
   return (
     <AuthenticationService.Provider value={makeAuthenticationService()}>
       <OrdersServiceComponent>
         <FluentProvider theme={webDarkTheme} dir="rtl">
-          <Router>
-            <Routes>
-              <Route path={ROUTES.LOGIN} Component={LoginForm} />
-              <Route path={ROUTES.ABOUT} Component={AboutUs} />
-              <Route path={ROUTES.MAIN}>
-                <Route path={ROUTES.ORDER} Component={Orders} />
-                <Route path={ROUTES.MY_ORDERS} Component={AssignedOrders} />
+          <div style={appStyle}>
+            <Router>
+              <Routes>
+                <Route path={ROUTES.LOGIN} Component={LoginForm} />
+                <Route path={ROUTES.ABOUT} Component={AboutUs} />
+                <Route path={ROUTES.MAIN}>
+                  <Route path={ROUTES.ORDER} Component={Orders} />
+                  <Route path={ROUTES.MY_ORDERS} Component={AssignedOrders} />
+                  <Route
+                    path={ROUTES.MAIN}
+                    element={<Navigate to={ROUTES.ORDER} replace />}
+                  />
+                </Route>
                 <Route
-                  path={ROUTES.MAIN}
-                  element={<Navigate to={ROUTES.ORDER} replace />}
+                  path="/"
+                  element={<Navigate to={ROUTES.LOGIN} replace />}
                 />
-              </Route>
-              <Route
-                path="/"
-                element={<Navigate to={ROUTES.LOGIN} replace />}
-              />
-              {/* <Route path="/" Component={HomePage}></Route>
+                {/* <Route path="/" Component={HomePage}></Route>
               <Route
                 path="/my-orders"
                 Component={OnlyIfAuthenticated(AssignedOrders)}
@@ -68,8 +76,9 @@ function App() {
                   return <EditOrder orderId={orderId ?? ""} />;
                 })}
               ></Route> */}
-            </Routes>
-          </Router>
+              </Routes>
+            </Router>
+          </div>
         </FluentProvider>
       </OrdersServiceComponent>
     </AuthenticationService.Provider>

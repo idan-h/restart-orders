@@ -16,8 +16,8 @@ import { Order, SubItem } from "../../types.ts";
 import { SubItems } from "./SubItems.tsx";
 import { useOrdersService } from "../../services/orders.ts";
 import { Header } from "../../components/header.tsx";
-import {useNavigate} from "react-router-dom";
-import {ROUTES} from "../../routes-const.ts";
+import { useNavigate } from "react-router-dom";
+import { ROUTES } from "../../routes-const.ts";
 
 const useStyles = makeStyles({
   card: {
@@ -114,17 +114,6 @@ export const Orders = () => {
                 <p style={{ margin: 10 }}>{comment}</p>
               ) : null}
             </CardPreview>
-            {/* <<<<<<< Updated upstream
-=======
-            <CardFooter>
-              <Button
-                onClick={() => handleAssign(id)}
-                disabled={subItems.every((subItem) => !subItem?.userId)}
-              >
-                שלח
-              </Button>
-            </CardFooter>
->>>>>>> Stashed changes */}
           </Card>
         );
       })}

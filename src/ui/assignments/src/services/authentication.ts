@@ -28,12 +28,15 @@ export function makeAuthenticationService() {
         localStorage.setItem("userId", newUserId);
       }
     },
-    userId() {
-      return userId;
-    },
     logout() {
       userId = undefined;
       localStorage.removeItem("userId");
+    },
+    userId() {
+      return userId;
+    },
+    isLoggedIn() {
+      return Boolean(userId);
     },
   };
 }

@@ -14,6 +14,21 @@ import { useAuthenticationService } from "../../services/authentication";
 import { Header } from "../../components/header";
 import { ROUTES } from "../../routes-const";
 
+const loginPageStyle: React.CSSProperties = {
+  flex: 1,
+  padding: "0 24px",
+};
+
+const loginCardStyle: React.CSSProperties = {
+  top: "35%",
+  transform: "translateY(-50%)",
+};
+
+const cardContentStyle: React.CSSProperties = {
+  padding: "10px",
+  width: "min-content",
+};
+
 export const LoginForm = () => {
   const { login } = useAuthenticationService();
   const [username, setUsername] = useState("");
@@ -42,49 +57,51 @@ export const LoginForm = () => {
   };
 
   return (
-    <div>
+    <>
       <Header />
-      <Card style={{ width: "100%" }}>
-        <CardHeader header={<h3>פורטל Restart לעמותות</h3>} />
-        <CardPreview style={{ padding: "10px", width: "min-content" }}>
-          <Field
-            label="שם משתמש"
-            orientation="vertical"
-            validationState={loginError ? "error" : undefined}
-          >
-            <Input
-              type="text"
-              value={username}
-              onChange={handleUsernameChange}
-            />
-          </Field>
-          <Field
-            label="סיסמא"
-            orientation="vertical"
-            validationMessage={loginError}
-            validationState={loginError ? "error" : undefined}
-          >
-            <Input
-              type="password"
-              value={password}
-              onChange={handlePasswordChange}
-            />
-          </Field>
-        </CardPreview>
-        <CardFooter>
-          <Button
-            appearance="primary"
-            onClick={() => {
-              setLoginError(undefined);
-              setIsLoading(true);
-              handleSubmit();
-            }}
-          >
-            כניסה
-          </Button>
-          {isLoading && <Spinner />}
-        </CardFooter>
-      </Card>
-    </div>
+      <div style={loginPageStyle}>
+        <Card style={loginCardStyle}>
+          <CardHeader header={<h3>פורטל Restart לעמותות</h3>} />
+          <CardPreview style={cardContentStyle}>
+            <Field
+              label="שם משתמש"
+              orientation="vertical"
+              validationState={loginError ? "error" : undefined}
+            >
+              <Input
+                type="text"
+                value={username}
+                onChange={handleUsernameChange}
+              />
+            </Field>
+            <Field
+              label="סיסמא"
+              orientation="vertical"
+              validationMessage={loginError}
+              validationState={loginError ? "error" : undefined}
+            >
+              <Input
+                type="password"
+                value={password}
+                onChange={handlePasswordChange}
+              />
+            </Field>
+          </CardPreview>
+          <CardFooter>
+            <Button
+              appearance="primary"
+              onClick={() => {
+                setLoginError(undefined);
+                setIsLoading(true);
+                handleSubmit();
+              }}
+            >
+              כניסה
+            </Button>
+            {isLoading && <Spinner />}
+          </CardFooter>
+        </Card>
+      </div>
+    </>
   );
 };
