@@ -7,17 +7,26 @@ export function makeAuthenticationService() {
   let userId: string | undefined = localStorage.getItem("userId") ?? undefined;
 
   return {
-    async login(userName: string, password: string): Promise<void> {
+    async login(userName: string, password: string) {
       const response = await fetch(new URL("login", baseUrl), {
         method: "POST",
         body: JSON.stringify({ username: userName, password }),
+      }).catch((error) => {
+        console.log(error);
       });
 
-      const { userId: newUserId } = await response.json();
-
-      userId = newUserId;
-
-      localStorage.setItem("userId", newUserId);
+      const responseJson = response
+        ? await response.json()
+        : { userId: undefined };
+      const error = responseJson.error;
+      if (error) {
+        console.log(error);
+        return Promise.reject(error);
+      } else {
+        const newUserId = responseJson.userId;
+        userId = newUserId;
+        localStorage.setItem("userId", newUserId);
+      }
     },
     userId() {
       return userId;
