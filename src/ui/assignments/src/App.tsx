@@ -1,21 +1,18 @@
-import { FluentProvider, webLightTheme } from "@fluentui/react-components";
+import React from "react";
 import {
   BrowserRouter as Router,
   Route,
   Routes,
-  useParams,
+  Navigate,
 } from "react-router-dom";
-import { LoginForm } from "./pages/login/LoginForm";
-import { Logout } from "./pages/login/Logout";
-import { HomePage } from "./pages/home/HomePage";
-import { EditOrder } from "./pages/edit-order/EditOrder";
-import { Orders } from "./pages/catalog/Orders.tsx";
-import { AssignedOrders } from "./pages/catalog/AssignedOrders.tsx";
-import { AboutUs } from "./pages/about/AboutUs.tsx";
-import "./App.css";
+
+import { FluentProvider, webDarkTheme } from "@fluentui/react-components";
+
 // import { makeFakeAuthenticationService } from "./services/fake-authentication.ts";
 // import { makeFakeOrdersService } from "./services/fake-orders.ts";
-import React from "react";
+
+import "./App.css";
+
 import {
   AuthenticationService,
   makeAuthenticationService,
@@ -23,14 +20,34 @@ import {
 } from "./services/authentication.ts";
 import { OrdersService, makeOrdersService } from "./services/orders.ts";
 
+import { LoginForm } from "./pages/login/LoginForm";
+import { Orders } from "./pages/catalog/Orders.tsx";
+import { AssignedOrders } from "./pages/catalog/AssignedOrders.tsx";
+import { AboutUs } from "./pages/about/AboutUs.tsx";
+import { ROUTES } from "./routes-const.ts";
+
 function App() {
   return (
     <AuthenticationService.Provider value={makeAuthenticationService()}>
       <OrdersServiceComponent>
-        <FluentProvider theme={webLightTheme} dir="rtl">
+        <FluentProvider theme={webDarkTheme} dir="rtl">
           <Router>
             <Routes>
-              <Route path="/" Component={HomePage}></Route>
+              <Route path={ROUTES.LOGIN} Component={LoginForm} />
+              <Route path={ROUTES.ABOUT} Component={AboutUs} />
+              <Route path={ROUTES.MAIN}>
+                <Route path={ROUTES.ORDER} Component={Orders} />
+                <Route path={ROUTES.MY_ORDERS} Component={AssignedOrders} />
+                <Route
+                  path={ROUTES.MAIN}
+                  element={<Navigate to={ROUTES.ORDER} replace />}
+                />
+              </Route>
+              <Route
+                path="/"
+                element={<Navigate to={ROUTES.LOGIN} replace />}
+              />
+              {/* <Route path="/" Component={HomePage}></Route>
               <Route
                 path="/my-orders"
                 Component={OnlyIfAuthenticated(AssignedOrders)}
@@ -50,7 +67,7 @@ function App() {
 
                   return <EditOrder orderId={orderId ?? ""} />;
                 })}
-              ></Route>
+              ></Route> */}
             </Routes>
           </Router>
         </FluentProvider>
@@ -59,23 +76,24 @@ function App() {
   );
 }
 
-function OnlyIfAuthenticated(originalComponent: React.FC) {
-  return () => {
-    // eslint-disable-next-line react-hooks/rules-of-hooks
-    const { userId } = useAuthenticationService();
+// function OnlyIfAuthenticated(originalComponent: React.FC) {
+//   return () => {
+//     // eslint-disable-next-line react-hooks/rules-of-hooks
+//     const { userId } = useAuthenticationService();
 
-    return userId() ? (
-      React.createElement(originalComponent)
-    ) : (
-      <div>you are not authenticated</div>
-    );
-  };
-}
+//     return userId() ? (
+//       React.createElement(originalComponent)
+//     ) : (
+//       <div>you are not authenticated</div>
+//     );
+//   };
+// }
 
 const OrdersServiceComponent: React.FC<{ children?: React.ReactNode }> = ({
   children,
 }) => {
   const { userId } = useAuthenticationService();
+  // const isLoggedIn = Boolean(userId());
 
   if (!userId()) {
     return children;

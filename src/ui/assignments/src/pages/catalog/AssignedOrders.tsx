@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import {
   makeStyles,
   Body1,
@@ -10,11 +11,12 @@ import {
   TextExpand24Regular,
   TextCollapse24Filled,
 } from "@fluentui/react-icons";
-import { useEffect, useState } from "react";
-import {Order, SubItem} from "../../types.ts";
+
+import { Order, SubItem } from "../../types.ts";
 import { useOrdersService } from "../../services/orders.ts";
-import { Link } from "react-router-dom";
-import {AssignedSubItems} from "./AssignedSubItems.tsx";
+
+import { AssignedSubItems } from "./AssignedSubItems.tsx";
+import { Header } from "../../components/header.tsx";
 
 const useStyles = makeStyles({
   card: {
@@ -26,20 +28,19 @@ const useStyles = makeStyles({
 });
 
 export const AssignedOrders = () => {
-  //const navigate = useNavigate();
   const { fetchAssignedOrders } = useOrdersService();
   const styles = useStyles();
 
   const [orders, setOrders] = useState<Order[] | undefined>();
   const [openNoteIds, setOpenNoteIds] = useState<string[]>([]);
 
-  const handleItemsChages = (orderId: string, items: SubItem[]) => {
+  const handleItemsChages = (orderId: string, subItems: SubItem[]) => {
     setOrders(
       orders?.map((order) =>
-        order.id === orderId ? { ...order, items } : order
-      )
+        order.id === orderId ? { ...order, subItems } : order
+      ).filter(order => order.subItems.length)
     );
-  }
+  };
 
   const toggleOpenNote = (id: string) => {
     setOpenNoteIds((openNoteIds) =>
@@ -59,9 +60,8 @@ export const AssignedOrders = () => {
 
   return (
     <div style={{ margin: "auto" }}>
-      <p>
-        <Link to="/">חזרה</Link>
-      </p>
+      <Header />
+
       <h2 style={{ textAlign: "center", margin: "20px auto" }}>הזמנות</h2>
       {orders.map(({ id, unit, subItems, comment }) => {
         return (
@@ -75,7 +75,11 @@ export const AssignedOrders = () => {
             />
 
             <CardPreview>
-              <AssignedSubItems items={subItems} onChange={(subItems) => handleItemsChages(id, subItems)} orderId={id} />
+              <AssignedSubItems
+                items={subItems}
+                onChange={(subItems) => handleItemsChages(id, subItems)}
+                orderId={id}
+              />
               {comment && (
                 <a
                   style={{ display: "flex", alignItems: "center", margin: 10 }}
@@ -93,15 +97,6 @@ export const AssignedOrders = () => {
                 <p style={{ margin: 10 }}>{comment}</p>
               ) : null}
             </CardPreview>
-            {/*<CardFooter>*/}
-            {/*  <Button*/}
-            {/*    onClick={() =>*/}
-            {/*      navigate(`/edit-order/${encodeURIComponent(id)}`)*/}
-            {/*    }*/}
-            {/*  >*/}
-            {/*    עדכן*/}
-            {/*  </Button>*/}
-            {/*</CardFooter>*/}
           </Card>
         );
       })}
