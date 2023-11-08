@@ -5,6 +5,7 @@ import { ROUTES } from "../routes-const";
 
 const headerStyle: React.CSSProperties = {
   height: "80px",
+  background: "gray",
 };
 
 export const Header: React.FunctionComponent = () => {

@@ -6,7 +6,12 @@ import {
   Navigate,
 } from "react-router-dom";
 
-import { FluentProvider, webDarkTheme } from "@fluentui/react-components";
+import {
+  FluentProvider,
+  Switch,
+  webDarkTheme,
+  webLightTheme,
+} from "@fluentui/react-components";
 
 // import { makeFakeAuthenticationService } from "./services/fake-authentication.ts";
 // import { makeFakeOrdersService } from "./services/fake-orders.ts";
@@ -33,11 +38,22 @@ const appStyle: React.CSSProperties = {
   flexDirection: "column",
 };
 
+function isDarkMode() {
+  try {
+    return window.matchMedia("(prefers-color-scheme: dark)").matches;
+  } catch (e) {
+    return false;
+  }
+}
+
 function App() {
   return (
     <AuthenticationService.Provider value={makeAuthenticationService()}>
       <OrdersServiceComponent>
-        <FluentProvider theme={webDarkTheme} dir="rtl">
+        <FluentProvider
+          theme={isDarkMode() ? webDarkTheme : webLightTheme}
+          dir="rtl"
+        >
           <div style={appStyle}>
             <Router>
               <Routes>

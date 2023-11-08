@@ -1,3 +1,5 @@
+import { useNavigate } from "react-router-dom";
+
 import {
   makeStyles,
   Body1,
@@ -16,7 +18,8 @@ import { Order, SubItem } from "../../types.ts";
 import { SubItems } from "./SubItems.tsx";
 import { useOrdersService } from "../../services/orders.ts";
 import { Header } from "../../components/header.tsx";
-import { useNavigate } from "react-router-dom";
+import { Loading } from "../../components/Loading.tsx";
+
 import { ROUTES } from "../../routes-const.ts";
 
 const useStyles = makeStyles({
@@ -73,7 +76,7 @@ export const Orders = () => {
   }, []);
 
   if (!orders) {
-    return "Loading...";
+    return <Loading />;
   }
 
   return (

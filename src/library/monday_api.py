@@ -364,11 +364,16 @@ class MondayBoard:
         query = f'''
                 {{
                     items(ids: {item_id}) {{
+                        id
                         name
+                        parent_item {{
+                            id
+                        }}
                         column_values {{
                             id
                             text
                             type
+                            value
                         }}
                       }}
                 }}

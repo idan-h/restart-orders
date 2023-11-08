@@ -17,6 +17,7 @@ import { useOrdersService } from "../../services/orders.ts";
 
 import { AssignedSubItems } from "./AssignedSubItems.tsx";
 import { Header } from "../../components/header.tsx";
+import { Loading } from "../../components/Loading.tsx";
 
 const useStyles = makeStyles({
   card: {
@@ -34,11 +35,13 @@ export const AssignedOrders = () => {
   const [orders, setOrders] = useState<Order[] | undefined>();
   const [openNoteIds, setOpenNoteIds] = useState<string[]>([]);
 
-  const handleItemsChages = (orderId: string, subItems: SubItem[]) => {
+  const handleItemsChanges = (orderId: string, subItems: SubItem[]) => {
     setOrders(
-      orders?.map((order) =>
-        order.id === orderId ? { ...order, subItems } : order
-      ).filter(order => order.subItems.length)
+      orders
+        ?.map((order) =>
+          order.id === orderId ? { ...order, subItems } : order
+        )
+        .filter((order) => order.subItems.length)
     );
   };
 
@@ -55,7 +58,7 @@ export const AssignedOrders = () => {
   }, []);
 
   if (!orders) {
-    return "Loading...";
+    return <Loading />;
   }
 
   return (
@@ -77,7 +80,7 @@ export const AssignedOrders = () => {
             <CardPreview>
               <AssignedSubItems
                 items={subItems}
-                onChange={(subItems) => handleItemsChages(id, subItems)}
+                onChange={(subItems) => handleItemsChanges(id, subItems)}
                 orderId={id}
               />
               {comment && (
