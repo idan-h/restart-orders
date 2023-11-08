@@ -4,7 +4,6 @@ import {
   Button,
   shorthands,
   Card,
-  CardFooter,
   CardHeader,
   CardPreview,
 } from "@fluentui/react-components";
@@ -34,18 +33,15 @@ export const Orders = () => {
   const [openNoteIds, setOpenNoteIds] = useState<string[]>([]);
   const { fetchUnassignedOrders, assignSubItem } = useOrdersService();
 
-  const handleAssign = (orderId: string) => {
+  const submit = () => {
     Promise.all(
-      orders
-        ?.find((order) => order.id === orderId)
-        ?.subItems.filter((subItem) => !!subItem.userId)
-        .map((subItem) =>
+      orders?.flatMap((order) => order.subItems.filter((subItem) => !!subItem.userId).map((subItem) =>
           assignSubItem({
-            orderId,
+            orderId: order.id,
             subItemId: subItem.id,
             subItemBoardId: subItem.subItemBoardId,
           })
-        ) ?? []
+        )) ?? []
     );
   };
 
@@ -112,19 +108,20 @@ export const Orders = () => {
                 <p style={{ margin: 10 }}>{comment}</p>
               ) : null}
             </CardPreview>
-            <CardFooter>
-              <Button
-                onClick={() => handleAssign(id)}
-                disabled={subItems.every(
-                  (subItem) => !subItem?.userId
-                )}
-              >
-                שלח
-              </Button>
-            </CardFooter>
           </Card>
         );
       })}
+
+      <div>
+        <Button
+          onClick={() => submit()}
+          disabled={orders.every(
+            (order) => order.subItems.every(subItem => !subItem.userId)
+          )}
+        >
+          שלח
+        </Button>
+      </div>
     </div>
   );
 };

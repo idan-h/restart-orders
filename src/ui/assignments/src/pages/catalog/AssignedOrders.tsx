@@ -1,10 +1,8 @@
 import {
   makeStyles,
   Body1,
-  Button,
   shorthands,
   Card,
-  CardFooter,
   CardHeader,
   CardPreview,
 } from "@fluentui/react-components";
@@ -13,10 +11,10 @@ import {
   TextCollapse24Filled,
 } from "@fluentui/react-icons";
 import { useEffect, useState } from "react";
-import { Order } from "../../types.ts";
-import { SubItems } from "./SubItems.tsx";
+import {Order, SubItem} from "../../types.ts";
 import { useOrdersService } from "../../services/orders.ts";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
+import {AssignedSubItems} from "./AssignedSubItems.tsx";
 
 const useStyles = makeStyles({
   card: {
@@ -28,12 +26,20 @@ const useStyles = makeStyles({
 });
 
 export const AssignedOrders = () => {
-  const navigate = useNavigate();
+  //const navigate = useNavigate();
   const { fetchAssignedOrders } = useOrdersService();
   const styles = useStyles();
 
   const [orders, setOrders] = useState<Order[] | undefined>();
   const [openNoteIds, setOpenNoteIds] = useState<string[]>([]);
+
+  const handleItemsChages = (orderId: string, items: SubItem[]) => {
+    setOrders(
+      orders?.map((order) =>
+        order.id === orderId ? { ...order, items } : order
+      )
+    );
+  }
 
   const toggleOpenNote = (id: string) => {
     setOpenNoteIds((openNoteIds) =>
@@ -69,7 +75,7 @@ export const AssignedOrders = () => {
             />
 
             <CardPreview>
-              <SubItems items={subItems} />
+              <AssignedSubItems items={subItems} onChange={(subItems) => handleItemsChages(id, subItems)} orderId={id} />
               {comment && (
                 <a
                   style={{ display: "flex", alignItems: "center", margin: 10 }}
@@ -87,15 +93,15 @@ export const AssignedOrders = () => {
                 <p style={{ margin: 10 }}>{comment}</p>
               ) : null}
             </CardPreview>
-            <CardFooter>
-              <Button
-                onClick={() =>
-                  navigate(`/edit-order/${encodeURIComponent(id)}`)
-                }
-              >
-                עדכן
-              </Button>
-            </CardFooter>
+            {/*<CardFooter>*/}
+            {/*  <Button*/}
+            {/*    onClick={() =>*/}
+            {/*      navigate(`/edit-order/${encodeURIComponent(id)}`)*/}
+            {/*    }*/}
+            {/*  >*/}
+            {/*    עדכן*/}
+            {/*  </Button>*/}
+            {/*</CardFooter>*/}
           </Card>
         );
       })}

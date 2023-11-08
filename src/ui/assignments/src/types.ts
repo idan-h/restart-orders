@@ -27,5 +27,5 @@ export type MondaySubItem = BaseSubItem
 export type SubItem = BaseSubItem & {
   productName: string;
   // Hack!
-  requestedQuantity?: number;
+  //requestedQuantity?: number;
 };

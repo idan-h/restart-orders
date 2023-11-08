@@ -30,16 +30,18 @@ export function makeOrdersService(userId: string) {
         )
       );
 
-      const mondayOrders = (await response.json()) as { orders: MondayOrder[] };
+      const mondayOrders = ((await response.json()) as { orders: MondayOrder[] }).orders;
 
       return {
-        orders: mondayOrders.orders.map((mondayOrders) => ({
+        orders: mondayOrders.map((mondayOrders) => ({
           ...mondayOrders,
-          subItems: mondayOrders.subItems.map((subItem) => ({
+          subItems: mondayOrders.subItems
+            .filter(item => !item.userId && productNames?.has(item.productId))
+            .map((subItem) => ({
             ...subItem,
             productName: productNames!.get(subItem.productId)!,
           })),
-        })),
+        })).filter(order => order.subItems.length),
       };
     },
     async fetchAssignedOrders(): Promise<{ orders: Order[] }> {
@@ -99,8 +101,8 @@ export function makeOrdersService(userId: string) {
     },
     async unAssignSubItem(request: {
       orderId: string;
-      subItemId: string;
-      subItemBoardId: string;
+        subItemId: string;
+        subItemBoardId: string;
     }) {
       const response = await fetch(
         new URL(`unassign?userId=${encodeURIComponent(userId)}`, baseUrl),
