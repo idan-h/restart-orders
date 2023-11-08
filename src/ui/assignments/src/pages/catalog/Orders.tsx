@@ -16,6 +16,7 @@ import { Order, SubItem } from "../../types.ts";
 import { SubItems } from "./SubItems.tsx";
 import { useOrdersService } from "../../services/orders.ts";
 import { Link } from "react-router-dom";
+import { Header } from "../../components/header.tsx";
 
 const useStyles = makeStyles({
   card: {
@@ -35,13 +36,17 @@ export const Orders = () => {
 
   const submit = () => {
     Promise.all(
-      orders?.flatMap((order) => order.subItems.filter((subItem) => !!subItem.userId).map((subItem) =>
-          assignSubItem({
-            orderId: order.id,
-            subItemId: subItem.id,
-            subItemBoardId: subItem.subItemBoardId,
-          })
-        )) ?? []
+      orders?.flatMap((order) =>
+        order.subItems
+          .filter((subItem) => !!subItem.userId)
+          .map((subItem) =>
+            assignSubItem({
+              orderId: order.id,
+              subItemId: subItem.id,
+              subItemBoardId: subItem.subItemBoardId,
+            })
+          )
+      ) ?? []
     );
   };
 
@@ -71,9 +76,8 @@ export const Orders = () => {
 
   return (
     <div style={{ margin: "auto" }}>
-      <p>
-        <Link to="/">חזרה</Link>
-      </p>
+      <Header />
+
       <h2 style={{ textAlign: "center", margin: "20px auto" }}>בקשות</h2>
       {orders.map(({ id, unit, subItems, comment }) => {
         return (
@@ -108,6 +112,17 @@ export const Orders = () => {
                 <p style={{ margin: 10 }}>{comment}</p>
               ) : null}
             </CardPreview>
+            {/* <<<<<<< Updated upstream
+=======
+            <CardFooter>
+              <Button
+                onClick={() => handleAssign(id)}
+                disabled={subItems.every((subItem) => !subItem?.userId)}
+              >
+                שלח
+              </Button>
+            </CardFooter>
+>>>>>>> Stashed changes */}
           </Card>
         );
       })}
@@ -115,8 +130,8 @@ export const Orders = () => {
       <div>
         <Button
           onClick={() => submit()}
-          disabled={orders.every(
-            (order) => order.subItems.every(subItem => !subItem.userId)
+          disabled={orders.every((order) =>
+            order.subItems.every((subItem) => !subItem.userId)
           )}
         >
           שלח

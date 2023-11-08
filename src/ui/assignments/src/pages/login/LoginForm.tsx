@@ -11,6 +11,8 @@ import {
 } from "@fluentui/react-components";
 import { useNavigate } from "react-router-dom";
 import { useAuthenticationService } from "../../services/authentication";
+import { Header } from "../../components/header";
+import { ROUTES } from "../../routes-const";
 
 export const LoginForm = () => {
   const { login } = useAuthenticationService();
@@ -31,7 +33,7 @@ export const LoginForm = () => {
   const handleSubmit = () => {
     login(username, password)
       .then(
-        () => navigate("/"),
+        () => navigate(ROUTES.MAIN),
         (error) => {
           setLoginError(error);
         }
@@ -40,42 +42,49 @@ export const LoginForm = () => {
   };
 
   return (
-    <Card style={{ width: "100%" }}>
-      <CardHeader header={<h3>פורטל Restart לעמותות</h3>} />
-      <CardPreview style={{ padding: "10px", width: "min-content" }}>
-        <Field
-          label="שם משתמש"
-          orientation="vertical"
-          validationState={loginError ? "error" : undefined}
-        >
-          <Input type="text" value={username} onChange={handleUsernameChange} />
-        </Field>
-        <Field
-          label="סיסמא"
-          orientation="vertical"
-          validationMessage={loginError}
-          validationState={loginError ? "error" : undefined}
-        >
-          <Input
-            type="password"
-            value={password}
-            onChange={handlePasswordChange}
-          />
-        </Field>
-      </CardPreview>
-      <CardFooter>
-        <Button
-          appearance="primary"
-          onClick={() => {
-            setLoginError(undefined);
-            setIsLoading(true);
-            handleSubmit();
-          }}
-        >
-          כניסה
-        </Button>
-        {isLoading && <Spinner />}
-      </CardFooter>
-    </Card>
+    <div>
+      <Header />
+      <Card style={{ width: "100%" }}>
+        <CardHeader header={<h3>פורטל Restart לעמותות</h3>} />
+        <CardPreview style={{ padding: "10px", width: "min-content" }}>
+          <Field
+            label="שם משתמש"
+            orientation="vertical"
+            validationState={loginError ? "error" : undefined}
+          >
+            <Input
+              type="text"
+              value={username}
+              onChange={handleUsernameChange}
+            />
+          </Field>
+          <Field
+            label="סיסמא"
+            orientation="vertical"
+            validationMessage={loginError}
+            validationState={loginError ? "error" : undefined}
+          >
+            <Input
+              type="password"
+              value={password}
+              onChange={handlePasswordChange}
+            />
+          </Field>
+        </CardPreview>
+        <CardFooter>
+          <Button
+            appearance="primary"
+            onClick={() => {
+              setLoginError(undefined);
+              setIsLoading(true);
+              handleSubmit();
+            }}
+          >
+            כניסה
+          </Button>
+          {isLoading && <Spinner />}
+        </CardFooter>
+      </Card>
+    </div>
   );
 };
