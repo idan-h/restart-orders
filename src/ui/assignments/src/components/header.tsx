@@ -1,47 +1,50 @@
 import React from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+import { Button } from "@fluentui/react-components";
 import { useAuthenticationService } from "../services/authentication";
 import { ROUTES } from "../routes-const";
 
 const headerStyle: React.CSSProperties = {
-  height: "80px",
   background: "gray",
 };
 
 export const Header: React.FunctionComponent = () => {
   const navigate = useNavigate();
-  const { pathname } = useLocation();
-  const { logout, getUserId } = useAuthenticationService();
-  const isLoggedIn = Boolean(getUserId());
+  const { logout, isLoggedIn } = useAuthenticationService();
 
   return (
     <div style={headerStyle}>
-      {/* left side */}
-      <div>
-        {pathname === ROUTES.ABOUT ? (
-          <button onClick={() => navigate("/")}>התחבר</button>
-        ) : (
-          <button onClick={() => navigate(ROUTES.ABOUT)}>אודות</button>
-        )}
+      {isLoggedIn() ? (
+        <Button
+          appearance="transparent"
+          onClick={() => {
+            logout();
+            navigate("/");
+          }}
+        >
+          התנתק
+        </Button>
+      ) : (
+        <Button appearance="transparent" onClick={() => navigate("/")}>
+          התחבר
+        </Button>
+      )}
 
-        {isLoggedIn && (
-          <button
-            onClick={() => {
-              logout();
-              navigate("/");
-            }}
+      {isLoggedIn() && (
+        <>
+          <Button
+            appearance="transparent"
+            onClick={() => navigate(ROUTES.ORDER)}
           >
-            {/* show only if logged in */}
-            התנתק
-          </button>
-        )}
-      </div>
-      {/* right side */}
-      {isLoggedIn && (
-        <div>
-          <button onClick={() => navigate(ROUTES.ORDER)}>בקשות</button>
-          <button onClick={() => navigate(ROUTES.MY_ORDERS)}>הזמנות שלי</button>
-        </div>
+            בקשות
+          </Button>
+          <Button
+            appearance="transparent"
+            onClick={() => navigate(ROUTES.MY_ORDERS)}
+          >
+            הזמנות שלי
+          </Button>
+        </>
       )}
     </div>
   );

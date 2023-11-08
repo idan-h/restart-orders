@@ -13,11 +13,7 @@ import { useNavigate } from "react-router-dom";
 import { useAuthenticationService } from "../../services/authentication";
 import { Header } from "../../components/header";
 import { ROUTES } from "../../routes-const";
-
-const loginPageStyle: React.CSSProperties = {
-  flex: 1,
-  padding: "0 24px",
-};
+import { pageStyle } from "../utils";
 
 const loginCardStyle: React.CSSProperties = {
   top: "35%",
@@ -66,7 +62,7 @@ export const LoginForm = () => {
   return (
     <>
       <Header />
-      <div style={loginPageStyle}>
+      <div style={pageStyle}>
         <Card style={loginCardStyle}>
           <CardHeader header={<h3>פורטל Restart לעמותות</h3>} />
           <CardPreview style={cardContentStyle}>
