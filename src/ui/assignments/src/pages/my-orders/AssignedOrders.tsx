@@ -11,7 +11,7 @@ import {
   TextCollapse24Filled,
 } from "@fluentui/react-icons";
 
-import { pageStyle } from "../utils.ts";
+import { pageStyle, titleStyle } from "../sharedStyles.ts";
 import { Order, SubItem } from "../../types.ts";
 import { useOrdersService } from "../../services/orders.ts";
 import { Header } from "../../components/header.tsx";
@@ -55,17 +55,15 @@ export const AssignedOrders = () => {
     fetchAssignedOrders().then((items) => setOrders(items.orders));
   }, []);
 
-  if (!orders) {
-    return <Loading />;
-  }
-
   return (
     <>
       <Header />
       <div style={pageStyle}>
-        <h2 style={{ textAlign: "center", margin: "20px auto" }}>הזמנות</h2>
-        {orders.map(({ id, unit, subItems, phone, comment }) => {
-          return (
+        <h2 style={titleStyle}>הזמנות</h2>
+        {!orders ? (
+          <Loading />
+        ) : (
+          orders.map(({ id, unit, subItems, phone, comment }) => (
             <Card key={id} className={styles.card}>
               <CardHeader
                 header={
@@ -113,8 +111,8 @@ export const AssignedOrders = () => {
                 ) : null}
               </CardPreview>
             </Card>
-          );
-        })}
+          ))
+        )}
       </div>
     </>
   );

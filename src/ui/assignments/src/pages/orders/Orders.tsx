@@ -21,7 +21,7 @@ import { Header } from "../../components/header.tsx";
 import { Loading } from "../../components/Loading.tsx";
 
 import { ROUTES } from "../../routes-const.ts";
-import { pageStyle } from "../utils.ts";
+import { pageStyle, titleStyle } from "../sharedStyles.ts";
 
 const useStyles = makeStyles({
   card: {
@@ -79,11 +79,9 @@ export const Orders = () => {
     <>
       <Header />
       <div style={pageStyle}>
-        <h2 style={{ textAlign: "center", margin: "20px auto" }}>בקשות</h2>
+        <h2 style={titleStyle}>בקשות</h2>
         {!orders ? (
-          <div style={{ position: "relative", top: "30%" }}>
-            <Loading />
-          </div>
+          <Loading />
         ) : (
           orders.map(({ id, unit, subItems, comment }) => (
             <Card key={id} className={styles.card}>
