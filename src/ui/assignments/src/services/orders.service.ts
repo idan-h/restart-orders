@@ -4,6 +4,7 @@ const baseUrl =
   "https://njdfolzzmvnaay5oxqife4tuwy.apigateway.il-jerusalem-1.oci.customer-oci.com/v1/";
 
 let productNames: Map<string, string>;
+let statusesList: string[];
 
 export function makeOrdersService(userId?: string) {
   if (!userId) {
@@ -136,6 +137,8 @@ export function makeOrdersService(userId?: string) {
     async fetchOrderStatusNames(): Promise<string[]> {
       console.debug("OrdersService:fetchOrderStatusNames");
 
+      if (statusesList) return statusesList;
+
       const response = await fetch(
         new URL(
           `get-subitem-statuses?userId=${encodeURIComponent(userId)}`,
@@ -143,7 +146,9 @@ export function makeOrdersService(userId?: string) {
         )
       );
 
-      return (await response.json()).statuses;
+      return (await response.json()).statuses.filter(
+        (status: string) => Boolean(status) // filter empty
+      );
     },
     /** Change item status  */
     async changeStatus(request: {

@@ -31,10 +31,14 @@ const useStyles = makeStyles({
   },
 });
 
+const DONE_STATUS = "בוצע";
+
 export const AssignedOrders = () => {
   const styles = useStyles();
 
   const [myOrders, setMyOrders] = useState<Order[] | undefined>();
+  const [statusesList, setStatusesList] = useState<string[] | undefined>();
+
   const [openNoteIds, setOpenNoteIds] = useState<string[]>([]);
 
   const [confirmOpen, setConfirmOpen] = useState<boolean | undefined>(false);
@@ -56,7 +60,31 @@ export const AssignedOrders = () => {
         .fetchAssignedOrders()
         .then((items) => setMyOrders(items.orders));
     }
+
+    if (!statusesList) {
+      ordersService
+        .fetchOrderStatusNames()
+        .then((_statusesList) => setStatusesList(_statusesList));
+    }
   }, []);
+
+  const handleStatusChange = (
+    orderId: string,
+    subItem: SubItem,
+    status: string
+  ) => {
+    if (!ordersService) {
+      console.error("handleStatusChange: ordersService not ready");
+      return;
+    }
+
+    ordersService.changeStatus({
+      orderId,
+      subItemId: subItem.id,
+      subItemBoardId: subItem.subItemBoardId,
+      status,
+    });
+  };
 
   const handleSubItemRemove = (orderId: string, subItem: SubItem) => {
     if (!ordersService) {
@@ -136,7 +164,24 @@ export const AssignedOrders = () => {
               <CardPreview>
                 <AssignedSubItems
                   items={subItems}
-                  onDelete={(subItem) => {
+                  statusesList={statusesList ?? []}
+                  onStatusChange={(subItem: SubItem, status: string) => {
+                    if (status === DONE_STATUS) {
+                      setConfirmProps({
+                        title: "האם אתה בטוח",
+                        subText: `האם לסמן את ${subItem.productName} כבוצע?`,
+                        onConfirm: (result: boolean) => {
+                          if (result) {
+                            handleStatusChange(id, subItem, status);
+                          }
+                        },
+                      });
+                      setConfirmOpen(true);
+                    } else {
+                      handleStatusChange(id, subItem, status);
+                    }
+                  }}
+                  onDelete={(subItem: SubItem) => {
                     setConfirmProps({
                       title: "האם אתה בטוח",
                       subText: `האם להסיר את ${subItem.productName}?`,

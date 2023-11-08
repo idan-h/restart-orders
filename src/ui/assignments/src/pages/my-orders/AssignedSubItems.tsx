@@ -6,18 +6,23 @@ import {
   createTableColumn,
   TableCellLayout,
   Button,
+  Dropdown,
+  Option,
 } from "@fluentui/react-components";
 import { Delete24Regular } from "@fluentui/react-icons";
+
 import { SubItem } from "../../types.ts";
 
 export interface AssignedSubItemsProps {
   items: SubItem[];
+  statusesList: string[];
+  onStatusChange: (subItem: SubItem, status: string) => void;
   onDelete: (subItem: SubItem) => void;
 }
 
 export const AssignedSubItems: React.FunctionComponent<
   AssignedSubItemsProps
-> = ({ items, onDelete }) => {
+> = ({ items, statusesList, onStatusChange, onDelete }) => {
   const columns = [
     // Info
     createTableColumn<SubItem>({
@@ -51,7 +56,22 @@ export const AssignedSubItems: React.FunctionComponent<
     createTableColumn<SubItem>({
       columnId: "status",
       renderCell: (item) => {
-        return <TableCellLayout>{item.status}</TableCellLayout>;
+        return (
+          <TableCellLayout>
+            <Dropdown
+              defaultValue={item.status}
+              onOptionSelect={(_event, data) => {
+                if (data.optionValue) {
+                  onStatusChange(item, data.optionValue);
+                }
+              }}
+            >
+              {statusesList.map((status, index) => (
+                <Option key={index}>{status}</Option>
+              ))}
+            </Dropdown>
+          </TableCellLayout>
+        );
       },
     }),
     // Delete button

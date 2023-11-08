@@ -116,6 +116,8 @@ export const Orders = () => {
         <h2 style={titleStyle}>בקשות</h2>
         {!orders ? (
           <Loading />
+        ) : orders.length === 0 ? (
+          <h3 style={titleStyle}>אין בקשות</h3>
         ) : (
           orders.map(({ id, unit, subItems, comment }, orderIndex) => (
             <Card key={id} className={styles.card}>
