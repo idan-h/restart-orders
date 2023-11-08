@@ -18,7 +18,10 @@ import { Header } from "../../components/header.tsx";
 import { Loading } from "../../components/Loading.tsx";
 import { AssignedSubItems } from "./AssignedSubItems.tsx";
 import { useAuthenticationService } from "../../services/authentication.ts";
-import { ConfirmDialog } from "../../components/confirm-dialog.tsx";
+import {
+  ConfirmDialog,
+  ConfirmDialogProps,
+} from "../../components/confirm-dialog.tsx";
 
 const useStyles = makeStyles({
   card: {
@@ -34,7 +37,10 @@ export const AssignedOrders = () => {
   const [myOrders, setMyOrders] = useState<Order[] | undefined>();
   const [openNoteIds, setOpenNoteIds] = useState<string[]>([]);
 
-  const confirmDialogOpenState = useState<boolean | undefined>(false);
+  const [confirmOpen, setConfirmOpen] = useState<boolean | undefined>(false);
+  const [confirmProps, setConfirmProps] = useState<
+    Omit<ConfirmDialogProps, "openState"> | undefined
+  >();
 
   const { getUserId } = useAuthenticationService();
   const ordersService = makeOrdersService(getUserId());
@@ -130,8 +136,17 @@ export const AssignedOrders = () => {
               <CardPreview>
                 <AssignedSubItems
                   items={subItems}
-                  onDelete={(subItemId) => {
-                    handleSubItemRemove(id, subItemId);
+                  onDelete={(subItem) => {
+                    setConfirmProps({
+                      title: "האם אתה בטוח",
+                      subText: `האם להסיר את ${subItem.productName}?`,
+                      onConfirm: (result: boolean) => {
+                        if (result) {
+                          handleSubItemRemove(id, subItem);
+                        }
+                      },
+                    });
+                    setConfirmOpen(true);
                   }}
                 />
                 {comment && (
@@ -159,12 +174,12 @@ export const AssignedOrders = () => {
           ))
         )}
       </div>
-      <ConfirmDialog
-        openState={confirmDialogOpenState}
-        title="האם אתה בטוח"
-        subText="ABC"
-        onConfirm={(result) => console.log(result)}
-      />
+      {confirmProps && (
+        <ConfirmDialog
+          openState={[confirmOpen, setConfirmOpen]}
+          {...confirmProps}
+        />
+      )}
     </>
   );
 };
