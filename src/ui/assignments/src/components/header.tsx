@@ -6,6 +6,10 @@ import { useAuthenticationService } from "../services/authentication";
 import { ROUTES } from "../routes-const";
 
 const headerStyle: React.CSSProperties = {
+  position: "fixed",
+  top: 0,
+  left: 0,
+  right: 0,
   background: tokens.colorBrandBackground2Hover,
   display: "flex",
   justifyContent: "space-between",
@@ -16,15 +20,20 @@ const selectedRouteStyle: React.CSSProperties = {
   borderBottom: `1px solid ${tokens.colorBrandForegroundLinkHover}`,
   borderRadius: "0px",
 };
+
 export const Header: React.FunctionComponent = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { logout, isLoggedIn } = useAuthenticationService();
 
+  const loggedIn = isLoggedIn();
+  const isAboutPage = location.pathname === ROUTES.ABOUT;
+
   return (
     <div style={headerStyle}>
+      {/* Text buttons */}
       <div>
-        {isLoggedIn() ? (
+        {loggedIn ? (
           <>
             <Button
               appearance="transparent"
@@ -45,22 +54,22 @@ export const Header: React.FunctionComponent = () => {
               הזמנות שלי
             </Button>
           </>
-        ) : (
+        ) : isAboutPage ? (
           <Button appearance="transparent" onClick={() => navigate("/")}>
             התחבר
           </Button>
-        )}
+        ) : null}
       </div>
+      {/* Icon buttons */}
       <div>
-        {location.pathname !== ROUTES.ABOUT && (
+        {!isAboutPage && (
           <Button
             appearance="transparent"
             onClick={() => navigate(ROUTES.ABOUT)}
-            style={location.pathname === ROUTES.ABOUT ? selectedRouteStyle : {}}
             icon={<Info24Regular />}
           />
         )}
-        {isLoggedIn() && (
+        {loggedIn && (
           <Button
             appearance="transparent"
             onClick={() => {
