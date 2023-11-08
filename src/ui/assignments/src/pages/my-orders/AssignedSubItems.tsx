@@ -11,7 +11,7 @@ import {
 } from "@fluentui/react-components";
 import { Delete24Regular } from "@fluentui/react-icons";
 
-import { SubItem } from "../../types.ts";
+import { DONE_STATUS, SubItem } from "../../types.ts";
 
 export interface AssignedSubItemsProps {
   items: SubItem[];
@@ -60,6 +60,7 @@ export const AssignedSubItems: React.FunctionComponent<
           <TableCellLayout>
             <Dropdown
               defaultValue={item.status}
+              disabled={item.status === DONE_STATUS}
               onOptionSelect={(_event, data) => {
                 if (data.optionValue) {
                   onStatusChange(item, data.optionValue);
@@ -78,6 +79,10 @@ export const AssignedSubItems: React.FunctionComponent<
     createTableColumn<SubItem>({
       columnId: "unassign",
       renderCell: (item) => {
+        if (item.status === DONE_STATUS) {
+          return null;
+        }
+
         return (
           <TableCellLayout>
             <Button

@@ -12,7 +12,7 @@ import {
 } from "@fluentui/react-icons";
 
 import { pageStyle, titleStyle } from "../sharedStyles.ts";
-import { Order, SubItem } from "../../types.ts";
+import { DONE_STATUS, Order, SubItem } from "../../types.ts";
 import { makeOrdersService } from "../../services/orders.service.ts";
 import { Header } from "../../components/header.tsx";
 import { Loading } from "../../components/Loading.tsx";
@@ -30,8 +30,6 @@ const useStyles = makeStyles({
     marginBottom: "30px",
   },
 });
-
-const DONE_STATUS = "בוצע";
 
 export const AssignedOrders = () => {
   const styles = useStyles();
@@ -173,6 +171,8 @@ export const AssignedOrders = () => {
                         onConfirm: (result: boolean) => {
                           if (result) {
                             handleStatusChange(id, subItem, status);
+                          } else {
+                            // todo: reset status
                           }
                         },
                       });
