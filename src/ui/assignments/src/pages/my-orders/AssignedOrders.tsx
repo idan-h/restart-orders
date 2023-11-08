@@ -11,13 +11,12 @@ import {
   TextCollapse24Filled,
 } from "@fluentui/react-icons";
 
+import { pageStyle } from "../utils.ts";
 import { Order, SubItem } from "../../types.ts";
 import { useOrdersService } from "../../services/orders.ts";
-
-import { AssignedSubItems } from "./AssignedSubItems.tsx";
 import { Header } from "../../components/header.tsx";
 import { Loading } from "../../components/Loading.tsx";
-import { pageStyle } from "../utils.ts";
+import { AssignedSubItems } from "./AssignedSubItems.tsx";
 
 const useStyles = makeStyles({
   card: {

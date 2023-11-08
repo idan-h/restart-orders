@@ -27,8 +27,8 @@ import {
 import { OrdersService, makeOrdersService } from "./services/orders.ts";
 
 import { LoginForm } from "./pages/login/LoginForm";
-import { Orders } from "./pages/catalog/Orders.tsx";
-import { AssignedOrders } from "./pages/catalog/AssignedOrders.tsx";
+import { Orders } from "./pages/orders/Orders.tsx";
+import { AssignedOrders } from "./pages/my-orders/AssignedOrders.tsx";
 import { AboutUs } from "./pages/about/AboutUs.tsx";
 import { ROUTES } from "./routes-const.ts";
 

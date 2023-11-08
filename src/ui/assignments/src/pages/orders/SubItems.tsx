@@ -6,6 +6,7 @@ import {
   TableCellLayout,
   Switch,
 } from "@fluentui/react-components";
+
 import { SubItem } from "../../types.ts";
 import { useAuthenticationService } from "../../services/authentication.ts";
 
@@ -30,19 +31,6 @@ export const SubItems = ({ items, onChange }: Props) => {
     );
   };
 
-  // const handleSubItemChange = (id: string, value: number) => {
-  //   onChange!(
-  //     items.map((item) =>
-  //       id === item.id
-  //         ? {
-  //             ...item,
-  //             requestedQuantity: value,
-  //           }
-  //         : item
-  //     )
-  //   );
-  // };
-
   return (
     <Table>
       <TableBody>
@@ -66,19 +54,6 @@ export const SubItems = ({ items, onChange }: Props) => {
             <TableCell>
               <TableCellLayout>{quantity}</TableCellLayout>
             </TableCell>
-            {/*<TableCell>*/}
-            {/*  <Input*/}
-            {/*    style={{ width: "60px" }}*/}
-            {/*    min={1}*/}
-            {/*    max={quantity}*/}
-            {/*    onChange={(_, data) =>*/}
-            {/*      handleSubItemChange(id, parseInt(data.value))*/}
-            {/*    }*/}
-            {/*    value={requestedQuantity?.toString()}*/}
-            {/*    type="number"*/}
-            {/*    disabled={!requestedQuantity}*/}
-            {/*  />*/}
-            {/*</TableCell>*/}
             {onChange && (
               <TableCell>
                 <TableCellLayout>
