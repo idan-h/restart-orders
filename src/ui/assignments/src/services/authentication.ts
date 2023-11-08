@@ -33,7 +33,7 @@ export function makeAuthenticationService() {
       localStorage.removeItem("userId");
     },
     getUserId() {
-      return userId;
+      return userId ?? null;
     },
     isLoggedIn() {
       return Boolean(userId);

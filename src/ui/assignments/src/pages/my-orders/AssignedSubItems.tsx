@@ -9,7 +9,8 @@ import {
 } from "@fluentui/react-components";
 import { Delete24Regular } from "@fluentui/react-icons";
 import { SubItem } from "../../types.ts";
-import { useOrdersService } from "../../services/orders.ts";
+import { useAuthenticationService } from "../../services/authentication.ts";
+import { makeOrdersService } from "../../services/orders.ts";
 
 type Props = {
   orderId: string;
@@ -18,9 +19,16 @@ type Props = {
 };
 
 export const AssignedSubItems = ({ items, orderId, onChange }: Props) => {
-  const { unAssignSubItem } = useOrdersService();
+  const { getUserId } = useAuthenticationService();
+  const ordersService = makeOrdersService(getUserId());
+
   const handleProductUnassign = (subItemId: string, subItemBoardId: string) => {
-    unAssignSubItem({
+    if (!ordersService) {
+      console.error("ordersService not ready");
+      return;
+    }
+
+    ordersService.unAssignSubItem({
       orderId,
       subItemId,
       subItemBoardId,

@@ -13,10 +13,11 @@ import {
 
 import { pageStyle, titleStyle } from "../sharedStyles.ts";
 import { Order, SubItem } from "../../types.ts";
-import { useOrdersService } from "../../services/orders.ts";
+import { makeOrdersService } from "../../services/orders.ts";
 import { Header } from "../../components/header.tsx";
 import { Loading } from "../../components/Loading.tsx";
 import { AssignedSubItems } from "./AssignedSubItems.tsx";
+import { useAuthenticationService } from "../../services/authentication.ts";
 
 const useStyles = makeStyles({
   card: {
@@ -27,11 +28,24 @@ const useStyles = makeStyles({
 });
 
 export const AssignedOrders = () => {
-  const { fetchAssignedOrders } = useOrdersService();
   const styles = useStyles();
 
   const [orders, setOrders] = useState<Order[] | undefined>();
   const [openNoteIds, setOpenNoteIds] = useState<string[]>([]);
+
+  const { getUserId } = useAuthenticationService();
+  const ordersService = makeOrdersService(getUserId());
+
+  useEffect(() => {
+    if (!ordersService) {
+      console.error("ordersService not ready");
+      return;
+    }
+
+    ordersService
+      .fetchAssignedOrders()
+      .then((items) => setOrders(items.orders));
+  }, []);
 
   const handleItemsChanges = (orderId: string, subItems: SubItem[]) => {
     setOrders(
@@ -50,10 +64,6 @@ export const AssignedOrders = () => {
         : [...openNoteIds, id]
     );
   };
-
-  useEffect(() => {
-    fetchAssignedOrders().then((items) => setOrders(items.orders));
-  }, []);
 
   return (
     <>

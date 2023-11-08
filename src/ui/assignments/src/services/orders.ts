@@ -1,11 +1,13 @@
-import React, { useContext } from "react";
 import { MondayOrder, Order } from "../types";
 
 const baseUrl =
   "https://njdfolzzmvnaay5oxqife4tuwy.apigateway.il-jerusalem-1.oci.customer-oci.com/v1/";
 
-export function makeOrdersService(userId: string) {
-  if (userId == null) throw new Error("bad login!");
+export function makeOrdersService(userId: string | null) {
+  if (!userId) {
+    console.error("ordersService - failed to load, not logged in");
+    return null;
+  }
 
   let productNames: Map<string, string> | undefined = undefined;
 
@@ -30,18 +32,24 @@ export function makeOrdersService(userId: string) {
         )
       );
 
-      const mondayOrders = ((await response.json()) as { orders: MondayOrder[] }).orders;
+      const mondayOrders = (
+        (await response.json()) as { orders: MondayOrder[] }
+      ).orders;
 
       return {
-        orders: mondayOrders.map((mondayOrders) => ({
-          ...mondayOrders,
-          subItems: mondayOrders.subItems
-            .filter(item => !item.userId && productNames?.has(item.productId))
-            .map((subItem) => ({
-            ...subItem,
-            productName: productNames!.get(subItem.productId)!,
-          })),
-        })).filter(order => order.subItems.length),
+        orders: mondayOrders
+          .map((mondayOrders) => ({
+            ...mondayOrders,
+            subItems: mondayOrders.subItems
+              .filter(
+                (item) => !item.userId && productNames?.has(item.productId)
+              )
+              .map((subItem) => ({
+                ...subItem,
+                productName: productNames!.get(subItem.productId)!,
+              })),
+          }))
+          .filter((order) => order.subItems.length),
       };
     },
     async fetchAssignedOrders(): Promise<{ orders: Order[] }> {
@@ -54,27 +62,33 @@ export function makeOrdersService(userId: string) {
         )
       );
 
-      const mondayOrders = ((await response.json()) as { orders: MondayOrder[] }).orders;
+      const mondayOrders = (
+        (await response.json()) as { orders: MondayOrder[] }
+      ).orders;
 
       return {
-        orders: mondayOrders.map((mondayOrders) => ({
-          ...mondayOrders,
-          subItems: mondayOrders.subItems
-            .filter(item => item.userId && productNames?.has(item.productId))
-            .map((subItem) => ({
-              ...subItem,
-              productName: productNames!.get(subItem.productId)!,
-            })),
-        })).filter(order => order.subItems.length),
+        orders: mondayOrders
+          .map((mondayOrders) => ({
+            ...mondayOrders,
+            subItems: mondayOrders.subItems
+              .filter(
+                (item) => item.userId && productNames?.has(item.productId)
+              )
+              .map((subItem) => ({
+                ...subItem,
+                productName: productNames!.get(subItem.productId)!,
+              })),
+          }))
+          .filter((order) => order.subItems.length),
       };
     },
     async fetchOrder(orderId: string): Promise<Order | undefined> {
       if (!productNames) productNames = await fetchProductNames();
       const response = await fetch(
         new URL(
-          `get-user-order/${encodeURIComponent(orderId)}?userId=${encodeURIComponent(
-            userId
-          )}`,
+          `get-user-order/${encodeURIComponent(
+            orderId
+          )}?userId=${encodeURIComponent(userId)}`,
           baseUrl
         )
       );
@@ -103,8 +117,8 @@ export function makeOrdersService(userId: string) {
     },
     async unAssignSubItem(request: {
       orderId: string;
-        subItemId: string;
-        subItemBoardId: string;
+      subItemId: string;
+      subItemBoardId: string;
     }) {
       const response = await fetch(
         new URL(`unassign?userId=${encodeURIComponent(userId)}`, baseUrl),
@@ -129,6 +143,11 @@ export function makeOrdersService(userId: string) {
   };
 
   async function fetchProductNames(): Promise<Map<string, string>> {
+    if (!userId) {
+      console.error("ordersService - failed to load, not logged in");
+      return Promise.reject();
+    }
+
     const response = await fetch(
       new URL("get-products?userId=" + encodeURIComponent(userId), baseUrl)
     );
@@ -141,9 +160,3 @@ export function makeOrdersService(userId: string) {
     );
   }
 }
-
-export const OrdersService =
-  //@ts-expect-error error
-  React.createContext<ReturnType<typeof makeOrdersService>>(undefined);
-
-export const useOrdersService = () => useContext(OrdersService);

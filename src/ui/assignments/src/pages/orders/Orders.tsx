@@ -16,12 +16,13 @@ import {
 import { useEffect, useState } from "react";
 import { Order, SubItem } from "../../types.ts";
 import { SubItems } from "./SubItems.tsx";
-import { useOrdersService } from "../../services/orders.ts";
 import { Header } from "../../components/header.tsx";
 import { Loading } from "../../components/Loading.tsx";
 
 import { ROUTES } from "../../routes-const.ts";
 import { pageStyle, titleStyle } from "../sharedStyles.ts";
+import { makeOrdersService } from "../../services/orders.ts";
+import { useAuthenticationService } from "../../services/authentication.ts";
 
 const useStyles = makeStyles({
   card: {
@@ -34,18 +35,35 @@ const useStyles = makeStyles({
 export const Orders = () => {
   const styles = useStyles();
   const navigate = useNavigate();
-
   const [orders, setOrders] = useState<Order[] | undefined>();
   const [openNoteIds, setOpenNoteIds] = useState<string[]>([]);
-  const { fetchUnassignedOrders, assignSubItem } = useOrdersService();
 
-  const submit = () => {
+  const { getUserId } = useAuthenticationService();
+  const ordersService = makeOrdersService(getUserId());
+
+  useEffect(() => {
+    if (!ordersService) {
+      console.error("ordersService not ready");
+      return;
+    }
+
+    ordersService
+      .fetchUnassignedOrders()
+      .then((items) => setOrders(items.orders));
+  }, [ordersService]);
+
+  const handleSubmit = () => {
+    if (!ordersService) {
+      console.error("ordersService not ready");
+      return;
+    }
+
     Promise.all(
       orders?.flatMap((order) =>
         order.subItems
           .filter((subItem) => !!subItem.userId)
           .map((subItem) =>
-            assignSubItem({
+            ordersService.assignSubItem({
               orderId: order.id,
               subItemId: subItem.id,
               subItemBoardId: subItem.subItemBoardId,
@@ -70,10 +88,6 @@ export const Orders = () => {
         : [...openNoteIds, id]
     );
   };
-
-  useEffect(() => {
-    fetchUnassignedOrders().then((items) => setOrders(items.orders));
-  }, []);
 
   return (
     <>
@@ -137,12 +151,12 @@ export const Orders = () => {
           <Button
             appearance="primary"
             style={{ width: "100%" }}
-            onClick={() => submit()}
+            onClick={handleSubmit}
             disabled={orders.every((order) =>
               order.subItems.every((subItem) => !subItem.userId)
             )}
           >
-            שלח
+            הוסף לבקשות שלי
           </Button>
         </div>
       )}
