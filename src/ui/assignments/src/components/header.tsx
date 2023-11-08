@@ -6,7 +6,7 @@ import { useAuthenticationService } from "../services/authentication";
 import { ROUTES } from "../routes-const";
 
 const headerStyle: React.CSSProperties = {
-  background: tokens.colorBrandBackgroundInvertedSelected,
+  background: tokens.colorBrandBackground2Hover,
   display: "flex",
   justifyContent: "space-between",
   padding: 8,
