@@ -359,3 +359,23 @@ class MondayBoard:
               }}
               }}'''
         self.mondayApi.query(query)
+
+    def get_item_v2(self, item_id , return_items_as='json'):
+        query = f'''
+                {{
+                    items(ids: {item_id}) {{
+                        name
+                        column_values {{
+                            id
+                            text
+                            type
+                        }}
+                      }}
+                }}
+                '''
+
+        if return_items_as == 'json':
+            return self.mondayApi.query(query, return_items_as=return_items_as).json()
+        else:
+            r = json_normalize(self.mondayApi.query(query, return_items_as=return_items_as))
+            return r

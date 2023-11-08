@@ -7,7 +7,7 @@ from fdk import response
 from fdk import context
 
 from library.functions import get_user_order
-from urllib.parse import urlparse
+from urllib.parse import urlparse , unquote
 
 
 def handler(ctx: context, data: io.BytesIO = None):
@@ -19,7 +19,7 @@ def handler(ctx: context, data: io.BytesIO = None):
 
     response_dict = {}
     try:
-        order_id = parsed_url.query.split('=')[1]
+        order_id = unquote(parsed_url.query.split('=')[1])
         if not order_id:
             raise Exception('order id is none')
 

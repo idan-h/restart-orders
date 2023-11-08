@@ -9,7 +9,7 @@ from fdk import context
 from library.functions import validate_user_login
  
 def handler(ctx: context, data: io.BytesIO = None):
-    logger = logging.getLogger()
+    logger.info('Login to user ')
  
     API_KEY = ctx.Config()['API_KEY']
 

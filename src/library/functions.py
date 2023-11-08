@@ -370,6 +370,16 @@ def get_user_order(api_key, item_id):
     orders = convert_to_orders(items)
     return orders_to_json(orders)
 
+# TODO pass DB connection details
+def market_place_create_item(api_key, item_id, board_id):
+    monday_api = MondayApi(api_key, API_URL)
+    monday_board = MondayBoard(monday_api, id=board_id)
+    items = monday_board.get_item_v2(item_id).get('data').get('items')
+
+
+    response_dict['item'] = items
+    logger.info(f'response {response_dict}')
+
 
 class SubItem:
     def __init__(self, id, subItemBoardId, productId, quantity, userId, status=None):
