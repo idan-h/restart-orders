@@ -54,16 +54,18 @@ export function makeOrdersService(userId: string) {
         )
       );
 
-      const mondayOrders = (await response.json()) as { orders: MondayOrder[] };
+      const mondayOrders = ((await response.json()) as { orders: MondayOrder[] }).orders;
 
       return {
-        orders: mondayOrders.orders.map((mondayOrders) => ({
+        orders: mondayOrders.map((mondayOrders) => ({
           ...mondayOrders,
-          subItems: mondayOrders.subItems.map((subItem) => ({
-            ...subItem,
-            productName: productNames!.get(subItem.productId)!,
-          })),
-        })),
+          subItems: mondayOrders.subItems
+            .filter(item => item.userId && productNames?.has(item.productId))
+            .map((subItem) => ({
+              ...subItem,
+              productName: productNames!.get(subItem.productId)!,
+            })),
+        })).filter(order => order.subItems.length),
       };
     },
     async fetchOrder(orderId: string): Promise<Order | undefined> {
