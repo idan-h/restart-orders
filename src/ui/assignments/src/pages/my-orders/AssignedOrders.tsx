@@ -18,6 +18,7 @@ import { Header } from "../../components/header.tsx";
 import { Loading } from "../../components/Loading.tsx";
 import { AssignedSubItems } from "./AssignedSubItems.tsx";
 import { useAuthenticationService } from "../../services/authentication.ts";
+import { ConfirmDialog } from "../../components/confirm-dialog.tsx";
 
 const useStyles = makeStyles({
   card: {
@@ -32,6 +33,8 @@ export const AssignedOrders = () => {
 
   const [myOrders, setMyOrders] = useState<Order[] | undefined>();
   const [openNoteIds, setOpenNoteIds] = useState<string[]>([]);
+
+  const confirmDialogOpenState = useState<boolean | undefined>(false);
 
   const { getUserId } = useAuthenticationService();
   const ordersService = makeOrdersService(getUserId());
@@ -49,14 +52,41 @@ export const AssignedOrders = () => {
     }
   }, []);
 
-  const handleItemsChanges = (orderId: string, subItems: SubItem[]) => {
-    setMyOrders(
-      myOrders
-        ?.map((order) =>
-          order.id === orderId ? { ...order, subItems } : order
-        )
-        .filter((order) => order.subItems.length)
-    );
+  const handleSubItemRemove = (orderId: string, subItem: SubItem) => {
+    if (!ordersService) {
+      console.error("handleSubItemRemove: ordersService not ready");
+      return;
+    }
+
+    ordersService.unAssignSubItem({
+      orderId,
+      subItemId: subItem.id,
+      subItemBoardId: subItem.subItemBoardId,
+    });
+
+    if (!myOrders) {
+      console.error("handleSubItemRemove: myOrders not empty");
+      return;
+    }
+
+    const orderIndex = myOrders.findIndex((order) => order.id === orderId);
+    if (orderIndex === -1) {
+      console.error("orderIndex not found");
+      return;
+    }
+
+    myOrders[orderIndex].subItems = [
+      ...myOrders[orderIndex].subItems.filter(
+        (_subItem) => _subItem.id !== subItem.id
+      ),
+    ];
+
+    const isEmptyOrder = myOrders[orderIndex].subItems.length === 0;
+    if (isEmptyOrder) {
+      myOrders.splice(orderIndex, 1);
+    }
+
+    setMyOrders([...myOrders]);
   };
 
   const toggleOpenNote = (id: string) => {
@@ -74,9 +104,11 @@ export const AssignedOrders = () => {
         <h2 style={titleStyle}>הזמנות</h2>
         {!myOrders ? (
           <Loading />
+        ) : myOrders.length === 0 ? (
+          <h3 style={titleStyle}>אין הזמנות</h3>
         ) : (
-          myOrders.map(({ id, unit, subItems, phone, comment }) => (
-            <Card key={id} className={styles.card}>
+          myOrders.map(({ id, unit, subItems, phone, comment }, index) => (
+            <Card key={index} className={styles.card}>
               <CardHeader
                 header={
                   <div
@@ -98,8 +130,9 @@ export const AssignedOrders = () => {
               <CardPreview>
                 <AssignedSubItems
                   items={subItems}
-                  onChange={(subItems) => handleItemsChanges(id, subItems)}
-                  orderId={id}
+                  onDelete={(subItemId) => {
+                    handleSubItemRemove(id, subItemId);
+                  }}
                 />
                 {comment && (
                   <a
@@ -126,6 +159,12 @@ export const AssignedOrders = () => {
           ))
         )}
       </div>
+      <ConfirmDialog
+        openState={confirmDialogOpenState}
+        title="האם אתה בטוח"
+        subText="ABC"
+        onConfirm={(result) => console.log(result)}
+      />
     </>
   );
 };

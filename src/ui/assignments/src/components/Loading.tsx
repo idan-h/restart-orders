@@ -1,5 +1,5 @@
-import { Spinner } from "@fluentui/react-components";
 import React from "react";
+import { Spinner } from "@fluentui/react-components";
 
 export const Loading: React.FunctionComponent = () => (
   <div style={{ position: "relative", top: "30%" }}>
