@@ -14,6 +14,8 @@ export function makeOrdersService(userId: string | null) {
   return {
     /** Get all orders for the orders page */
     async fetchUnassignedOrders(): Promise<{ orders: Order[] }> {
+      console.debug("OrdersService:fetchUnassignedOrders");
+
       if (!productNames) productNames = await fetchProductNames();
 
       const response = await fetch(
@@ -45,6 +47,8 @@ export function makeOrdersService(userId: string | null) {
     },
     /** Get all orders for the my-orders page */
     async fetchAssignedOrders(): Promise<{ orders: Order[] }> {
+      console.debug("OrdersService:fetchAssignedOrders");
+
       if (!productNames) productNames = await fetchProductNames();
 
       const response = await fetch(
@@ -76,6 +80,8 @@ export function makeOrdersService(userId: string | null) {
     },
     /** no in use */
     async fetchOrder(orderId: string): Promise<Order | undefined> {
+      console.debug("OrdersService:fetchOrder");
+
       if (!productNames) productNames = await fetchProductNames();
       const response = await fetch(
         new URL(
@@ -102,6 +108,8 @@ export function makeOrdersService(userId: string | null) {
       subItemId: string;
       subItemBoardId: string;
     }) {
+      console.debug("OrdersService:assignSubItem");
+
       const response = await fetch(
         new URL(`assign?userId=${encodeURIComponent(userId)}`, baseUrl),
         { method: "POST", body: JSON.stringify(request) }
@@ -115,6 +123,8 @@ export function makeOrdersService(userId: string | null) {
       subItemId: string;
       subItemBoardId: string;
     }) {
+      console.debug("OrdersService:unAssignSubItem");
+
       const response = await fetch(
         new URL(`unassign?userId=${encodeURIComponent(userId)}`, baseUrl),
         { method: "POST", body: JSON.stringify(request) }
@@ -124,6 +134,8 @@ export function makeOrdersService(userId: string | null) {
     },
     /** Get all statuses for the status dropdown  */
     async fetchOrderStatusNames(): Promise<string[]> {
+      console.debug("OrdersService:fetchOrderStatusNames");
+
       const response = await fetch(
         new URL(
           `get-subitem-statuses?userId=${encodeURIComponent(userId)}`,
@@ -140,6 +152,8 @@ export function makeOrdersService(userId: string | null) {
       subItemBoardId: string;
       status: string;
     }) {
+      console.debug("OrdersService:changeStatus");
+
       const response = await fetch(
         new URL(`change-status?userId=${encodeURIComponent(userId)}`, baseUrl),
         { method: "POST", body: JSON.stringify(request) }
@@ -155,6 +169,8 @@ export function makeOrdersService(userId: string | null) {
       console.error("ordersService - failed to load, not logged in");
       return Promise.reject();
     }
+
+    console.debug("OrdersService:fetchProductNames");
 
     const response = await fetch(
       new URL("get-products?userId=" + encodeURIComponent(userId), baseUrl)
