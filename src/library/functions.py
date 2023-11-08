@@ -409,7 +409,6 @@ def get_user_order(api_key, item_id):
     orders = convert_to_orders(items)
     return orders_to_json(orders)
 
-# TODO pass DB connection details
 def market_place_create_or_update_order(api_key, item_id, board_id, dbUser, dbPassword, dbDsn):
     monday_api = MondayApi(api_key, API_URL)
     monday_board = MondayBoard(monday_api, id=board_id)
@@ -421,38 +420,124 @@ def market_place_create_or_update_order(api_key, item_id, board_id, dbUser, dbPa
     order = Order.from_monday_item(items[0], board_id)
     print(f"Order: {order.to_json()}")
 
-    query = """
-INSERT INTO orders (id, name, phone, region, unit, comments, role, orderValidationStatus, orderStatus, priority, email, createdAt, lastUpdated, board_id)
-VALUES (:1, :2, :3, :4, :5, :6, :7, :8, :9, :10, :11, :12, :13, :14)
-"""
-    params = (order.id, order.name, order.phone, order.region, order.unit, order.comments, order.role, order.orderValidationStatus, order.orderStatus, order.priority, order.email, order.createdAt, order.lastUpdated, order.board_id)
-        
+    query, params = get_create_or_update_order_query(order)
+
     # TODO DELETE logs
     print("query: ")
     print(query)
     print("params: ")
     print(params)
 
-    print(oracleDB.execute(query, params))
+    oracleDB.execute(query, params)
 
     # TODO DELETE logs
     query = """SELECT * FROM orders"""
     print(oracleDB.execute(query, return_rows=True))
-    # oracleDB.execute(query, params)
     print(f"Done")
 
-# TODO pass DB connection details
-def market_place_create_or_update_subitem(api_key, item_id, board_id):
+def market_place_create_or_update_subitem(api_key, item_id, board_id, order_id, dbUser, dbPassword, dbDsn):
     monday_api = MondayApi(api_key, API_URL)
     monday_board = MondayBoard(monday_api, id=board_id)
+    oracleDB = OracleDB(dbUser, dbPassword, dbDsn)
+    oracleDB.connect()
     items = monday_board.get_item_v2(item_id).get('data').get('items')
 
     print(f"Items: {items}")
-    subItem = SubItem.from_monday_item(items[0], board_id)
+    subItem = SubItem.from_monday_item(items[0], board_id, order_id)
     print(f"SubItem: {subItem.to_json()}")
 
-    # TODO insert to DB
+    query, params = get_create_or_update_subitem_query(subItem)
 
+    # TODO DELETE logs
+    print("query: ")
+    print(query)
+    print("params: ")
+    print(params)
+    
+    oracleDB.execute(query, params)
+
+    # TODO DELETE logs
+    query = """SELECT * FROM order_subitems"""
+    print(oracleDB.execute(query, return_rows=True))
+    print(f"Done")
+
+def get_create_or_update_subitem_query(subItem):
+    query = """
+MERGE INTO ADMIN.order_subitems d
+USING (
+select 
+:1  as id , 
+:2  as subItemBoardId, 
+:3  as productId, 
+:4  as quantity,
+:5  as userId ,
+:6  as status,
+:7  as comments , 
+:8  as order_id
+from dual 
+) x
+
+ON (d.id = x.id)
+WHEN MATCHED THEN UPDATE SET 
+d.subItemBoardId = x.subItemBoardId, 
+d.productId = x.productId, 
+d.quantity = x.quantity ,
+d.userId  = x.userId,
+d.status = x.status,
+d.comments = x.comments,
+d.order_id = x.order_id
+WHEN NOT MATCHED THEN 
+INSERT (id ,subItemBoardId, productId , quantity , userId , status , comments , order_id) 
+VALUES (x.id , x.subItemBoardId, x.productId , x.quantity , x.userId , x.status , x.comments , x.order_id )
+"""
+    params = (subItem.id, subItem.subItemBoardId, subItem.productId, subItem.quantity, subItem.userId, subItem.status, subItem.comments, subItem.order_id)
+
+    return query, params
+
+def get_create_or_update_order_query(order):
+    query = """
+MERGE INTO ADMIN.orders d
+USING (
+select 
+:1  as id , 
+:2  as name, 
+:3  as phone, 
+:4  as region,
+:5  as unit ,
+:6  as comments,
+:7  as role, 
+:8  as orderValidationStatus,
+:9  as orderStatus, 
+:10 as priority ,
+:11 as email,
+:12 as createdAt,
+:13 as lastUpdated,
+:14 as board_id
+from dual 
+) x
+
+ON (d.id = x.id)
+WHEN MATCHED THEN UPDATE SET 
+d.name = x.name, 
+d.phone = x.phone, 
+d.region = x.region ,
+d.unit  = x.unit,
+d.comments = x.comments,
+d.role = x.role, 
+d.orderValidationStatus = x.orderValidationStatus ,
+d.orderStatus = x.orderStatus , 
+d.priority  = x.priority,
+d.email = x.email,
+d.createdAt = x.createdAt,
+d.lastUpdated = x.lastUpdated,
+d.board_id = x.board_id
+WHEN NOT MATCHED THEN 
+INSERT (id, name , phone , region , unit , comments , role , orderValidationStatus , orderStatus , priority , email , createdAt , lastUpdated , board_id) 
+VALUES (x.id, x.name , x.phone , x.region , x.unit , x.comments , x.role , x.orderValidationStatus , x.orderStatus , x.priority , x.email , x.createdAt , x.lastUpdated , x.board_id)
+"""
+    params = (order.id, order.name, order.phone, order.region, order.unit, order.comments, order.role, order.orderValidationStatus, order.orderStatus, order.priority, order.email, order.createdAt, order.lastUpdated, order.board_id)
+
+    return query, params
 
 class SubItem:
     def __init__(self, id, subItemBoardId, productId, quantity, userId, status=None, order_id="empty", comments = "empty"):
@@ -470,10 +555,11 @@ class SubItem:
         product_id = next((get_product_id_from_connect_boards(col['value']) for col in subitem['column_values'] if col['id'] == 'connect_boards'), "None") # productId / מספר מוצר
         quantity = next((col['text'] for col in subitem['column_values'] if col['id'] == 'numbers'), "None") # quantity / כמות 
         user_id = next((col['text'] for col in subitem['column_values'] if col['id'] == 'text4'), "None") # userId / אימייל משויך להזמנה
-        status = next((col['text'] for col in subitem['column_values'] if col['id'] == 'status'), "None")  
+        status = next((col['text'] for col in subitem['column_values'] if col['id'] == 'status'), "None")  # סטטוס
+        comments = next((col['text'] for col in subitem['column_values'] if col['id'] == 'text'), "None")  # הערות
         # print(f"sub_id: {sub_id} board_id: {board_id} product_id: {product_id} quantity: {quantity} user_id: {user_id} status: {status}")
         
-        return SubItem(sub_id, board_id, product_id, quantity, user_id, status, order_id)
+        return SubItem(sub_id, board_id, product_id, quantity, user_id, status, order_id, comments)
     
     # used for debuging 
     def to_json(self):
@@ -565,3 +651,4 @@ class Order:
             'unit': self.unit,
             'subItems': [subItem.to_dict() for subItem in self.subItems]
         }
+
