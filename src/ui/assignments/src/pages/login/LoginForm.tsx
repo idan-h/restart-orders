@@ -7,6 +7,7 @@ import {
   CardPreview,
   Field,
   Input,
+  Spinner,
 } from "@fluentui/react-components";
 import { useNavigate } from "react-router-dom";
 import { useAuthenticationService } from "../../services/authentication";
@@ -15,7 +16,8 @@ export const LoginForm = () => {
   const { login } = useAuthenticationService();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const [loginState, setLoginState] = useState<string | undefined>();
+  const [loginError, setLoginError] = useState<string | undefined>();
+  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
   const handleUsernameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -27,12 +29,14 @@ export const LoginForm = () => {
   };
 
   const handleSubmit = () => {
-    login(username, password).then(
-      () => navigate("/"),
-      (error) => {
-        setLoginState(error);
-      }
-    );
+    login(username, password)
+      .then(
+        () => navigate("/"),
+        (error) => {
+          setLoginError(error);
+        }
+      )
+      .finally(() => setIsLoading(false));
   };
 
   return (
@@ -42,15 +46,15 @@ export const LoginForm = () => {
         <Field
           label="שם משתמש"
           orientation="vertical"
-          validationState={loginState ? "error" : undefined}
+          validationState={loginError ? "error" : undefined}
         >
           <Input type="text" value={username} onChange={handleUsernameChange} />
         </Field>
         <Field
           label="סיסמא"
           orientation="vertical"
-          validationMessage={loginState}
-          validationState={loginState ? "error" : undefined}
+          validationMessage={loginError}
+          validationState={loginError ? "error" : undefined}
         >
           <Input
             type="password"
@@ -60,9 +64,17 @@ export const LoginForm = () => {
         </Field>
       </CardPreview>
       <CardFooter>
-        <Button appearance="primary" onClick={handleSubmit}>
+        <Button
+          appearance="primary"
+          onClick={() => {
+            setLoginError(undefined);
+            setIsLoading(true);
+            handleSubmit();
+          }}
+        >
           כניסה
         </Button>
+        {isLoading && <Spinner />}
       </CardFooter>
     </Card>
   );
