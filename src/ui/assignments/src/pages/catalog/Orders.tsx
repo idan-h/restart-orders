@@ -21,10 +21,10 @@ import { Header } from "../../components/header.tsx";
 import { Loading } from "../../components/Loading.tsx";
 
 import { ROUTES } from "../../routes-const.ts";
+import { pageStyle } from "../utils.ts";
 
 const useStyles = makeStyles({
   card: {
-    ...shorthands.margin("auto"),
     textAlign: "left",
     width: "100%",
     marginBottom: "30px",
@@ -80,57 +80,62 @@ export const Orders = () => {
   }
 
   return (
-    <div style={{ margin: "auto" }}>
+    <>
       <Header />
-
-      <h2 style={{ textAlign: "center", margin: "20px auto" }}>בקשות</h2>
-      {orders.map(({ id, unit, subItems, comment }) => {
-        return (
-          <Card key={id} className={styles.card}>
-            <CardHeader
-              header={
-                <Body1 style={{ textAlign: "left" }}>
-                  <b>{unit}</b>
-                </Body1>
-              }
-            />
-
-            <CardPreview>
-              <SubItems
-                onChange={(subItems) => handleSubItemsChange(id, subItems)}
-                items={subItems}
+      <div style={pageStyle}>
+        <h2 style={{ textAlign: "center", margin: "20px auto" }}>בקשות</h2>
+        {orders.map(({ id, unit, subItems, comment }) => {
+          return (
+            <Card key={id} className={styles.card}>
+              <CardHeader
+                header={
+                  <Body1 style={{ textAlign: "left" }}>
+                    <b>{unit}</b>
+                  </Body1>
+                }
               />
-              {comment && (
-                <a
-                  style={{ display: "flex", alignItems: "center", margin: 10 }}
-                  onClick={() => toggleOpenNote(id)}
-                >
-                  הערות
-                  {openNoteIds.includes(id) ? (
-                    <TextCollapse24Filled />
-                  ) : (
-                    <TextExpand24Regular />
-                  )}
-                </a>
-              )}
-              {openNoteIds.includes(id) ? (
-                <p style={{ margin: 10 }}>{comment}</p>
-              ) : null}
-            </CardPreview>
-          </Card>
-        );
-      })}
 
-      <div>
-        <Button
-          onClick={() => submit()}
-          disabled={orders.every((order) =>
-            order.subItems.every((subItem) => !subItem.userId)
-          )}
-        >
-          שלח
-        </Button>
+              <CardPreview>
+                <SubItems
+                  onChange={(subItems) => handleSubItemsChange(id, subItems)}
+                  items={subItems}
+                />
+                {comment && (
+                  <a
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      margin: 10,
+                    }}
+                    onClick={() => toggleOpenNote(id)}
+                  >
+                    הערות
+                    {openNoteIds.includes(id) ? (
+                      <TextCollapse24Filled />
+                    ) : (
+                      <TextExpand24Regular />
+                    )}
+                  </a>
+                )}
+                {openNoteIds.includes(id) ? (
+                  <p style={{ margin: 10 }}>{comment}</p>
+                ) : null}
+              </CardPreview>
+            </Card>
+          );
+        })}
+
+        <div>
+          <Button
+            onClick={() => submit()}
+            disabled={orders.every((order) =>
+              order.subItems.every((subItem) => !subItem.userId)
+            )}
+          >
+            שלח
+          </Button>
+        </div>
       </div>
-    </div>
+    </>
   );
 };
