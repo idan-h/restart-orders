@@ -1,11 +1,14 @@
 import React from "react";
 import { useLocation, useNavigate } from "react-router-dom";
+import { Info24Regular } from "@fluentui/react-icons";
 import { Button, tokens } from "@fluentui/react-components";
 import { useAuthenticationService } from "../services/authentication";
 import { ROUTES } from "../routes-const";
 
 const headerStyle: React.CSSProperties = {
-  background: tokens.colorBrandForegroundInvertedHover,
+  background: tokens.colorBrandBackgroundInvertedSelected,
+  display: "flex",
+  justifyContent: "space-between",
   padding: 8,
 };
 
@@ -20,41 +23,50 @@ export const Header: React.FunctionComponent = () => {
 
   return (
     <div style={headerStyle}>
-      {isLoggedIn() ? (
+      <div>
+        {isLoggedIn() ? (
+          <>
+            <Button
+              appearance="transparent"
+              onClick={() => {
+                logout();
+                navigate("/");
+              }}
+            >
+              התנתק
+            </Button>
+            <Button
+              appearance="transparent"
+              onClick={() => navigate(ROUTES.ORDER)}
+              style={
+                location.pathname === ROUTES.ORDER ? selectedRouteStyle : {}
+              }
+            >
+              בקשות
+            </Button>
+            <Button
+              appearance="transparent"
+              onClick={() => navigate(ROUTES.MY_ORDERS)}
+              style={
+                location.pathname === ROUTES.MY_ORDERS ? selectedRouteStyle : {}
+              }
+            >
+              הזמנות שלי
+            </Button>
+          </>
+        ) : (
+          <Button appearance="transparent" onClick={() => navigate("/")}>
+            התחבר
+          </Button>
+        )}
+      </div>
+      {location.pathname !== ROUTES.ABOUT && (
         <Button
           appearance="transparent"
-          onClick={() => {
-            logout();
-            navigate("/");
-          }}
-        >
-          התנתק
-        </Button>
-      ) : (
-        <Button appearance="transparent" onClick={() => navigate("/")}>
-          התחבר
-        </Button>
-      )}
-
-      {isLoggedIn() && (
-        <>
-          <Button
-            appearance="transparent"
-            onClick={() => navigate(ROUTES.ORDER)}
-            style={location.pathname === ROUTES.ORDER ? selectedRouteStyle : {}}
-          >
-            בקשות
-          </Button>
-          <Button
-            appearance="transparent"
-            onClick={() => navigate(ROUTES.MY_ORDERS)}
-            style={
-              location.pathname === ROUTES.MY_ORDERS ? selectedRouteStyle : {}
-            }
-          >
-            הזמנות שלי
-          </Button>
-        </>
+          onClick={() => navigate(ROUTES.ABOUT)}
+          style={location.pathname === ROUTES.ABOUT ? selectedRouteStyle : {}}
+          icon={<Info24Regular />}
+        />
       )}
     </div>
   );
