@@ -165,7 +165,7 @@ export const Orders = () => {
       <div style={pageStyle}>
         <h2 style={titleStyle}>בקשות</h2>
         {saving ? (
-          <Loading label="...מעדכן" />
+          <Loading label="מעדכן..." />
         ) : !displayedOrders ? (
           <Loading />
         ) : (
