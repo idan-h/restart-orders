@@ -26,19 +26,21 @@ export const SubItems: React.FunctionComponent<SubItemsProps> = ({
       columnId: "file",
       renderCell: (item: SubItem) => {
         return (
-          <TableCellLayout>
-            <div
-              style={{
-                maxWidth: 200,
-                textOverflow: "ellipsis",
-                overflow: "hidden",
-                wordWrap: "break-word",
-                whiteSpace: "nowrap",
-              }}
-            >
-              {item.productName}
-            </div>
-          </TableCellLayout>
+          <DataGridCell style={{ flex: 4 }}>
+            <TableCellLayout>
+              <div
+                style={{
+                  maxWidth: 200,
+                  textOverflow: "ellipsis",
+                  overflow: "hidden",
+                  wordWrap: "break-word",
+                  whiteSpace: "nowrap",
+                }}
+              >
+                {item.productName}
+              </div>
+            </TableCellLayout>
+          </DataGridCell>
         );
       },
     }),
@@ -46,7 +48,11 @@ export const SubItems: React.FunctionComponent<SubItemsProps> = ({
     createTableColumn<SubItem>({
       columnId: "quantity",
       renderCell: (item: SubItem) => {
-        return <TableCellLayout>{item.quantity}</TableCellLayout>;
+        return (
+          <DataGridCell style={{ flex: 1 }}>
+            <TableCellLayout>{item.quantity}</TableCellLayout>
+          </DataGridCell>
+        );
       },
     }),
     // Toggle status
@@ -54,12 +60,14 @@ export const SubItems: React.FunctionComponent<SubItemsProps> = ({
       columnId: "status",
       renderCell: (subItem: SubItem) => {
         return (
-          <TableCellLayout>
-            <Switch
-              onChange={(_, data) => onToggle(subItem, data.checked)}
-              checked={Boolean(subItem.userId)}
-            />
-          </TableCellLayout>
+          <DataGridCell style={{ flex: 1 }}>
+            <TableCellLayout style={{ flexDirection: "row-reverse" }}>
+              <Switch
+                onChange={(_, data) => onToggle(subItem, data.checked)}
+                checked={Boolean(subItem.userId)}
+              />
+            </TableCellLayout>
+          </DataGridCell>
         );
       },
     }),
@@ -69,13 +77,8 @@ export const SubItems: React.FunctionComponent<SubItemsProps> = ({
     <DataGrid items={items} columns={columns} getRowId={(item) => item.id}>
       <DataGridBody<SubItem>>
         {({ item, rowId }) => (
-          <DataGridRow<SubItem>
-            key={rowId}
-            selectionCell={{ style: { display: "none" } }}
-          >
-            {({ renderCell }) => (
-              <DataGridCell>{renderCell(item)}</DataGridCell>
-            )}
+          <DataGridRow<SubItem> key={rowId}>
+            {({ renderCell }) => renderCell(item)}
           </DataGridRow>
         )}
       </DataGridBody>

@@ -178,7 +178,7 @@ export const Orders = () => {
                 <Card
                   key={id}
                   style={{
-                    textAlign: "left",
+                    textAlign: "right",
                     width: "100%",
                     marginBottom: "30px",
                   }}
@@ -190,7 +190,6 @@ export const Orders = () => {
                       </Body1>
                     }
                   />
-
                   <CardPreview>
                     <SubItems
                       items={subItems}
