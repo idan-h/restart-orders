@@ -9,30 +9,19 @@ import {
 } from "@fluentui/react-components";
 
 import { SubItem } from "../../types.ts";
-import { useAuthenticationService } from "../../services/authentication.ts";
+import React from "react";
 
-type Props = {
+export interface SubItemsProps {
   items: SubItem[];
-  onChange?: (products: SubItem[]) => void;
-};
+  onToggle: (subItem: SubItem, isChecked: boolean) => void;
+}
 
-export const SubItems = ({ items, onChange }: Props) => {
-  const { getUserId } = useAuthenticationService();
-
-  const handleProductToggle = (id: string, checked: boolean) => {
-    onChange!(
-      items.map((item) =>
-        id === item.id
-          ? {
-              ...item,
-              userId: checked ? getUserId() : undefined,
-            }
-          : item
-      )
-    );
-  };
-
+export const SubItems: React.FunctionComponent<SubItemsProps> = ({
+  items,
+  onToggle,
+}) => {
   const columns = [
+    // Info
     createTableColumn<SubItem>({
       columnId: "file",
       renderCell: (item: SubItem) => {
@@ -53,31 +42,29 @@ export const SubItems = ({ items, onChange }: Props) => {
         );
       },
     }),
+    // Quantity
     createTableColumn<SubItem>({
       columnId: "quantity",
       renderCell: (item: SubItem) => {
         return <TableCellLayout>{item.quantity}</TableCellLayout>;
       },
     }),
-
+    // Toggle status
     createTableColumn<SubItem>({
       columnId: "status",
-      renderCell: (item: SubItem) => {
+      renderCell: (subItem: SubItem) => {
         return (
-          onChange && (
-            <TableCellLayout>
-              <Switch
-                onChange={(_, data) =>
-                  handleProductToggle(item.id, data.checked)
-                }
-                checked={!!item.userId}
-              />
-            </TableCellLayout>
-          )
+          <TableCellLayout>
+            <Switch
+              onChange={(_, data) => onToggle(subItem, data.checked)}
+              checked={Boolean(subItem.userId)}
+            />
+          </TableCellLayout>
         );
       },
     }),
   ];
+
   return (
     <DataGrid items={items} columns={columns} getRowId={(item) => item.id}>
       <DataGridBody<SubItem>>
@@ -95,40 +82,3 @@ export const SubItems = ({ items, onChange }: Props) => {
     </DataGrid>
   );
 };
-
-/**
- * {items.map(({ id, productName, quantity, userId }) => (
-          <TableRow key={id}>
-            <TableCell>
-              <TableCellLayout>
-                <div
-                  style={{
-                    maxWidth: 200,
-                    textOverflow: "ellipsis",
-                    overflow: "hidden",
-                    wordWrap: "break-word",
-                    whiteSpace: "nowrap",
-                  }}
-                >
-                  {productName}
-                </div>
-              </TableCellLayout>
-            </TableCell>
-            <TableCell>
-              <TableCellLayout>{quantity}</TableCellLayout>
-            </TableCell>
-            {onChange && (
-              <TableCell>
-                <TableCellLayout>
-                  <Switch
-                    onChange={(_, data) =>
-                      handleProductToggle(id, data.checked)
-                    }
-                    checked={!!userId}
-                  />
-                </TableCellLayout>
-              </TableCell>
-            )}
-          </TableRow>
-        ))}
- */

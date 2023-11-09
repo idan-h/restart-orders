@@ -12,13 +12,16 @@ import {
 } from "@fluentui/react-icons";
 
 import { pageStyle, titleStyle } from "../sharedStyles.ts";
-import { Order, SubItem } from "../../types.ts";
+import { DONE_STATUS, Order, SubItem } from "../../types.ts";
 import { makeOrdersService } from "../../services/orders.service.ts";
 import { Header } from "../../components/header.tsx";
 import { Loading } from "../../components/Loading.tsx";
 import { AssignedSubItems } from "./AssignedSubItems.tsx";
 import { useAuthenticationService } from "../../services/authentication.ts";
-import { ConfirmDialog } from "../../components/confirm-dialog.tsx";
+import {
+  ConfirmDialog,
+  ConfirmDialogProps,
+} from "../../components/confirm-dialog.tsx";
 
 const useStyles = makeStyles({
   card: {
@@ -32,9 +35,14 @@ export const AssignedOrders = () => {
   const styles = useStyles();
 
   const [myOrders, setMyOrders] = useState<Order[] | undefined>();
+  const [statusesList, setStatusesList] = useState<string[] | undefined>();
+
   const [openNoteIds, setOpenNoteIds] = useState<string[]>([]);
 
-  const confirmDialogOpenState = useState<boolean | undefined>(false);
+  const [confirmOpen, setConfirmOpen] = useState<boolean | undefined>(false);
+  const [confirmProps, setConfirmProps] = useState<
+    Omit<ConfirmDialogProps, "openState"> | undefined
+  >();
 
   const { getUserId } = useAuthenticationService();
   const ordersService = makeOrdersService(getUserId());
@@ -50,7 +58,31 @@ export const AssignedOrders = () => {
         .fetchAssignedOrders()
         .then((items) => setMyOrders(items.orders));
     }
+
+    if (!statusesList) {
+      ordersService
+        .fetchOrderStatusNames()
+        .then((_statusesList) => setStatusesList(_statusesList));
+    }
   }, []);
+
+  const handleStatusChange = (
+    orderId: string,
+    subItem: SubItem,
+    status: string
+  ) => {
+    if (!ordersService) {
+      console.error("handleStatusChange: ordersService not ready");
+      return;
+    }
+
+    ordersService.changeStatus({
+      orderId,
+      subItemId: subItem.id,
+      subItemBoardId: subItem.subItemBoardId,
+      status,
+    });
+  };
 
   const handleSubItemRemove = (orderId: string, subItem: SubItem) => {
     if (!ordersService) {
@@ -130,8 +162,36 @@ export const AssignedOrders = () => {
               <CardPreview>
                 <AssignedSubItems
                   items={subItems}
-                  onDelete={(subItemId) => {
-                    handleSubItemRemove(id, subItemId);
+                  statusesList={statusesList ?? []}
+                  onStatusChange={(subItem: SubItem, status: string) => {
+                    if (status === DONE_STATUS) {
+                      setConfirmProps({
+                        title: "האם אתה בטוח",
+                        subText: `האם לסמן את ${subItem.productName} כבוצע?`,
+                        onConfirm: (result: boolean) => {
+                          if (result) {
+                            handleStatusChange(id, subItem, status);
+                          } else {
+                            // todo: reset status
+                          }
+                        },
+                      });
+                      setConfirmOpen(true);
+                    } else {
+                      handleStatusChange(id, subItem, status);
+                    }
+                  }}
+                  onDelete={(subItem: SubItem) => {
+                    setConfirmProps({
+                      title: "האם אתה בטוח",
+                      subText: `האם להסיר את ${subItem.productName}?`,
+                      onConfirm: (result: boolean) => {
+                        if (result) {
+                          handleSubItemRemove(id, subItem);
+                        }
+                      },
+                    });
+                    setConfirmOpen(true);
                   }}
                 />
                 {comment && (
@@ -159,12 +219,12 @@ export const AssignedOrders = () => {
           ))
         )}
       </div>
-      <ConfirmDialog
-        openState={confirmDialogOpenState}
-        title="האם אתה בטוח"
-        subText="ABC"
-        onConfirm={(result) => console.log(result)}
-      />
+      {confirmProps && (
+        <ConfirmDialog
+          openState={[confirmOpen, setConfirmOpen]}
+          {...confirmProps}
+        />
+      )}
     </>
   );
 };

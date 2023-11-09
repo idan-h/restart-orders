@@ -36,9 +36,11 @@ export const ConfirmDialog: React.FunctionComponent<ConfirmDialogProps> = ({
                 לא
               </Button>
             </DialogTrigger>
-            <Button appearance="primary" onClick={() => onConfirm(true)}>
-              כן
-            </Button>
+            <DialogTrigger disableButtonEnhancement>
+              <Button appearance="primary" onClick={() => onConfirm(true)}>
+                כן
+              </Button>
+            </DialogTrigger>
           </DialogActions>
         </DialogBody>
       </DialogSurface>

@@ -32,3 +32,5 @@ export type SubItem = BaseSubItem & {
   // Hack!
   //requestedQuantity?: number;
 };
+
+export const DONE_STATUS = "בוצע";

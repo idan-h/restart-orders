@@ -35,6 +35,7 @@ const useStyles = makeStyles({
 export const Orders = () => {
   const styles = useStyles();
   const navigate = useNavigate();
+  const [saving, setSaving] = useState(false);
   const [orders, setOrders] = useState<Order[] | undefined>();
   const [openNoteIds, setOpenNoteIds] = useState<string[]>([]);
 
@@ -54,33 +55,64 @@ export const Orders = () => {
     }
   }, [ordersService]);
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (!ordersService) {
       console.error("ordersService not ready");
       return;
     }
 
-    Promise.all(
-      orders?.flatMap((order) =>
-        order.subItems
-          .filter((subItem) => !!subItem.userId)
-          .map((subItem) =>
-            ordersService.assignSubItem({
-              orderId: order.id,
-              subItemId: subItem.id,
-              subItemBoardId: subItem.subItemBoardId,
-            })
-          )
-      ) ?? []
-    ).then(() => navigate(ROUTES.MY_ORDERS));
+    
+    try {
+      setSaving(true);
+      await Promise.all(
+        orders?.flatMap((order) =>
+          order.subItems
+            .filter((subItem) => !!subItem.userId)
+            .map((subItem) =>
+              ordersService.assignSubItem({
+                orderId: order.id,
+                subItemId: subItem.id,
+                subItemBoardId: subItem.subItemBoardId,
+              })
+            )
+        ) ?? []);
+    }
+    catch (e) {
+      console.error("failed to save all items");
+      // reloading because some items may have succeded
+      window.location.reload();
+      return;
+    }
+    finally {
+      setSaving(false);
+    }
+    navigate(ROUTES.MY_ORDERS);
   };
 
-  const handleSubItemsChange = (orderId: string, subItems: SubItem[]) => {
-    setOrders(
-      orders?.map((order) =>
-        order.id === orderId ? { ...order, subItems } : order
-      )
+  const handleToggleSubItem = (
+    orderIndex: number,
+    subItem: SubItem,
+    isChecked: boolean
+  ) => {
+    if (!orders) {
+      console.error("handleToggleSubItem: orders empty");
+      return;
+    }
+
+    const subItemsIndex = orders[orderIndex].subItems.findIndex(
+      (_subItem) => _subItem.id === subItem.id
     );
+    if (subItemsIndex === -1) {
+      console.error("handleToggleSubItem: subItem not found");
+      return;
+    }
+
+    orders[orderIndex].subItems[subItemsIndex] = {
+      ...subItem,
+      userId: isChecked ? getUserId() : undefined,
+    };
+
+    setOrders([...orders]);
   };
 
   const toggleOpenNote = (id: string) => {
@@ -96,10 +128,14 @@ export const Orders = () => {
       <Header />
       <div style={pageStyle}>
         <h2 style={titleStyle}>בקשות</h2>
-        {!orders ? (
+        {saving ? (
+          <Loading label="...מעדכן" />
+        ) : !orders ? (
           <Loading />
+        ) : orders.length === 0 ? (
+          <h3 style={titleStyle}>אין בקשות</h3>
         ) : (
-          orders.map(({ id, unit, subItems, comment }) => (
+          orders.map(({ id, unit, subItems, comment }, orderIndex) => (
             <Card key={id} className={styles.card}>
               <CardHeader
                 header={
@@ -111,8 +147,10 @@ export const Orders = () => {
 
               <CardPreview>
                 <SubItems
-                  onChange={(subItems) => handleSubItemsChange(id, subItems)}
                   items={subItems}
+                  onToggle={(subItem: SubItem, isChecked: boolean) =>
+                    handleToggleSubItem(orderIndex, subItem, isChecked)
+                  }
                 />
                 {comment && (
                   <a
@@ -154,7 +192,7 @@ export const Orders = () => {
             appearance="primary"
             style={{ width: "100%" }}
             onClick={handleSubmit}
-            disabled={orders.every((order) =>
+            disabled={saving || orders.every((order) =>
               order.subItems.every((subItem) => !subItem.userId)
             )}
           >
