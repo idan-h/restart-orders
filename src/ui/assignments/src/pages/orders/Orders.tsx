@@ -16,7 +16,7 @@ import {
 import { useEffect, useState } from "react";
 import { Order, SubItem } from "../../types.ts";
 import { SubItems } from "./SubItems.tsx";
-import { Header } from "../../components/header.tsx";
+import { Header } from "../../components/Header.tsx";
 import { Loading } from "../../components/Loading.tsx";
 
 import { ROUTES } from "../../routes-const.ts";
@@ -134,49 +134,52 @@ export const Orders = () => {
         ) : orders.length === 0 ? (
           <h3 style={titleStyle}>אין בקשות</h3>
         ) : (
-          orders.map(({ id, unit, subItems, comment }, orderIndex) => (
-            <Card key={id} className={styles.card}>
-              <CardHeader
-                header={
-                  <Body1 style={{ textAlign: "left" }}>
-                    <b>{unit}</b>
-                  </Body1>
-                }
-              />
-
-              <CardPreview>
-                <SubItems
-                  items={subItems}
-                  onToggle={(subItem: SubItem, isChecked: boolean) =>
-                    handleToggleSubItem(orderIndex, subItem, isChecked)
+          <div>
+            <div>filter</div>
+            {orders.map(({ id, unit, subItems, comment }, orderIndex) => (
+              <Card key={id} className={styles.card}>
+                <CardHeader
+                  header={
+                    <Body1 style={{ textAlign: "left" }}>
+                      <b>{unit}</b>
+                    </Body1>
                   }
                 />
-                {comment && (
-                  <a
-                    style={{
-                      display: "flex",
-                      alignItems: "center",
-                      margin: 10,
-                    }}
-                    onClick={() => toggleOpenNote(id)}
-                  >
-                    הערות
-                    {openNoteIds.includes(id) ? (
-                      <TextCollapse24Filled />
-                    ) : (
-                      <TextExpand24Regular />
-                    )}
-                  </a>
-                )}
-                {openNoteIds.includes(id) ? (
-                  <p style={{ margin: 10 }}>{comment}</p>
-                ) : null}
-              </CardPreview>
-            </Card>
-          ))
+
+                <CardPreview>
+                  <SubItems
+                    items={subItems}
+                    onToggle={(subItem: SubItem, isChecked: boolean) =>
+                      handleToggleSubItem(orderIndex, subItem, isChecked)
+                    }
+                  />
+                  {comment && (
+                    <a
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        margin: 10,
+                      }}
+                      onClick={() => toggleOpenNote(id)}
+                    >
+                      הערות
+                      {openNoteIds.includes(id) ? (
+                        <TextCollapse24Filled />
+                      ) : (
+                        <TextExpand24Regular />
+                      )}
+                    </a>
+                  )}
+                  {openNoteIds.includes(id) ? (
+                    <p style={{ margin: 10 }}>{comment}</p>
+                  ) : null}
+                </CardPreview>
+              </Card>
+            ))}
+          </div>
         )}
       </div>
-      {orders && (
+      {orders?.length && (
         <div
           style={{
             position: "fixed",

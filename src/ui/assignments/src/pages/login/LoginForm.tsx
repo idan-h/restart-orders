@@ -11,7 +11,7 @@ import {
 } from "@fluentui/react-components";
 import { useNavigate } from "react-router-dom";
 import { useAuthenticationService } from "../../services/authentication";
-import { Header } from "../../components/header";
+import { Header } from "../../components/Header";
 import { ROUTES } from "../../routes-const";
 import { pageStyle } from "../sharedStyles";
 

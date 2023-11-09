@@ -14,14 +14,14 @@ import {
 import { pageStyle, titleStyle } from "../sharedStyles.ts";
 import { DONE_STATUS, Order, SubItem } from "../../types.ts";
 import { makeOrdersService } from "../../services/orders.service.ts";
-import { Header } from "../../components/header.tsx";
+import { Header } from "../../components/Header.tsx";
 import { Loading } from "../../components/Loading.tsx";
 import { AssignedSubItems } from "./AssignedSubItems.tsx";
 import { useAuthenticationService } from "../../services/authentication.ts";
 import {
   ConfirmDialog,
   ConfirmDialogProps,
-} from "../../components/confirm-dialog.tsx";
+} from "../../components/ConfirmDialog.tsx";
 
 const useStyles = makeStyles({
   card: {
