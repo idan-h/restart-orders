@@ -44,7 +44,7 @@ export const Orders = () => {
 
   useEffect(() => {
     if (!ordersService) {
-      console.error("ordersService not ready");
+      console.error("Orders::Init: ordersService not ready");
       return;
     }
 
@@ -57,11 +57,10 @@ export const Orders = () => {
 
   const handleSubmit = async () => {
     if (!ordersService) {
-      console.error("ordersService not ready");
+      console.error("Orders::handleSubmit: ordersService not ready");
       return;
     }
 
-    
     try {
       setSaving(true);
       await Promise.all(
@@ -75,17 +74,17 @@ export const Orders = () => {
                 subItemBoardId: subItem.subItemBoardId,
               })
             )
-        ) ?? []);
-    }
-    catch (e) {
-      console.error("failed to save all items");
-      // reloading because some items may have succeded
+        ) ?? []
+      );
+    } catch (e) {
+      console.error("Orders::handleSubmit: failed to save all items");
+      // reloading because some items may have succeeded
       window.location.reload();
       return;
-    }
-    finally {
+    } finally {
       setSaving(false);
     }
+
     navigate(ROUTES.MY_ORDERS);
   };
 
@@ -95,7 +94,7 @@ export const Orders = () => {
     isChecked: boolean
   ) => {
     if (!orders) {
-      console.error("handleToggleSubItem: orders empty");
+      console.error("Orders::handleToggleSubItem: orders empty");
       return;
     }
 
@@ -103,7 +102,7 @@ export const Orders = () => {
       (_subItem) => _subItem.id === subItem.id
     );
     if (subItemsIndex === -1) {
-      console.error("handleToggleSubItem: subItem not found");
+      console.error("Orders::handleToggleSubItem: subItem not found");
       return;
     }
 
@@ -192,9 +191,12 @@ export const Orders = () => {
             appearance="primary"
             style={{ width: "100%" }}
             onClick={handleSubmit}
-            disabled={saving || orders.every((order) =>
-              order.subItems.every((subItem) => !subItem.userId)
-            )}
+            disabled={
+              saving ||
+              orders.every((order) =>
+                order.subItems.every((subItem) => !subItem.userId)
+              )
+            }
           >
             הוסף לבקשות שלי
           </Button>

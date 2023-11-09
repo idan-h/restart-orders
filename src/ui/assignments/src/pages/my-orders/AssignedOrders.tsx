@@ -49,7 +49,7 @@ export const AssignedOrders = () => {
 
   useEffect(() => {
     if (!ordersService) {
-      console.error("ordersService not ready");
+      console.error("MyOrders::Init: ordersService not ready");
       return;
     }
 
@@ -72,7 +72,7 @@ export const AssignedOrders = () => {
     status: string
   ) => {
     if (!ordersService) {
-      console.error("handleStatusChange: ordersService not ready");
+      console.error("MyOrders::handleStatusChange: ordersService not ready");
       return;
     }
 
@@ -86,7 +86,7 @@ export const AssignedOrders = () => {
 
   const handleSubItemRemove = (orderId: string, subItem: SubItem) => {
     if (!ordersService) {
-      console.error("handleSubItemRemove: ordersService not ready");
+      console.error("MyOrders::handleSubItemRemove: ordersService not ready");
       return;
     }
 
@@ -97,13 +97,13 @@ export const AssignedOrders = () => {
     });
 
     if (!myOrders) {
-      console.error("handleSubItemRemove: myOrders not empty");
+      console.error("MyOrders::handleSubItemRemove: myOrders not empty");
       return;
     }
 
     const orderIndex = myOrders.findIndex((order) => order.id === orderId);
     if (orderIndex === -1) {
-      console.error("orderIndex not found");
+      console.error("MyOrders::handleSubItemRemove: orderIndex not found");
       return;
     }
 
