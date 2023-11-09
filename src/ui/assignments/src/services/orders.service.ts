@@ -84,6 +84,7 @@ export function makeOrdersService(userId?: string) {
       console.debug("OrdersService:fetchOrder");
 
       if (!productNames) productNames = await fetchProductNames();
+
       const response = await fetch(
         new URL(
           `get-user-order/${encodeURIComponent(
