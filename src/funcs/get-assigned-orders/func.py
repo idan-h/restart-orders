@@ -25,7 +25,7 @@ def handler(ctx: context, data: io.BytesIO = None):
         if not user_id:
             raise Exception('User id is none')
         
-        response_dict = {"orders" : get_assigned_orders_to_user(USERNAME, PASSWORD, DSN, user_id)}
+        response_dict = {"orders": get_assigned_orders_to_user(USERNAME, PASSWORD, DSN, user_id)}
     except (Exception,):
         logger.info('error: ' + traceback.format_exc().replace('\n', ''))
         response_dict['error'] = 'An error has occurred'

@@ -5,7 +5,6 @@ import uuid
 import json
 import pandas as pd
 from datetime import datetime
-from src.library.oracle_db import OracleDB
 
 
 def create_order(api_key, dto):
@@ -295,6 +294,45 @@ def update_order_status(api_key , order_id , subitem_id ,subitem_board_id, subit
         return False
 
 
+def orders_table_rows_to_array(rows):
+    # Structuring the results into a JSON format.
+    orders = {}
+
+    for row in rows:
+        order_id = row[0]
+        if order_id not in orders:
+            orders[order_id] = {
+                "id": order_id,
+                "name": row[1],
+                "phone": row[2],
+                "region": row[3],
+                "unit": row[4],
+                "subItems": [],
+                "role": row[5],
+                "comments": row[6],
+                "orderValidationStatus": row[7],
+                "orderStatus": row[8],
+                "priority": row[9],
+                "email": row[10],
+                "createdAt": row[11].isoformat(),
+                "lastUpdated": row[12].isoformat(),
+                "board_id": row[13]
+            }
+        sub_item = {
+            "id": row[14],
+            "subItemBoardId": row[15],
+            "productId": row[16],
+            "quantity": row[17],
+            "userId": row[18],
+            "status": row[19],
+            "comments": row[20],
+            "order_id": order_id
+        }
+        orders[order_id]["subItems"].append(sub_item)
+
+    return orders
+
+
 def get_unassigned_orders(user, password, dsn):
     oracle = OracleDB(user, password, dsn)
     oracle.connect()
@@ -330,41 +368,7 @@ def get_unassigned_orders(user, password, dsn):
 
     # Execute the query and fetch all results.
     rows = oracle.execute(query, return_rows=True)
-
-    # Structuring the results into a JSON format.
-    orders = {}
-    for row in rows:
-        order_id = row[0]
-        if order_id not in orders:
-            orders[order_id] = {
-                "id": order_id,
-                "name": row[1],
-                "phone": row[2],
-                "region": row[3],
-                "unit": row[4],
-                "subItems": [],
-                "role": row[5],
-                "comments": row[6],
-                "orderValidationStatus": row[7],
-                "orderStatus": row[8],
-                "priority": row[9],
-                "email": row[10],
-                "createdAt": row[11],
-                "lastUpdated": row[12],
-                "board_id": row[13]
-            }
-        sub_item = {
-            "id": row[14],
-            "subItemBoardId": row[15],
-            "productId": row[16],
-            "quantity": row[17],
-            "userId": row[18],
-            "status": row[19],
-            "comments": row[20],
-            "order_id": order_id
-        }
-        orders[order_id]["subItems"].append(sub_item)
-
+    orders = orders_table_rows_to_array(rows)
     orders_list = list(orders.values())
 
     return orders_list
@@ -405,41 +409,7 @@ def get_assigned_orders_to_user(user, password, dsn, user_id):
 
     # Execute the query and fetch all results.
     rows = oracle.execute(query, parms=(user_id,), return_rows=True)
-
-    # Structuring the results into a JSON format.
-    orders = {}
-    for row in rows:
-        order_id = row[0]
-        if order_id not in orders:
-            orders[order_id] = {
-                "id": order_id,
-                "name": row[1],
-                "phone": row[2],
-                "region": row[3],
-                "unit": row[4],
-                "subItems": [],
-                "role": row[5],
-                "comments": row[6],
-                "orderValidationStatus": row[7],
-                "orderStatus": row[8],
-                "priority": row[9],
-                "email": row[10],
-                "createdAt": row[11],
-                "lastUpdated": row[12],
-                "board_id": row[13]
-            }
-        sub_item = {
-            "id": row[14],
-            "subItemBoardId": row[15],
-            "productId": row[16],
-            "quantity": row[17],
-            "userId": row[18],
-            "status": row[19],
-            "comments": row[20],
-            "order_id": order_id
-        }
-        orders[order_id]["subItems"].append(sub_item)
-
+    orders = orders_table_rows_to_array(rows)
     orders_list = list(orders.values())
 
     return orders_list
@@ -723,7 +693,7 @@ class Order:
         self.orderStatus = orderStatus
         self.priority = priority
         self.email = email
-        self.createdAt = datetime.fromisoformat(createdAt.replace('Z', '+00:00')) 
+        self.createdAt = datetime.fromisoformat(createdAt.replace('Z', '+00:00'))
         self.lastUpdated = datetime.fromisoformat(lastUpdated.replace('Z', '+00:00')) 
         self.board_id = board_id
 
