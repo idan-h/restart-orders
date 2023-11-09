@@ -10,7 +10,8 @@ import {
 } from "@fluentui/react-components";
 
 const defaultStyle: React.CSSProperties = {
-  margin: "6px 0",
+  width: "100%",
+  marginBottom: "12px",
 };
 
 const DEBOUNCE_TIME = 500;
@@ -41,8 +42,6 @@ export interface SearchBoxProps {
 export const SearchBoxDebounce: React.FunctionComponent<SearchBoxProps> = ({
   onChange: notifyChange,
 }) => {
-  // const { searchText: defaultValue, onChange: notifyChange, className } = props;
-
   const [searchValue, setSearchValue] = useState<string>("");
 
   const immediateChange = useCallback<(searchText: string) => void>(
@@ -75,6 +74,7 @@ export const SearchBoxDebounce: React.FunctionComponent<SearchBoxProps> = ({
       contentAfter={
         searchValue ? <ClearButton onClick={() => immediateChange("")} /> : null
       }
+      placeholder="חיפוש"
       value={searchValue}
       onChange={inputChange}
       autoComplete="off"

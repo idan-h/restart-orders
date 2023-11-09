@@ -1,7 +1,6 @@
 import { useNavigate } from "react-router-dom";
 
 import {
-  makeStyles,
   Body1,
   Button,
   Card,
@@ -23,24 +22,19 @@ import { ROUTES } from "../../routes-const.ts";
 import { pageStyle, titleStyle } from "../sharedStyles.ts";
 import { makeOrdersService } from "../../services/orders.service.ts";
 import { useAuthenticationService } from "../../services/authentication.ts";
-
-const useStyles = makeStyles({
-  card: {
-    textAlign: "left",
-    width: "100%",
-    marginBottom: "30px",
-  },
-});
+import { SearchBoxDebounce } from "../../components/SearchBoxDebounce.tsx";
 
 export const Orders = () => {
-  const styles = useStyles();
   const navigate = useNavigate();
-  const [saving, setSaving] = useState(false);
-  const [orders, setOrders] = useState<Order[] | undefined>();
-  const [openNoteIds, setOpenNoteIds] = useState<string[]>([]);
 
   const { getUserId } = useAuthenticationService();
   const ordersService = makeOrdersService(getUserId());
+
+  const [orders, setOrders] = useState<Order[] | undefined>(); // all orders
+  const [displayedOrders, setDisplayedOrders] = useState<Order[] | undefined>(); // filtered orders
+  const [search, setSearch] = useState(""); // search text (used to re-calculate displayedOrders after item state change - toggle)
+  const [openNoteIds, setOpenNoteIds] = useState<string[]>([]); // open notes ids (used to toggle open notes)
+  const [saving, setSaving] = useState(false); // saving state (used for saving spinner and block submit button)
 
   useEffect(() => {
     if (!ordersService) {
@@ -49,11 +43,88 @@ export const Orders = () => {
     }
 
     if (!orders) {
-      ordersService
-        .fetchUnassignedOrders()
-        .then((items) => setOrders(items.orders));
+      ordersService.fetchUnassignedOrders().then((items) => {
+        setOrders(items.orders);
+        setDisplayedOrders(items.orders);
+      });
     }
   }, [ordersService]);
+
+  const handleToggleSubItem = (
+    orderId: string,
+    subItem: SubItem,
+    isChecked: boolean
+  ) => {
+    if (!orders) {
+      console.error("Orders::handleToggleSubItem: orders empty");
+      return;
+    }
+
+    const orderIndex = orders.findIndex((order) => order.id === orderId);
+    if (orderIndex === -1) {
+      console.error("Orders::handleToggleSubItem: order not found");
+      return;
+    }
+
+    const subItemsIndex = orders[orderIndex].subItems.findIndex(
+      (_subItem) => _subItem.id === subItem.id
+    );
+    if (subItemsIndex === -1) {
+      console.error("Orders::handleToggleSubItem: subItem not found");
+      return;
+    }
+
+    orders[orderIndex].subItems[subItemsIndex] = {
+      ...subItem,
+      userId: isChecked ? getUserId() : undefined,
+    };
+
+    setOrders([...orders]);
+    handleSearch(search); // update displayedOrders with the new toggle state
+  };
+
+  const handleSearch = (searchText: string) => {
+    console.debug("Orders::handleSearch", searchText);
+
+    setSearch(searchText);
+
+    if (!orders) {
+      console.error("Orders::handleSearch: orders empty");
+      return;
+    }
+
+    if (searchText) {
+      const filteredOrders: Order[] = [];
+
+      orders.forEach((order) => {
+        if (order.unit?.includes(searchText)) {
+          // group title includes search text - add all sub items
+          filteredOrders.push(order);
+        } else {
+          // group title does not include search text - filter sub items
+          const filteredSubItems = order.subItems.filter((subItem) =>
+            subItem.productName.includes(searchText)
+          );
+          if (filteredSubItems.length) {
+            // add only the sub items that match the search text
+            filteredOrders.push({ ...order, subItems: filteredSubItems });
+          }
+        }
+      });
+
+      setDisplayedOrders(filteredOrders);
+    } else {
+      setDisplayedOrders(orders); // clear search
+    }
+  };
+
+  const toggleOpenNote = (id: string) => {
+    setOpenNoteIds((openNoteIds) =>
+      openNoteIds.includes(id)
+        ? openNoteIds.filter((openNoteId) => openNoteId !== id)
+        : [...openNoteIds, id]
+    );
+  };
 
   const handleSubmit = async () => {
     if (!ordersService) {
@@ -88,40 +159,6 @@ export const Orders = () => {
     navigate(ROUTES.MY_ORDERS);
   };
 
-  const handleToggleSubItem = (
-    orderIndex: number,
-    subItem: SubItem,
-    isChecked: boolean
-  ) => {
-    if (!orders) {
-      console.error("Orders::handleToggleSubItem: orders empty");
-      return;
-    }
-
-    const subItemsIndex = orders[orderIndex].subItems.findIndex(
-      (_subItem) => _subItem.id === subItem.id
-    );
-    if (subItemsIndex === -1) {
-      console.error("Orders::handleToggleSubItem: subItem not found");
-      return;
-    }
-
-    orders[orderIndex].subItems[subItemsIndex] = {
-      ...subItem,
-      userId: isChecked ? getUserId() : undefined,
-    };
-
-    setOrders([...orders]);
-  };
-
-  const toggleOpenNote = (id: string) => {
-    setOpenNoteIds((openNoteIds) =>
-      openNoteIds.includes(id)
-        ? openNoteIds.filter((openNoteId) => openNoteId !== id)
-        : [...openNoteIds, id]
-    );
-  };
-
   return (
     <>
       <Header />
@@ -129,57 +166,66 @@ export const Orders = () => {
         <h2 style={titleStyle}>בקשות</h2>
         {saving ? (
           <Loading label="...מעדכן" />
-        ) : !orders ? (
+        ) : !displayedOrders ? (
           <Loading />
-        ) : orders.length === 0 ? (
-          <h3 style={titleStyle}>אין בקשות</h3>
         ) : (
-          <div>
-            <div>filter</div>
-            {orders.map(({ id, unit, subItems, comment }, orderIndex) => (
-              <Card key={id} className={styles.card}>
-                <CardHeader
-                  header={
-                    <Body1 style={{ textAlign: "left" }}>
-                      <b>{unit}</b>
-                    </Body1>
-                  }
-                />
-
-                <CardPreview>
-                  <SubItems
-                    items={subItems}
-                    onToggle={(subItem: SubItem, isChecked: boolean) =>
-                      handleToggleSubItem(orderIndex, subItem, isChecked)
+          <>
+            <SearchBoxDebounce onChange={handleSearch} />
+            {displayedOrders.length === 0 ? (
+              <h3 style={titleStyle}>אין בקשות</h3>
+            ) : (
+              displayedOrders.map(({ id, unit, subItems, comment }) => (
+                <Card
+                  key={id}
+                  style={{
+                    textAlign: "left",
+                    width: "100%",
+                    marginBottom: "30px",
+                  }}
+                >
+                  <CardHeader
+                    header={
+                      <Body1 style={{ textAlign: "left" }}>
+                        <b>{unit}</b>
+                      </Body1>
                     }
                   />
-                  {comment && (
-                    <a
-                      style={{
-                        display: "flex",
-                        alignItems: "center",
-                        margin: 10,
-                      }}
-                      onClick={() => toggleOpenNote(id)}
-                    >
-                      הערות
-                      {openNoteIds.includes(id) ? (
-                        <TextCollapse24Filled />
-                      ) : (
-                        <TextExpand24Regular />
-                      )}
-                    </a>
-                  )}
-                  {openNoteIds.includes(id) ? (
-                    <p style={{ margin: 10 }}>{comment}</p>
-                  ) : null}
-                </CardPreview>
-              </Card>
-            ))}
-          </div>
+
+                  <CardPreview>
+                    <SubItems
+                      items={subItems}
+                      onToggle={(subItem: SubItem, isChecked: boolean) =>
+                        handleToggleSubItem(id, subItem, isChecked)
+                      }
+                    />
+                    {comment && (
+                      <a
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          margin: 10,
+                        }}
+                        onClick={() => toggleOpenNote(id)}
+                      >
+                        הערות
+                        {openNoteIds.includes(id) ? (
+                          <TextCollapse24Filled />
+                        ) : (
+                          <TextExpand24Regular />
+                        )}
+                      </a>
+                    )}
+                    {openNoteIds.includes(id) ? (
+                      <p style={{ margin: 10 }}>{comment}</p>
+                    ) : null}
+                  </CardPreview>
+                </Card>
+              ))
+            )}
+          </>
         )}
       </div>
-      {orders?.length && (
+      {displayedOrders?.length && (
         <div
           style={{
             position: "fixed",
@@ -196,7 +242,7 @@ export const Orders = () => {
             onClick={handleSubmit}
             disabled={
               saving ||
-              orders.every((order) =>
+              displayedOrders.every((order) =>
                 order.subItems.every((subItem) => !subItem.userId)
               )
             }

@@ -3,7 +3,7 @@ export type BaseOrder = {
   id: string;
   region: string;
   phone: string;
-  unit: string;
+  unit: string | undefined; // may be undefined - invalid data, missing unit name
   comment: string;
 };
 
@@ -29,8 +29,6 @@ export type MondaySubItem = BaseSubItem;
 
 export type SubItem = BaseSubItem & {
   productName: string;
-  // Hack!
-  //requestedQuantity?: number;
 };
 
 export const DONE_STATUS = "בוצע";
