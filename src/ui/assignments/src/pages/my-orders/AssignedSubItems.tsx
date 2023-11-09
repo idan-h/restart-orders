@@ -29,19 +29,21 @@ export const AssignedSubItems: React.FunctionComponent<
       columnId: "file",
       renderCell: (item) => {
         return (
-          <TableCellLayout>
-            <div
-              style={{
-                maxWidth: 200,
-                textOverflow: "ellipsis",
-                overflow: "hidden",
-                wordWrap: "break-word",
-                whiteSpace: "nowrap",
-              }}
-            >
-              {item.productName}
-            </div>
-          </TableCellLayout>
+          <DataGridCell style={{ flex: 4 }}>
+            <TableCellLayout>
+              <div
+                style={{
+                  maxWidth: 200,
+                  textOverflow: "ellipsis",
+                  overflow: "hidden",
+                  wordWrap: "break-word",
+                  whiteSpace: "nowrap",
+                }}
+              >
+                {item.productName}
+              </div>
+            </TableCellLayout>
+          </DataGridCell>
         );
       },
     }),
@@ -49,7 +51,11 @@ export const AssignedSubItems: React.FunctionComponent<
     createTableColumn<SubItem>({
       columnId: "quantity",
       renderCell: (item) => {
-        return <TableCellLayout>{item.quantity}</TableCellLayout>;
+        return (
+          <DataGridCell style={{ flex: 1 }}>
+            <TableCellLayout>{item.quantity}</TableCellLayout>
+          </DataGridCell>
+        );
       },
     }),
     // Status
@@ -57,21 +63,24 @@ export const AssignedSubItems: React.FunctionComponent<
       columnId: "status",
       renderCell: (item) => {
         return (
-          <TableCellLayout>
-            <Dropdown
-              defaultValue={item.status}
-              disabled={item.status === DONE_STATUS}
-              onOptionSelect={(_event, data) => {
-                if (data.optionValue) {
-                  onStatusChange(item, data.optionValue);
-                }
-              }}
-            >
-              {statusesList.map((status, index) => (
-                <Option key={index}>{status}</Option>
-              ))}
-            </Dropdown>
-          </TableCellLayout>
+          <DataGridCell style={{ flex: 4 }}>
+            <TableCellLayout>
+              <Dropdown
+                style={{ minWidth: "unset", width: "110px" }}
+                defaultValue={item.status}
+                disabled={item.status === DONE_STATUS}
+                onOptionSelect={(_event, data) => {
+                  if (data.optionValue) {
+                    onStatusChange(item, data.optionValue);
+                  }
+                }}
+              >
+                {statusesList.map((status, index) => (
+                  <Option key={index}>{status}</Option>
+                ))}
+              </Dropdown>
+            </TableCellLayout>
+          </DataGridCell>
         );
       },
     }),
@@ -80,17 +89,19 @@ export const AssignedSubItems: React.FunctionComponent<
       columnId: "unassign",
       renderCell: (item) => {
         if (item.status === DONE_STATUS) {
-          return null;
+          return <DataGridCell />;
         }
 
         return (
-          <TableCellLayout>
-            <Button
-              appearance="transparent"
-              onClick={() => onDelete(item)}
-              icon={<Delete24Regular />}
-            />
-          </TableCellLayout>
+          <DataGridCell style={{ flex: 1 }}>
+            <TableCellLayout style={{ flexDirection: "row-reverse" }}>
+              <Button
+                appearance="transparent"
+                onClick={() => onDelete(item)}
+                icon={<Delete24Regular />}
+              />
+            </TableCellLayout>
+          </DataGridCell>
         );
       },
     }),
@@ -100,13 +111,8 @@ export const AssignedSubItems: React.FunctionComponent<
     <DataGrid items={items} columns={columns} getRowId={(item) => item.id}>
       <DataGridBody<SubItem>>
         {({ item, rowId }) => (
-          <DataGridRow<SubItem>
-            key={rowId}
-            selectionCell={{ style: { display: "none" } }}
-          >
-            {({ renderCell }) => (
-              <DataGridCell>{renderCell(item)}</DataGridCell>
-            )}
+          <DataGridRow<SubItem> key={rowId}>
+            {({ renderCell }) => renderCell(item)}
           </DataGridRow>
         )}
       </DataGridBody>
