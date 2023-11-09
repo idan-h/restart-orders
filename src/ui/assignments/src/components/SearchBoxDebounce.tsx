@@ -7,11 +7,11 @@ import {
   ButtonProps,
   Input,
   InputOnChangeData,
-  InputProps,
-  mergeClasses,
 } from "@fluentui/react-components";
 
-import styles from "./SearchBoxDebounce.module.scss";
+const defaultStyle: React.CSSProperties = {
+  margin: "6px 0",
+};
 
 const DEBOUNCE_TIME = 500;
 
@@ -32,31 +32,18 @@ const ClearButton: React.FunctionComponent<
 
 export type ChangeFn = (searchText: string) => void;
 
-export interface SearchBoxProps extends Omit<InputProps, "onChange"> {
-  /** Default value */
-  searchText?: string;
+export interface SearchBoxProps {
   /** Debounced event callback  */
   onChange: ChangeFn;
-  /** Clear icon */
-  clearIcon?: React.JSX.Element;
-  /** indicates if the contentBefore should be hidden  */
-  hideContentBefore?: boolean;
-  /** indicates if the search is disabled  */
-  disabled?: boolean;
 }
 
 /** Search box with debounced change event */
-export const SearchBoxDebounce: React.FunctionComponent<SearchBoxProps> = (
-  props: SearchBoxProps
-) => {
-  const {
-    searchText: defaultValue,
-    onChange: notifyChange,
-    className,
-    hideContentBefore,
-  } = props;
+export const SearchBoxDebounce: React.FunctionComponent<SearchBoxProps> = ({
+  onChange: notifyChange,
+}) => {
+  // const { searchText: defaultValue, onChange: notifyChange, className } = props;
 
-  const [searchValue, setSearchValue] = useState<string>(defaultValue ?? "");
+  const [searchValue, setSearchValue] = useState<string>("");
 
   const immediateChange = useCallback<(searchText: string) => void>(
     (searchText) => {
@@ -83,18 +70,10 @@ export const SearchBoxDebounce: React.FunctionComponent<SearchBoxProps> = (
 
   return (
     <Input
-      {...props}
-      className={mergeClasses(styles.defaultStyle, className)}
-      contentBefore={
-        hideContentBefore ? undefined : props.contentBefore ?? <SearchRegular />
-      }
+      style={defaultStyle}
+      contentBefore={<SearchRegular />}
       contentAfter={
-        searchValue ? (
-          <ClearButton
-            icon={props.clearIcon}
-            onClick={() => immediateChange("")}
-          />
-        ) : null
+        searchValue ? <ClearButton onClick={() => immediateChange("")} /> : null
       }
       value={searchValue}
       onChange={inputChange}
