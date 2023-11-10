@@ -14,6 +14,9 @@ def handler(ctx: context, data: io.BytesIO = None):
     logger = logging.getLogger()
 
     API_KEY = ctx.Config()['API_KEY']
+    ORACLE_DSN = ctx.Config()['ORACLE_DSN']
+    ORACLE_PASSWORD = ctx.Config()['ORACLE_PASSWORD']
+    ORACLE_USER = ctx.Config()['ORACLE_USER']
 
     parsed_url = urlparse(ctx.RequestURL())
 
@@ -34,7 +37,7 @@ def handler(ctx: context, data: io.BytesIO = None):
         if 'subItemBoardId' not in body.keys():
             raise Exception('Sub item board id not provided')
 
-        success = assign_product(API_KEY, body["orderId"], body["subItemId"], body["subItemBoardId"] , user_id)
+        success = assign_product(API_KEY, body["orderId"], body["subItemId"], body["subItemBoardId"] , user_id, ORACLE_USER, ORACLE_PASSWORD, ORACLE_DSN)
         if success:
             response_dict = {"success": "Product was assigned successfully"}
         else:

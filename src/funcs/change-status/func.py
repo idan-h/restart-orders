@@ -12,6 +12,9 @@ def handler(ctx: context, data: io.BytesIO = None):
     logger = logging.getLogger()
  
     API_KEY = ctx.Config()['API_KEY']
+    ORACLE_DSN = ctx.Config()['ORACLE_DSN']
+    ORACLE_PASSWORD = ctx.Config()['ORACLE_PASSWORD']
+    ORACLE_USER = ctx.Config()['ORACLE_USER']
 
     try:
         body = json.loads(data.getvalue())
@@ -32,7 +35,7 @@ def handler(ctx: context, data: io.BytesIO = None):
         subitem_id = body["subItemId"]
         status = body["status"]
         subitem_board_id = body["subItemBoardId"]
-        success = update_order_status(API_KEY, order_id, subitem_id, subitem_board_id, status)
+        success = update_order_status(API_KEY, order_id, subitem_id, subitem_board_id, status, ORACLE_USER, ORACLE_PASSWORD, ORACLE_DSN)
         response_dict = {"status": success} if success else {"error": "Failed to update status"}
 
     except (Exception,) as e:
