@@ -168,7 +168,7 @@ export const AssignedOrders = () => {
                       if (status === DONE_STATUS) {
                         setConfirmProps({
                           title: "האם אתה בטוח",
-                          subText: `האם לסמן את ${subItem.productName} כבוצע?`,
+                          subText: `האם לסמן את ${subItem.name} כבוצע?`,
                           onConfirm: (result: boolean) => {
                             if (result) {
                               handleStatusChange(id, subItem, status);
@@ -185,7 +185,7 @@ export const AssignedOrders = () => {
                     onDelete={(subItem: SubItem) => {
                       setConfirmProps({
                         title: "האם אתה בטוח",
-                        subText: `האם להסיר את ${subItem.productName}?`,
+                        subText: `האם להסיר את ${subItem.name}?`,
                         onConfirm: (result: boolean) => {
                           if (result) {
                             handleSubItemRemove(id, subItem);

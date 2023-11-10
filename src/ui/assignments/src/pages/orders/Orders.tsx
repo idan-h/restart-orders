@@ -106,7 +106,7 @@ export const Orders = () => {
         } else {
           // group title does not include search text - filter sub items
           const filteredSubItems = order.subItems.filter((subItem) =>
-            subItem.productName.includes(searchText)
+            subItem.name.includes(searchText)
           );
           if (filteredSubItems.length) {
             // add only the sub items that match the search text
@@ -127,6 +127,29 @@ export const Orders = () => {
         ? openNoteIds.filter((openNoteId) => openNoteId !== id)
         : [...openNoteIds, id]
     );
+  };
+
+  const handleFilterByTypeChange = (
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    _: any,
+    data: {
+      optionValue: string | undefined;
+      optionText: string | undefined;
+      selectedOptions: string[];
+    }
+  ) => {
+    data.optionValue === "All"
+      ? setDisplayedOrders(orders)
+      : setDisplayedOrders((_) =>
+          orders?.filter(
+            (unit) =>
+              unit.subItems.filter((subItem) =>
+                data.optionValue
+                  ? subItem.type.split(",").includes(data.optionValue)
+                  : true
+              ).length > 0
+          )
+        );
   };
 
   const handleSubmit = async () => {
@@ -180,24 +203,7 @@ export const Orders = () => {
                 <SearchBoxDebounce onChange={handleSearch} />
               </Field>
               <Field label="סינון לפי סוג">
-                <Combobox
-                  onOptionSelect={(_, data) => {
-                    data.optionValue === "All"
-                      ? setDisplayedOrders(orders)
-                      : setDisplayedOrders((_) =>
-                          orders?.filter(
-                            (unit) =>
-                              unit.subItems.filter((subItem) =>
-                                data.optionValue
-                                  ? subItem.type
-                                      .split(",")
-                                      .includes(data.optionValue)
-                                  : true
-                              ).length > 0
-                          )
-                        );
-                  }}
-                >
+                <Combobox onOptionSelect={handleFilterByTypeChange}>
                   {[
                     { key: "All", value: "הכל" },
                     { key: "IDF", value: "צהל" },

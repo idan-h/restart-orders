@@ -28,7 +28,7 @@ export const SubItems: React.FunctionComponent<SubItemsProps> = ({
       renderCell: (item: SubItem) => {
         return (
           <DataGridCell style={{ flex: 4 }}>
-            <TableCellLayout>{item.productName}</TableCellLayout>
+            <TableCellLayout>{item.name}</TableCellLayout>
           </DataGridCell>
         );
       },
