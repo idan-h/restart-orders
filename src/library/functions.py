@@ -4,7 +4,6 @@ from .consts import API_URL, PRODUCT_BOARD_ID, ORDERS_BOARD_ID, DONATIONS_BOARD_
 import uuid
 import json
 import pandas as pd
-import json
 from datetime import datetime
 
 
@@ -295,18 +294,126 @@ def update_order_status(api_key , order_id , subitem_id ,subitem_board_id, subit
         return False
 
 
+def orders_table_rows_to_array(rows):
+    # Structuring the results into a JSON format.
+    orders = {}
 
-def get_unassigned_orders(api_key):
-    orders = get_valid_orders(api_key)
+    for row in rows:
+        order_id = row[0]
+        if order_id not in orders:
+            orders[order_id] = {
+                "id": order_id,
+                "name": row[1],
+                "phone": row[2],
+                "region": row[3],
+                "unit": row[4],
+                "subItems": [],
+                "role": row[5],
+                "comments": row[6],
+                "orderValidationStatus": row[7],
+                "orderStatus": row[8],
+                "priority": row[9],
+                "email": row[10],
+                "createdAt": row[11].isoformat(),
+                "lastUpdated": row[12].isoformat(),
+                "board_id": row[13]
+            }
+        sub_item = {
+            "id": row[14],
+            "subItemBoardId": row[15],
+            "productId": row[16],
+            "quantity": row[17],
+            "userId": row[18],
+            "status": row[19],
+            "comments": row[20],
+            "order_id": order_id
+        }
+        orders[order_id]["subItems"].append(sub_item)
 
-    orders = [order for order in orders if any(subItem.userId is None or subItem.userId == "None" for subItem in order.subItems)]   
-    return orders_to_json(orders)
+    return orders
 
-def get_assigned_orders_to_user(api_key, user_id):
-    orders = get_valid_orders(api_key)
 
-    orders = [order for order in orders if any(subItem.userId is not None and subItem.userId == user_id for subItem in order.subItems)]   
-    return orders_to_json(orders)
+def get_unassigned_orders(user, password, dsn):
+    oracle = OracleDB(user, password, dsn)
+    oracle.connect()
+
+    query = """
+    SELECT
+        o.ID as "orderId",
+        o.NAME as "name",
+        o.PHONE as "phone",
+        o.REGION as "region",
+        o.UNIT as "unit",
+        o.ROLE as "role",
+        o.COMMENTS as "orderComments",
+        o.ORDERVALIDATIONSTATUS as "orderValidationStatus",
+        o.ORDERSTATUS as "orderStatus",
+        o.PRIORITY as "priority",
+        o.EMAIL as "email",
+        o.CREATEDAT as "createdAt",
+        o.LASTUPDATED as "lastUpdated",
+        o.BOARD_ID as "boardId",
+        s.ID as "subItemId",
+        s.SUBITEMBOARDID as "subItemBoardId",
+        s.PRODUCTID as "productId",
+        s.QUANTITY as "quantity",
+        s.USERID as "userId",
+        s.STATUS as "subItemStatus",
+        s.COMMENTS as "subItemComments"
+    FROM
+        ORDERS o
+    JOIN
+        ORDER_SUBITEMS s ON o.ID = s.ORDER_ID AND s.USERID is null
+    """
+
+    # Execute the query and fetch all results.
+    rows = oracle.execute(query, return_rows=True)
+    orders = orders_table_rows_to_array(rows)
+    orders_list = list(orders.values())
+
+    return orders_list
+
+
+def get_assigned_orders_to_user(user, password, dsn, user_id):
+    oracle = OracleDB(user, password, dsn)
+    oracle.connect()
+
+    query = """
+        SELECT
+            o.ID as "orderId",
+            o.NAME as "name",
+            o.PHONE as "phone",
+            o.REGION as "region",
+            o.UNIT as "unit",
+            o.ROLE as "role",
+            o.COMMENTS as "orderComments",
+            o.ORDERVALIDATIONSTATUS as "orderValidationStatus",
+            o.ORDERSTATUS as "orderStatus",
+            o.PRIORITY as "priority",
+            o.EMAIL as "email",
+            o.CREATEDAT as "createdAt",
+            o.LASTUPDATED as "lastUpdated",
+            o.BOARD_ID as "boardId",
+            s.ID as "subItemId",
+            s.SUBITEMBOARDID as "subItemBoardId",
+            s.PRODUCTID as "productId",
+            s.QUANTITY as "quantity",
+            s.USERID as "userId",
+            s.STATUS as "subItemStatus",
+            s.COMMENTS as "subItemComments"
+        FROM
+            ORDERS o
+        JOIN
+            ORDER_SUBITEMS s ON o.ID = s.ORDER_ID AND s.USERID = :1
+        """
+
+    # Execute the query and fetch all results.
+    rows = oracle.execute(query, parms=(user_id,), return_rows=True)
+    orders = orders_table_rows_to_array(rows)
+    orders_list = list(orders.values())
+
+    return orders_list
+
 
 def get_valid_orders(api_key):
     monday_api = MondayApi(api_key, API_URL)
@@ -322,6 +429,7 @@ def get_valid_orders(api_key):
     # print(items)
     orders = convert_to_orders(items)
     return orders
+
 
 def convert_to_orders(items):
     orders = []
@@ -585,7 +693,7 @@ class Order:
         self.orderStatus = orderStatus
         self.priority = priority
         self.email = email
-        self.createdAt = datetime.fromisoformat(createdAt.replace('Z', '+00:00')) 
+        self.createdAt = datetime.fromisoformat(createdAt.replace('Z', '+00:00'))
         self.lastUpdated = datetime.fromisoformat(lastUpdated.replace('Z', '+00:00')) 
         self.board_id = board_id
 
