@@ -101,10 +101,10 @@ export const Orders = () => {
   };
 
   const handleTilterByText = (searchText: string) => {
-    console.debug("Orders::handleSearch", searchText);
+    console.debug("Orders::handleTilterByText", searchText);
 
     if (!orders) {
-      console.error("Orders::handleSearch: orders empty");
+      console.error("Orders::handleTilterByText: orders empty");
       return;
     }
 
@@ -142,11 +142,16 @@ export const Orders = () => {
     }
   };
 
-  // $G$ TODO - fix to work with visible props
   const handleFilterByType = (optionValue?: string) => {
+    if (!orders) {
+      console.error("Orders::handleFilterByType: orders empty");
+      return;
+    }
+
     optionValue === "All"
-      ? setOrders(orders)
+      ? setOrders([...orders])
       : setOrders((_) =>
+          // $G$  BUG HERE! TODO - fix to work with new visible props
           orders?.filter(
             (unit) =>
               unit.subItems.filter((subItem) =>
@@ -212,10 +217,10 @@ export const Orders = () => {
           <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
             {/* filters */}
             <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
-              <Field label="חיפוש">
+              <Field label="חיפוש" style={{ flex: 1 }}>
                 <SearchBoxDebounce onChange={handleTilterByText} />
               </Field>
-              <Field label="סינון לפי סוג">
+              <Field label="סינון לפי סוג" style={{ flex: 1 }}>
                 <TypeFilter onChange={handleFilterByType} />
               </Field>
             </div>
