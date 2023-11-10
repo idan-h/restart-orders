@@ -9,6 +9,8 @@ import {
   Dropdown,
   Option,
   TableColumnSizingOptions,
+  DataGridHeader,
+  DataGridHeaderCell,
 } from "@fluentui/react-components";
 import { Delete24Regular } from "@fluentui/react-icons";
 
@@ -27,6 +29,9 @@ export const AssignedSubItems: React.FunctionComponent<
   const columns = [
     createTableColumn<SubItem>({
       columnId: "file",
+      renderHeaderCell: () => {
+        return "פריט";
+      },
       renderCell: (item) => {
         return (
           <DataGridCell style={{ flex: 4 }}>
@@ -37,6 +42,9 @@ export const AssignedSubItems: React.FunctionComponent<
     }),
     createTableColumn<SubItem>({
       columnId: "quantity",
+      renderHeaderCell: () => {
+        return "כמות";
+      },
       renderCell: (item) => {
         return (
           <DataGridCell style={{ flex: 1 }}>
@@ -47,6 +55,9 @@ export const AssignedSubItems: React.FunctionComponent<
     }),
     createTableColumn<SubItem>({
       columnId: "status",
+      renderHeaderCell: () => {
+        return "סטטוס";
+      },
       renderCell: (item) => {
         return (
           <DataGridCell style={{ flex: 4 }}>
@@ -72,6 +83,9 @@ export const AssignedSubItems: React.FunctionComponent<
     }),
     createTableColumn<SubItem>({
       columnId: "delete",
+      renderHeaderCell: () => {
+        return "";
+      },
       renderCell: (item) => {
         if (item.status === DONE_STATUS) {
           return <DataGridCell />;
@@ -109,6 +123,13 @@ export const AssignedSubItems: React.FunctionComponent<
       getRowId={(item) => item.id}
       columnSizingOptions={columnSizing}
     >
+      <DataGridHeader>
+        <DataGridRow selectionCell={{ style: { display: "none" } }}>
+          {({ renderHeaderCell }) => (
+            <DataGridHeaderCell>{renderHeaderCell()}</DataGridHeaderCell>
+          )}
+        </DataGridRow>
+      </DataGridHeader>
       <DataGridBody<SubItem>>
         {({ item, rowId }) => (
           <DataGridRow<SubItem> key={rowId}>

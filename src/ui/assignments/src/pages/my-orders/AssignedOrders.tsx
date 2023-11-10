@@ -156,6 +156,7 @@ export const AssignedOrders = () => {
                     >
                       <ContactPersonDetailsTable items={[item]} />
                       <Divider />
+                      <Divider />
                     </div>
                   }
                 />
