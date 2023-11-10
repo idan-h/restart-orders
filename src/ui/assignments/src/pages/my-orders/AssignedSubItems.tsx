@@ -8,6 +8,7 @@ import {
   Button,
   Dropdown,
   Option,
+  TableColumnSizingOptions,
 } from "@fluentui/react-components";
 import { Delete24Regular } from "@fluentui/react-icons";
 
@@ -24,30 +25,16 @@ export const AssignedSubItems: React.FunctionComponent<
   AssignedSubItemsProps
 > = ({ items, statusesList, onStatusChange, onDelete }) => {
   const columns = [
-    // Info
     createTableColumn<SubItem>({
       columnId: "file",
       renderCell: (item) => {
         return (
           <DataGridCell style={{ flex: 4 }}>
-            <TableCellLayout>
-              <div
-                style={{
-                  maxWidth: 200,
-                  textOverflow: "ellipsis",
-                  overflow: "hidden",
-                  wordWrap: "break-word",
-                  whiteSpace: "nowrap",
-                }}
-              >
-                {item.productName}
-              </div>
-            </TableCellLayout>
+            <TableCellLayout>{item.productName}</TableCellLayout>
           </DataGridCell>
         );
       },
     }),
-    // Quantity
     createTableColumn<SubItem>({
       columnId: "quantity",
       renderCell: (item) => {
@@ -58,7 +45,6 @@ export const AssignedSubItems: React.FunctionComponent<
         );
       },
     }),
-    // Status
     createTableColumn<SubItem>({
       columnId: "status",
       renderCell: (item) => {
@@ -84,9 +70,8 @@ export const AssignedSubItems: React.FunctionComponent<
         );
       },
     }),
-    // Delete button
     createTableColumn<SubItem>({
-      columnId: "unassign",
+      columnId: "delete",
       renderCell: (item) => {
         if (item.status === DONE_STATUS) {
           return <DataGridCell />;
@@ -107,8 +92,23 @@ export const AssignedSubItems: React.FunctionComponent<
     }),
   ];
 
+  const columnSizing: TableColumnSizingOptions = {
+    file: {
+      minWidth: 150,
+    },
+    quantity: {},
+    status: {},
+    delete: {
+      minWidth: 50,
+    },
+  };
   return (
-    <DataGrid items={items} columns={columns} getRowId={(item) => item.id}>
+    <DataGrid
+      items={items}
+      columns={columns}
+      getRowId={(item) => item.id}
+      columnSizingOptions={columnSizing}
+    >
       <DataGridBody<SubItem>>
         {({ item, rowId }) => (
           <DataGridRow<SubItem> key={rowId}>

@@ -5,6 +5,7 @@ import {
   Card,
   CardHeader,
   CardPreview,
+  Body1Stronger,
 } from "@fluentui/react-components";
 import {
   TextExpand24Regular,
@@ -139,84 +140,85 @@ export const AssignedOrders = () => {
         ) : myOrders.length === 0 ? (
           <h3 style={titleStyle}>אין הזמנות</h3>
         ) : (
-          myOrders.map(({ id, unit, subItems, phone, comment }, index) => (
-            <Card key={index} className={styles.card}>
-              <CardHeader
-                header={
-                  <div
-                    style={{
-                      width: "100%",
-                      display: "flex",
-                      justifyContent: "space-between",
+          myOrders.map(
+            ({ id, unit, subItems, region, name, phone, comment }, index) => (
+              <Card key={index} className={styles.card}>
+                <CardHeader
+                  header={
+                    <div
+                      style={{
+                        width: "100%",
+                        display: "flex",
+                        flexDirection: "column",
+                        alignItems: "flex-start",
+                      }}
+                    >
+                      <Body1Stronger style={{ textAlign: "left" }}>
+                        {name}-{unit}-{region ?? "אזור לא ידוע"}
+                      </Body1Stronger>
+                      <Body1Stronger>{phone}</Body1Stronger>
+                    </div>
+                  }
+                />
+                <CardPreview>
+                  <AssignedSubItems
+                    items={subItems}
+                    statusesList={statusesList ?? []}
+                    onStatusChange={(subItem: SubItem, status: string) => {
+                      if (status === DONE_STATUS) {
+                        setConfirmProps({
+                          title: "האם אתה בטוח",
+                          subText: `האם לסמן את ${subItem.productName} כבוצע?`,
+                          onConfirm: (result: boolean) => {
+                            if (result) {
+                              handleStatusChange(id, subItem, status);
+                            } else {
+                              // todo: reset status
+                            }
+                          },
+                        });
+                        setConfirmOpen(true);
+                      } else {
+                        handleStatusChange(id, subItem, status);
+                      }
                     }}
-                  >
-                    <Body1 style={{ textAlign: "left" }}>
-                      <b>{unit}</b>
-                    </Body1>
-                    <Body1>
-                      <b>{phone}</b>
-                    </Body1>
-                  </div>
-                }
-              />
-              <CardPreview>
-                <AssignedSubItems
-                  items={subItems}
-                  statusesList={statusesList ?? []}
-                  onStatusChange={(subItem: SubItem, status: string) => {
-                    if (status === DONE_STATUS) {
+                    onDelete={(subItem: SubItem) => {
                       setConfirmProps({
                         title: "האם אתה בטוח",
-                        subText: `האם לסמן את ${subItem.productName} כבוצע?`,
+                        subText: `האם להסיר את ${subItem.productName}?`,
                         onConfirm: (result: boolean) => {
                           if (result) {
-                            handleStatusChange(id, subItem, status);
-                          } else {
-                            // todo: reset status
+                            handleSubItemRemove(id, subItem);
                           }
                         },
                       });
                       setConfirmOpen(true);
-                    } else {
-                      handleStatusChange(id, subItem, status);
-                    }
-                  }}
-                  onDelete={(subItem: SubItem) => {
-                    setConfirmProps({
-                      title: "האם אתה בטוח",
-                      subText: `האם להסיר את ${subItem.productName}?`,
-                      onConfirm: (result: boolean) => {
-                        if (result) {
-                          handleSubItemRemove(id, subItem);
-                        }
-                      },
-                    });
-                    setConfirmOpen(true);
-                  }}
-                />
-                {comment && (
-                  <a
-                    style={{
-                      display: "flex",
-                      alignItems: "center",
-                      margin: 10,
                     }}
-                    onClick={() => toggleOpenNote(id)}
-                  >
-                    הערות
-                    {openNoteIds.includes(id) ? (
-                      <TextCollapse24Filled />
-                    ) : (
-                      <TextExpand24Regular />
-                    )}
-                  </a>
-                )}
-                {openNoteIds.includes(id) ? (
-                  <p style={{ margin: 10 }}>{comment}</p>
-                ) : null}
-              </CardPreview>
-            </Card>
-          ))
+                  />
+                  {comment && (
+                    <a
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        margin: 10,
+                      }}
+                      onClick={() => toggleOpenNote(id)}
+                    >
+                      הערות
+                      {openNoteIds.includes(id) ? (
+                        <TextCollapse24Filled />
+                      ) : (
+                        <TextExpand24Regular />
+                      )}
+                    </a>
+                  )}
+                  {openNoteIds.includes(id) ? (
+                    <p style={{ margin: 10 }}>{comment}</p>
+                  ) : null}
+                </CardPreview>
+              </Card>
+            )
+          )
         )}
       </div>
       {confirmProps && (

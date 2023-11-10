@@ -391,14 +391,14 @@ def get_last_updated_from_value(value):
 # get json from connect_boards column and return the product id
 def get_product_id_from_connect_boards(connect_boards_object):
     if connect_boards_object is None:
-        return "None"
+        return None
     connect_boards_object = json.loads(connect_boards_object)
     if connect_boards_object['linkedPulseIds'] is None:
-        return "None"
+        return None
     if connect_boards_object['linkedPulseIds'][0] is None:
-        return "None"
+        return None
     if connect_boards_object['linkedPulseIds'][0]['linkedPulseId'] is None:
-        return "None"
+        return None
     
     return connect_boards_object['linkedPulseIds'][0]['linkedPulseId']
 

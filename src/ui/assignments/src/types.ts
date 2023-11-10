@@ -3,6 +3,7 @@ export type BaseOrder = {
   id: string;
   region: string;
   phone: string;
+  name: string;
   unit: string | undefined; // may be undefined - invalid data, missing unit name
   comment: string;
 };

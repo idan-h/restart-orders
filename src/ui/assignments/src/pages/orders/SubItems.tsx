@@ -5,6 +5,7 @@ import {
   DataGridRow,
   Switch,
   TableCellLayout,
+  TableColumnSizingOptions,
   createTableColumn,
 } from "@fluentui/react-components";
 
@@ -27,19 +28,7 @@ export const SubItems: React.FunctionComponent<SubItemsProps> = ({
       renderCell: (item: SubItem) => {
         return (
           <DataGridCell style={{ flex: 4 }}>
-            <TableCellLayout>
-              <div
-                style={{
-                  maxWidth: 200,
-                  textOverflow: "ellipsis",
-                  overflow: "hidden",
-                  wordWrap: "break-word",
-                  whiteSpace: "nowrap",
-                }}
-              >
-                {item.productName}
-              </div>
-            </TableCellLayout>
+            <TableCellLayout>{item.productName}</TableCellLayout>
           </DataGridCell>
         );
       },
@@ -73,11 +62,27 @@ export const SubItems: React.FunctionComponent<SubItemsProps> = ({
     }),
   ];
 
+  const columnSizingOptions: TableColumnSizingOptions = {
+    file: {minWidth: 200},
+    quantity: { minWidth: 50},
+    status: { minWidth: 80 },
+  };
   return (
-    <DataGrid items={items} columns={columns} getRowId={(item) => item.id}>
+    <DataGrid
+      items={items}
+      columns={columns}
+      getRowId={(item) => item.id}
+      columnSizingOptions={columnSizingOptions}
+    >
       <DataGridBody<SubItem>>
         {({ item, rowId }) => (
-          <DataGridRow<SubItem> key={rowId}>
+          <DataGridRow<SubItem>
+            key={rowId}
+            onClick={() => {
+              const isPrevChecked = Boolean(item.userId);
+              onToggle(item, !isPrevChecked);
+            }}
+          >
             {({ renderCell }) => renderCell(item)}
           </DataGridRow>
         )}
