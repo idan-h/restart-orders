@@ -25,7 +25,6 @@ import {
   ConfirmDialog,
   ConfirmDialogProps,
 } from "../../components/ConfirmDialog.tsx";
-import { ContactPersonDetailsTable } from "./ContactPersonDetails.tsx";
 
 const useStyles = makeStyles({
   card: {
@@ -156,7 +155,12 @@ export const AssignedOrders = () => {
                         width: "-webkit-fill-available",
                       }}
                     >
-                      <ContactPersonDetailsTable items={[item]} />
+                      {/* <ContactPersonDetailsTable items={[item]} /> */}
+                      <Body1Stronger>
+                        {item.unit} {item.region}
+                      </Body1Stronger>
+                      <Body1Stronger>{item.name}</Body1Stronger>
+                      <Body1Stronger>{item.phone}</Body1Stronger>
                       <Divider />
                       <Divider />
                     </div>
@@ -170,7 +174,7 @@ export const AssignedOrders = () => {
                       if (status === DONE_STATUS) {
                         setConfirmProps({
                           title: "האם אתה בטוח",
-                          subText: `האם לסמן את ${subItem.name} כבוצע?`,
+                          subText: `האם לסמן את ${subItem.product.name} כבוצע?`,
                           onConfirm: (result: boolean) => {
                             if (result) {
                               handleStatusChange(id, subItem, status);
@@ -187,7 +191,7 @@ export const AssignedOrders = () => {
                     onDelete={(subItem: SubItem) => {
                       setConfirmProps({
                         title: "האם אתה בטוח",
-                        subText: `האם להסיר את ${subItem.name}?`,
+                        subText: `האם להסיר את ${subItem.product.name}?`,
                         onConfirm: (result: boolean) => {
                           if (result) {
                             handleSubItemRemove(id, subItem);

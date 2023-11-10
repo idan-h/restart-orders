@@ -30,9 +30,11 @@ export type BaseSubItem = {
 export type MondaySubItem = BaseSubItem;
 
 export type SubItem = BaseSubItem & {
-  name: string;
-  type: string;
-  product_number: string;
+  product: {
+    name: string;
+    type: string;
+    product_number: string;
+  };
 };
 
 export const DONE_STATUS = "בוצע";

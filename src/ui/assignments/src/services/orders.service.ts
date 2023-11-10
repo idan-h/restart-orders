@@ -5,7 +5,7 @@ const baseUrl =
 
 let productDetails: Map<
   string,
-  { name: string; product_number: number; type: string }
+  { name: string; product_number: string; type: string }
 >;
 let statusesList: string[];
 
@@ -45,8 +45,7 @@ export function makeOrdersService(userId?: string) {
               )
               .map((subItem) => ({
                 ...subItem,
-                productName: productDetails!.get(subItem.productId)!.name,
-                type: productDetails!.get(subItem.productId)!.type,
+                product: productDetails!.get(subItem.productId)!,
               })),
           }))
           .filter((order) => order.subItems.length),
@@ -56,7 +55,9 @@ export function makeOrdersService(userId?: string) {
     async fetchAssignedOrders(): Promise<{ orders: Order[] }> {
       console.debug("OrdersService:fetchAssignedOrders");
 
-      if (!productDetails) productDetails = await fetchProductDetails();
+      if (!productDetails) {
+        productDetails = await fetchProductDetails();
+      }
 
       const response = await fetch(
         new URL(
@@ -79,7 +80,7 @@ export function makeOrdersService(userId?: string) {
               )
               .map((subItem) => ({
                 ...subItem,
-                productName: productDetails!.get(subItem.productId)!,
+                product: productDetails!.get(subItem.productId)!,
               })),
           }))
           .filter((order) => order.subItems.length),
@@ -177,7 +178,7 @@ export function makeOrdersService(userId?: string) {
 
   /** List of all items in the database. */
   async function fetchProductDetails(): Promise<
-    Map<string, { name: string; product_number: number; type: string }>
+    Map<string, { name: string; product_number: string; type: string }>
   > {
     if (!userId) {
       console.error("ordersService - failed to load, not logged in");

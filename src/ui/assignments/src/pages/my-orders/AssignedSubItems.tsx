@@ -28,14 +28,14 @@ export const AssignedSubItems: React.FunctionComponent<
 > = ({ items, statusesList, onStatusChange, onDelete }) => {
   const columns = [
     createTableColumn<SubItem>({
-      columnId: "file",
+      columnId: "itemDescription",
       renderHeaderCell: () => {
         return "פריט";
       },
-      renderCell: (item) => {
+      renderCell: (item: SubItem) => {
         return (
-          <DataGridCell style={{ flex: 4 }}>
-            <TableCellLayout>{item.name}</TableCellLayout>
+          <DataGridCell>
+            <TableCellLayout>{item.product.name}</TableCellLayout>
           </DataGridCell>
         );
       },
@@ -47,7 +47,7 @@ export const AssignedSubItems: React.FunctionComponent<
       },
       renderCell: (item) => {
         return (
-          <DataGridCell style={{ flex: 1 }}>
+          <DataGridCell>
             <TableCellLayout>{item.quantity}</TableCellLayout>
           </DataGridCell>
         );
@@ -60,7 +60,7 @@ export const AssignedSubItems: React.FunctionComponent<
       },
       renderCell: (item) => {
         return (
-          <DataGridCell style={{ flex: 4 }}>
+          <DataGridCell>
             <TableCellLayout>
               <Dropdown
                 style={{ minWidth: "unset", width: "110px" }}
@@ -92,7 +92,7 @@ export const AssignedSubItems: React.FunctionComponent<
         }
 
         return (
-          <DataGridCell style={{ flex: 1 }}>
+          <DataGridCell>
             <TableCellLayout style={{ flexDirection: "row-reverse" }}>
               <Button
                 appearance="transparent"
@@ -107,8 +107,9 @@ export const AssignedSubItems: React.FunctionComponent<
   ];
 
   const columnSizing: TableColumnSizingOptions = {
-    file: {
-      minWidth: 150,
+    itemDescription: {
+      minWidth: 50,
+      defaultWidth: 50,
     },
     quantity: {},
     status: {},

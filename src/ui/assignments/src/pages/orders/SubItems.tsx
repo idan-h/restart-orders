@@ -27,8 +27,8 @@ export const SubItems: React.FunctionComponent<SubItemsProps> = ({
       columnId: "file",
       renderCell: (item: SubItem) => {
         return (
-          <DataGridCell style={{ flex: 4 }}>
-            <TableCellLayout>{item.name}</TableCellLayout>
+          <DataGridCell>
+            <TableCellLayout>{item.product.name}</TableCellLayout>
           </DataGridCell>
         );
       },
@@ -38,7 +38,7 @@ export const SubItems: React.FunctionComponent<SubItemsProps> = ({
       columnId: "quantity",
       renderCell: (item: SubItem) => {
         return (
-          <DataGridCell style={{ flex: 1 }}>
+          <DataGridCell>
             <TableCellLayout>{item.quantity}</TableCellLayout>
           </DataGridCell>
         );
@@ -49,7 +49,7 @@ export const SubItems: React.FunctionComponent<SubItemsProps> = ({
       columnId: "status",
       renderCell: (subItem: SubItem) => {
         return (
-          <DataGridCell style={{ flex: 1 }}>
+          <DataGridCell>
             <TableCellLayout style={{ flexDirection: "row-reverse" }}>
               <Switch
                 onChange={(_, data) => onToggle(subItem, data.checked)}
@@ -64,7 +64,6 @@ export const SubItems: React.FunctionComponent<SubItemsProps> = ({
 
   const columnSizingOptions: TableColumnSizingOptions = {
     file: { minWidth: 200 },
-    quantity: { minWidth: 50 },
     status: { minWidth: 80 },
   };
   return (
