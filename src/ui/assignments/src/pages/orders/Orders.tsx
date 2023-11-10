@@ -1,5 +1,4 @@
 import { useEffect, useMemo, useState } from "react";
-import { useNavigate } from "react-router-dom";
 import {
   Body1,
   Button,
@@ -14,8 +13,7 @@ import {
   TextCollapse24Filled,
 } from "@fluentui/react-icons";
 
-import { ROUTES } from "../../routes-const.ts";
-import { SubItem, VisibleOrder } from "../../types.ts";
+import { SubItem, VisibleOrder, VisibleSubItem } from "../../types.ts";
 import { useAuthenticationService } from "../../services/authentication.ts";
 import { OrdersService } from "../../services/Orders.service.ts";
 import { Header } from "../../components/header.tsx";
@@ -23,6 +21,10 @@ import { Loading } from "../../components/Loading.tsx";
 import { SearchBoxDebounce } from "../../components/SearchBoxDebounce.tsx";
 import { SubHeader, SubHeader2 } from "../../components/SubHeader.tsx";
 import { TypeFilter } from "../../components/TypeFilter.tsx";
+import {
+  ConfirmDialog,
+  ConfirmDialogProps,
+} from "../../components/ConfirmDialog.tsx";
 import { SubItems } from "./SubItems.tsx";
 import { pageStyle } from "../sharedStyles.ts";
 
@@ -37,11 +39,14 @@ const showOrder = (order: VisibleOrder): VisibleOrder => ({
 });
 
 export const Orders = () => {
-  const navigate = useNavigate();
-
   const [orders, setOrders] = useState<VisibleOrder[] | undefined>(); // all orders
   const [openNoteIds, setOpenNoteIds] = useState<number[]>([]); // open notes ids (used to toggle open notes)
   const [saving, setSaving] = useState(false); // saving state (used for saving spinner and block submit button)
+
+  const [confirmOpen, setConfirmOpen] = useState<boolean | undefined>(false);
+  const [confirmProps, setConfirmProps] = useState<
+    Omit<ConfirmDialogProps, "openState"> | undefined
+  >();
 
   const { getUserId } = useAuthenticationService();
   const userId = getUserId();
@@ -177,20 +182,48 @@ export const Orders = () => {
       return;
     }
 
+    if (!orders) {
+      console.error("Orders::handleSubmit: orders empty");
+      return;
+    }
+
+    // The server is slow. We first call the assign method but we still.
+    // The filter out the items that where assigned. All the assigned items and orders that don't have any un-assigned items left.
+    let subItemsToAssign: VisibleSubItem[] = [];
+    const ordersToKeep: VisibleOrder[] = [];
+
     try {
       setSaving(true);
+
+      orders.forEach((order) => {
+        const itemsToKeep: VisibleSubItem[] = []; // will be kept
+        const itemsToRemove: VisibleSubItem[] = []; // will be assigned
+
+        order.subItems.forEach((subItem) =>
+          subItem.userId
+            ? itemsToRemove.push(subItem)
+            : itemsToKeep.push(subItem)
+        );
+
+        subItemsToAssign = subItemsToAssign.concat(itemsToRemove);
+
+        if (itemsToKeep.length) {
+          // keep this order
+          ordersToKeep.push({
+            ...order,
+            subItems: itemsToKeep,
+          });
+        }
+      });
+
       await Promise.all(
-        orders?.flatMap((order) =>
-          order.subItems
-            .filter((subItem) => !!subItem.userId)
-            .map((subItem) =>
-              ordersService.assignSubItem({
-                orderId: order.id,
-                subItemId: subItem.id,
-                subItemBoardId: subItem.subItemBoardId,
-              })
-            )
-        ) ?? []
+        subItemsToAssign.map((subItem) =>
+          ordersService.assignSubItem({
+            orderId: subItem.orderId,
+            subItemId: subItem.id,
+            subItemBoardId: subItem.subItemBoardId,
+          })
+        )
       );
     } catch (e) {
       console.error("Orders::handleSubmit: failed to save all items");
@@ -198,10 +231,21 @@ export const Orders = () => {
       window.location.reload();
       return;
     } finally {
+      setOrders(ordersToKeep); // update the UI with the orders that were not assigned
       setSaving(false);
-    }
 
-    navigate(ROUTES.MY_ORDERS);
+      setConfirmProps({
+        title: "הזמנה נשלחה בהצלחה",
+        subText: "הפריט שלך יופיע תחת לשונית הזמנות שלי",
+        buttons: [
+          {
+            text: "אישור",
+            appearance: "primary",
+          },
+        ],
+      });
+      setConfirmOpen(true);
+    }
   };
 
   return (
@@ -306,6 +350,12 @@ export const Orders = () => {
             הוסף להזמנות שלי
           </Button>
         </div>
+      )}
+      {confirmProps && (
+        <ConfirmDialog
+          openState={[confirmOpen, setConfirmOpen]}
+          {...confirmProps}
+        />
       )}
     </>
   );

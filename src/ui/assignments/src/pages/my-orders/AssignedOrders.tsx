@@ -40,6 +40,7 @@ export const AssignedOrders = () => {
   const [statusesList, setStatusesList] = useState<string[] | undefined>();
 
   const [openNoteIds, setOpenNoteIds] = useState<number[]>([]);
+
   const [confirmOpen, setConfirmOpen] = useState<boolean | undefined>(false);
   const [confirmProps, setConfirmProps] = useState<
     Omit<ConfirmDialogProps, "openState"> | undefined
@@ -76,7 +77,7 @@ export const AssignedOrders = () => {
     }
   }, []);
 
-  const handleStatusChange = (
+  const handleSubItemStatusChange = (
     orderId: number,
     subItem: SubItem,
     status: string
@@ -92,6 +93,38 @@ export const AssignedOrders = () => {
       subItemBoardId: subItem.subItemBoardId,
       status,
     });
+  };
+
+  const confirmSubItemStatusChange = (
+    orderId: number,
+    subItem: SubItem,
+    status: string
+  ) => {
+    if (status === DONE_STATUS) {
+      setConfirmProps({
+        title: "האם אתה בטוח",
+        subText: `האם לסמן את ${subItem.product.name} כבוצע?`,
+        buttons: [
+          {
+            text: "לא",
+            appearance: "secondary",
+            onClick: () => {
+              // todo: revert DONE status
+            },
+          },
+          {
+            text: "כן",
+            appearance: "primary",
+            onClick: () => {
+              handleSubItemStatusChange(orderId, subItem, status);
+            },
+          },
+        ],
+      });
+      setConfirmOpen(true);
+    } else {
+      handleSubItemStatusChange(orderId, subItem, status);
+    }
   };
 
   const handleSubItemRemove = (orderId: number, subItem: SubItem) => {
@@ -129,6 +162,27 @@ export const AssignedOrders = () => {
     }
 
     setMyOrders([...myOrders]);
+  };
+
+  const confirmSubItemRemove = (orderId: number, subItem: SubItem) => {
+    setConfirmProps({
+      title: "האם אתה בטוח",
+      subText: `האם להסיר את ${subItem.product.name}?`,
+      buttons: [
+        {
+          text: "לא",
+          appearance: "secondary",
+        },
+        {
+          text: "כן",
+          appearance: "primary",
+          onClick: () => {
+            handleSubItemRemove(orderId, subItem);
+          },
+        },
+      ],
+    });
+    setConfirmOpen(true);
   };
 
   const toggleOpenNote = (id: number) => {
@@ -177,36 +231,10 @@ export const AssignedOrders = () => {
                   <AssignedSubItems
                     items={subItems}
                     statusesList={statusesList ?? []}
-                    onStatusChange={(subItem: SubItem, status: string) => {
-                      if (status === DONE_STATUS) {
-                        setConfirmProps({
-                          title: "האם אתה בטוח",
-                          subText: `האם לסמן את ${subItem.product.name} כבוצע?`,
-                          onConfirm: (result: boolean) => {
-                            if (result) {
-                              handleStatusChange(id, subItem, status);
-                            } else {
-                              // todo: reset status
-                            }
-                          },
-                        });
-                        setConfirmOpen(true);
-                      } else {
-                        handleStatusChange(id, subItem, status);
-                      }
-                    }}
-                    onDelete={(subItem: SubItem) => {
-                      setConfirmProps({
-                        title: "האם אתה בטוח",
-                        subText: `האם להסיר את ${subItem.product.name}?`,
-                        onConfirm: (result: boolean) => {
-                          if (result) {
-                            handleSubItemRemove(id, subItem);
-                          }
-                        },
-                      });
-                      setConfirmOpen(true);
-                    }}
+                    onStatusChange={(item, status) =>
+                      confirmSubItemStatusChange(id, item, status)
+                    }
+                    onDelete={(item) => confirmSubItemRemove(id, item)}
                   />
                   {comments && (
                     <a
