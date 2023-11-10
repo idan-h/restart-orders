@@ -1,7 +1,7 @@
 import { AddCircle28Regular, Checkmark28Regular } from "@fluentui/react-icons";
 
 import { Microsoft, Monday, Restart, Oracle, Firma } from "./images";
-import { Header } from "../../components/Header";
+import { LoginHeader } from "../../components/header";
 import { pageStyle } from "../sharedStyles";
 
 const TextLine = (text: string) => {
@@ -25,7 +25,7 @@ const TextLine2 = (text: string) => {
 export const AboutUs = () => {
   return (
     <>
-      <Header />
+      <LoginHeader />
       <div style={pageStyle}>
         <h1 style={{ textAlign: "center" }}>מי אנחנו</h1>
         <p>

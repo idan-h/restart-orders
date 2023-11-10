@@ -1,14 +1,15 @@
 import { Order, SubItem } from "../types";
-import FAKE_ORDERS from "../fake-orders";
+// import FAKE_ORDERS from "../fake-orders";
 
 export function makeFakeOrdersService(userId: string) {
   const ordersFromStorage = JSON.parse(
     localStorage.getItem("orders") ?? "null"
   );
 
-  const orders = ordersFromStorage
-    ? new Map<string, Order>(ordersFromStorage)
-    : new Map<string, Order>(FAKE_ORDERS.map((o) => [o.id, o]));
+ 
+  const orders = new Map<string, Order>(ordersFromStorage)
+ // const orders = ordersFromStorage ? new Map<string, Order>(ordersFromStorage)
+ //   : new Map<string, Order>(FAKE_ORDERS.map((o) => [o.id, o]));
 
   saveOrders(orders);
 

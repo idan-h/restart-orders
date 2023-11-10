@@ -14,7 +14,7 @@ import {
 import { pageStyle, titleStyle } from "../sharedStyles.ts";
 import { DONE_STATUS, Order, SubItem } from "../../types.ts";
 import { makeOrdersService } from "../../services/orders.service.ts";
-import { Header } from "../../components/Header.tsx";
+import { LoginHeader } from "../../components/header.tsx";
 import { Loading } from "../../components/Loading.tsx";
 import { AssignedSubItems } from "./AssignedSubItems.tsx";
 import { useAuthenticationService } from "../../services/authentication.ts";
@@ -131,7 +131,7 @@ export const AssignedOrders = () => {
 
   return (
     <>
-      <Header />
+      <LoginHeader />
       <div style={pageStyle}>
         <h2 style={titleStyle}>הזמנות</h2>
         {!myOrders ? (

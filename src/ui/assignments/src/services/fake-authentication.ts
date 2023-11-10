@@ -12,7 +12,7 @@ export function makeFakeAuthenticationService(): ReturnType<
       localStorage.setItem("fakeUserId", userId);
     },
     getUserId() {
-      return userId;
+      return userId ;
     },
     logout() {
       userId = undefined;

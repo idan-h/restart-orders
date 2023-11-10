@@ -15,7 +15,7 @@ import {
 import { useEffect, useState } from "react";
 import { Order, SubItem } from "../../types.ts";
 import { SubItems } from "./SubItems.tsx";
-import { Header } from "../../components/Header.tsx";
+import { LoginHeader } from "../../components/header.tsx";
 import { Loading } from "../../components/Loading.tsx";
 
 import { ROUTES } from "../../routes-const.ts";
@@ -161,7 +161,7 @@ export const Orders = () => {
 
   return (
     <>
-      <Header />
+      <LoginHeader />
       <div style={pageStyle}>
         <h2 style={titleStyle}>בקשות</h2>
         {saving ? (
