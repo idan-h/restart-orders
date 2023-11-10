@@ -21,7 +21,7 @@ const selectedRouteStyle: React.CSSProperties = {
   borderRadius: "0px",
 };
 
-export const LoginHeader: React.FunctionComponent = () => {
+export const Header: React.FunctionComponent = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { logout, isLoggedIn } = useAuthenticationService();

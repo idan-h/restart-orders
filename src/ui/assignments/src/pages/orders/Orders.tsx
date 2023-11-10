@@ -23,7 +23,7 @@ import { SubItem, VisibleOrder } from "../../types.ts";
 import { useAuthenticationService } from "../../services/authentication.ts";
 import { OrdersService } from "../../services/Orders.service.ts";
 import { SubItems } from "./SubItems.tsx";
-import { LoginHeader } from "../../components/header.tsx";
+import { Header } from "../../components/header.tsx";
 import { Loading } from "../../components/Loading.tsx";
 import { SearchBoxDebounce } from "../../components/SearchBoxDebounce.tsx";
 import { pageStyle, titleStyle } from "../sharedStyles.ts";
@@ -209,7 +209,7 @@ export const Orders = () => {
 
   return (
     <>
-      <LoginHeader />
+      <Header />
       <div style={pageStyle}>
         <Subtitle1 style={titleStyle}>
           בקשות{orders && ` (${orders?.length})`}

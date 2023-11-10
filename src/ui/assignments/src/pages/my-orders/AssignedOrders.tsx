@@ -18,7 +18,7 @@ import { DONE_STATUS, Order, SubItem } from "../../types.ts";
 import { useAuthenticationService } from "../../services/authentication.ts";
 import { OrdersService } from "../../services/Orders.service.ts";
 import { Loading } from "../../components/Loading.tsx";
-import { LoginHeader } from "../../components/header.tsx";
+import { Header } from "../../components/header.tsx";
 
 import {
   ConfirmDialog,
@@ -143,7 +143,7 @@ export const AssignedOrders = () => {
 
   return (
     <>
-      <LoginHeader />
+      <Header />
       <div style={pageStyle}>
         <Subtitle1 style={titleStyle}>הזמנות</Subtitle1>
         {!myOrders ? (

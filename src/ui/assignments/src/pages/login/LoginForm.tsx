@@ -11,7 +11,7 @@ import {
 } from "@fluentui/react-components";
 import { useNavigate } from "react-router-dom";
 import { useAuthenticationService } from "../../services/authentication";
-import { LoginHeader } from "../../components/header";
+import { Header } from "../../components/header";
 import { ROUTES } from "../../routes-const";
 import { pageStyle } from "../sharedStyles";
 
@@ -61,7 +61,7 @@ export const LoginForm = () => {
 
   return (
     <>
-      <LoginHeader />
+      <Header />
       <div style={pageStyle}>
         <Card style={loginCardStyle}>
           <CardHeader header={<h3>פורטל Restart לעמותות</h3>} />
