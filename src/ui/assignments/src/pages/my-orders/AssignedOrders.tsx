@@ -6,6 +6,8 @@ import {
   CardPreview,
   Body1Stronger,
   Divider,
+  Subtitle1,
+  Subtitle2,
 } from "@fluentui/react-components";
 import {
   TextExpand24Regular,
@@ -135,14 +137,14 @@ export const AssignedOrders = () => {
     <>
       <LoginHeader />
       <div style={pageStyle}>
-        <h2 style={titleStyle}>הזמנות</h2>
+        <Subtitle1 style={titleStyle}>הזמנות</Subtitle1>
         {!myOrders ? (
           <Loading />
         ) : myOrders.length === 0 ? (
-          <h3 style={titleStyle}>אין הזמנות</h3>
+          <Subtitle2 style={titleStyle}>אין הזמנות</Subtitle2>
         ) : (
           myOrders.map((item, index) => {
-            const { id, unit, subItems, region, name, phone, comment } = item;
+            const { id, subItems, comment } = item;
             return (
               <Card key={index} className={styles.card}>
                 <CardHeader

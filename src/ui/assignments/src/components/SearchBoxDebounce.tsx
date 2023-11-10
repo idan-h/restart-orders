@@ -9,6 +9,10 @@ import {
   InputOnChangeData,
 } from "@fluentui/react-components";
 
+const defaultStyle: React.CSSProperties = {
+  width: 250,
+};
+
 const DEBOUNCE_TIME = 500;
 
 const debounceChange = debounce((onChange: ChangeFn, searchText = "") => {
@@ -64,6 +68,7 @@ export const SearchBoxDebounce: React.FunctionComponent<SearchBoxProps> = ({
 
   return (
     <Input
+      style={defaultStyle}
       contentBefore={<SearchRegular />}
       contentAfter={
         searchValue ? <ClearButton onClick={() => immediateChange("")} /> : null

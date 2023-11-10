@@ -9,6 +9,8 @@ import {
   Combobox,
   Field,
   Option,
+  Subtitle1,
+  Subtitle2,
   tokens,
 } from "@fluentui/react-components";
 import {
@@ -189,16 +191,16 @@ export const Orders = () => {
     <>
       <LoginHeader />
       <div style={pageStyle}>
-        <h2 style={titleStyle}>
+        <Subtitle1 style={titleStyle}>
           בקשות{displayedOrders && ` (${displayedOrders?.length})`}
-        </h2>
+        </Subtitle1>
         {saving ? (
           <Loading label="מעדכן..." />
         ) : !displayedOrders ? (
           <Loading />
         ) : (
-          <>
-            <div style={{ display: "flex", gap: 12 }}>
+          <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+            <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
               <Field label="חיפוש">
                 <SearchBoxDebounce onChange={handleSearch} />
               </Field>
@@ -219,7 +221,7 @@ export const Orders = () => {
               </Field>
             </div>
             {displayedOrders.length === 0 ? (
-              <h3 style={titleStyle}>אין בקשות</h3>
+              <Subtitle2 style={titleStyle}>אין בקשות</Subtitle2>
             ) : (
               displayedOrders.map(({ id, unit, subItems, comment }) => {
                 return (
@@ -270,7 +272,7 @@ export const Orders = () => {
                 );
               })
             )}
-          </>
+          </div>
         )}
       </div>
       {displayedOrders?.length && (
