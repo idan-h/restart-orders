@@ -16,7 +16,10 @@ import {
 import { SubItem, VisibleOrder, VisibleSubItem } from "../../types.ts";
 import { useAuthenticationService } from "../../services/authentication.ts";
 import { OrdersService } from "../../services/Orders.service.ts";
-import { filterOrdersByText } from "../../services/filterOrders.ts";
+import {
+  filterOrdersByText,
+  filterOrdersByType,
+} from "../../services/filterOrders.ts";
 import { Header } from "../../components/header.tsx";
 import { Loading } from "../../components/Loading.tsx";
 import { SearchBoxDebounce } from "../../components/SearchBoxDebounce.tsx";
@@ -64,29 +67,12 @@ export const Orders = () => {
     }
   }, [ordersService]);
 
-  const handleTilterByText = (searchText: string) => {
-    filterOrdersByText(searchText, [orders, setOrders]);
+  const handleTilterByText = (searchText?: string) => {
+    filterOrdersByText([orders, setOrders], searchText);
   };
 
   const handleFilterByType = (optionValue?: string) => {
-    if (!orders) {
-      console.error("Orders::handleFilterByType: orders empty");
-      return;
-    }
-
-    optionValue === "All"
-      ? setOrders([...orders])
-      : setOrders((_) =>
-          // $G$  BUG HERE! TODO - fix to work with new visible props
-          orders?.filter(
-            (unit) =>
-              unit.subItems.filter((subItem) =>
-                optionValue
-                  ? subItem.product.type.split(",").includes(optionValue)
-                  : true
-              ).length > 0
-          )
-        );
+    filterOrdersByType([orders, setOrders], optionValue);
   };
 
   const handleToggleSubItem = (

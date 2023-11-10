@@ -12,11 +12,11 @@ const showOrder = (order: VisibleOrder): VisibleOrder => ({
 });
 
 export const filterOrdersByText = (
-  searchText: string,
   [orders, setOrders]: [
     VisibleOrder[] | undefined,
     Dispatch<SetStateAction<VisibleOrder[] | undefined>>
-  ]
+  ],
+  searchText = ""
 ) => {
   console.debug("filterOrders::filterOrdersByText", searchText);
 
@@ -56,5 +56,37 @@ export const filterOrdersByText = (
   } else {
     // clear search - all items visible
     setOrders(orders.map(showOrder));
+  }
+};
+
+export const filterOrdersByType = (
+  [orders, setOrders]: [
+    VisibleOrder[] | undefined,
+    Dispatch<SetStateAction<VisibleOrder[] | undefined>>
+  ],
+  optionValue = "All"
+) => {
+  console.debug("filterOrders::filterOrdersByType", optionValue);
+
+  if (!orders) {
+    console.error("filterOrders::filterOrdersByType: orders empty");
+    return;
+  }
+
+  // $G$  BUG HERE! TODO - fix to work with new visible props
+  if (optionValue === "All") {
+    // clear search - all items visible
+    setOrders([...orders]);
+  } else {
+    setOrders((_) =>
+      orders?.filter(
+        (unit) =>
+          unit.subItems.filter((subItem) =>
+            optionValue
+              ? subItem.product.type.split(",").includes(optionValue)
+              : true
+          ).length > 0
+      )
+    );
   }
 };

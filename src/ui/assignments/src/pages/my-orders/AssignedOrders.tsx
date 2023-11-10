@@ -26,7 +26,11 @@ import {
 import { pageStyle } from "../sharedStyles.ts";
 import { AssignedSubItems } from "./AssignedSubItems.tsx";
 import { SearchBoxDebounce } from "../../components/SearchBoxDebounce.tsx";
-import { filterOrdersByText } from "../../services/filterOrders.ts";
+import { TypeFilter } from "../../components/TypeFilter.tsx";
+import {
+  filterOrdersByText,
+  filterOrdersByType,
+} from "../../services/filterOrders.ts";
 
 const useStyles = makeStyles({
   card: {
@@ -80,8 +84,12 @@ export const AssignedOrders = () => {
     }
   }, []);
 
-  const handleTilterByText = (searchText: string) => {
-    filterOrdersByText(searchText, [myOrders, setMyOrders]);
+  const handleTilterByText = (searchText?: string) => {
+    filterOrdersByText([myOrders, setMyOrders], searchText);
+  };
+
+  const handleFilterByType = (optionValue?: string) => {
+    filterOrdersByType([myOrders, setMyOrders], optionValue);
   };
 
   const handleSubItemStatusChange = (
@@ -214,10 +222,9 @@ export const AssignedOrders = () => {
               <Field label="חיפוש" style={{ flex: 1 }}>
                 <SearchBoxDebounce onChange={handleTilterByText} />
               </Field>
-              {/* TODO: ADD TYPE FILTER
               <Field label="סינון לפי סוג" style={{ flex: 1 }}>
                 <TypeFilter onChange={handleFilterByType} />
-              </Field> */}
+              </Field>
             </div>
             {myOrders.length === 0 ? (
               <SubHeader2>אין הזמנות</SubHeader2>
