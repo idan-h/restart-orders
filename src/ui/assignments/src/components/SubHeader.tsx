@@ -1,5 +1,5 @@
 import React from "react";
-import { Subtitle1 } from "@fluentui/react-components";
+import { Subtitle1, Subtitle2 } from "@fluentui/react-components";
 
 const subHeaderStyle: React.CSSProperties = {
   display: "block",
@@ -10,3 +10,7 @@ const subHeaderStyle: React.CSSProperties = {
 export const SubHeader: React.FunctionComponent<{
   children: React.ReactNode;
 }> = ({ children }) => <Subtitle1 style={subHeaderStyle}>{children}</Subtitle1>;
+
+export const SubHeader2: React.FunctionComponent<{
+  children: React.ReactNode;
+}> = ({ children }) => <Subtitle2 style={subHeaderStyle}>{children}</Subtitle2>;

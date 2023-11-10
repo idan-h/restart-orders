@@ -6,11 +6,7 @@ import {
   Card,
   CardHeader,
   CardPreview,
-  Combobox,
   Field,
-  Option,
-  Subtitle1,
-  Subtitle2,
   tokens,
 } from "@fluentui/react-components";
 import {
@@ -22,12 +18,13 @@ import { ROUTES } from "../../routes-const.ts";
 import { SubItem, VisibleOrder } from "../../types.ts";
 import { useAuthenticationService } from "../../services/authentication.ts";
 import { OrdersService } from "../../services/Orders.service.ts";
-import { SubItems } from "./SubItems.tsx";
 import { Header } from "../../components/header.tsx";
 import { Loading } from "../../components/Loading.tsx";
 import { SearchBoxDebounce } from "../../components/SearchBoxDebounce.tsx";
+import { SubHeader, SubHeader2 } from "../../components/SubHeader.tsx";
+import { TypeFilter } from "../../components/TypeFilter.tsx";
+import { SubItems } from "./SubItems.tsx";
 import { pageStyle } from "../sharedStyles.ts";
-import { SubHeader } from "../../components/SubHeader.tsx";
 
 /** show order and all sub items */
 const showOrder = (order: VisibleOrder): VisibleOrder => ({
@@ -103,7 +100,7 @@ export const Orders = () => {
     setOrders([...orders]);
   };
 
-  const handleSearch = (searchText: string) => {
+  const handleTilterByText = (searchText: string) => {
     console.debug("Orders::handleSearch", searchText);
 
     if (!orders) {
@@ -145,34 +142,28 @@ export const Orders = () => {
     }
   };
 
+  // $G$ TODO - fix to work with visible props
+  const handleFilterByType = (optionValue?: string) => {
+    optionValue === "All"
+      ? setOrders(orders)
+      : setOrders((_) =>
+          orders?.filter(
+            (unit) =>
+              unit.subItems.filter((subItem) =>
+                optionValue
+                  ? subItem.product.type.split(",").includes(optionValue)
+                  : true
+              ).length > 0
+          )
+        );
+  };
+
   const toggleOpenNote = (id: number) => {
     setOpenNoteIds((openNoteIds) =>
       openNoteIds.includes(id)
         ? openNoteIds.filter((openNoteId) => openNoteId !== id)
         : [...openNoteIds, id]
     );
-  };
-
-  const handleFilterByTypeChange = (
-    _: unknown,
-    data: {
-      optionValue: string | undefined;
-      optionText: string | undefined;
-      selectedOptions: string[];
-    }
-  ) => {
-    data.optionValue === "All"
-      ? setOrders(orders)
-      : setOrders((_) =>
-          orders?.filter(
-            (unit) =>
-              unit.subItems.filter((subItem) =>
-                data.optionValue
-                  ? subItem.product.type.split(",").includes(data.optionValue)
-                  : true
-              ).length > 0
-          )
-        );
   };
 
   const handleSubmit = async () => {
@@ -219,29 +210,19 @@ export const Orders = () => {
           <Loading />
         ) : (
           <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+            {/* filters */}
             <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
               <Field label="חיפוש">
-                <SearchBoxDebounce onChange={handleSearch} />
+                <SearchBoxDebounce onChange={handleTilterByText} />
               </Field>
               <Field label="סינון לפי סוג">
-                <Combobox onOptionSelect={handleFilterByTypeChange}>
-                  {[
-                    { key: "All", value: "הכל" },
-                    { key: "IDF", value: "צהל" },
-                    { key: "EMR", value: "כיתת כוננות" },
-                    { key: "SEW", value: "תיקוני מתפרה" },
-                    { key: "SEWMAN", value: "ייצור מתפרה" },
-                  ].map((option) => (
-                    <Option key={option.key} value={option.key}>
-                      {option.value}
-                    </Option>
-                  ))}
-                </Combobox>
+                <TypeFilter onChange={handleFilterByType} />
               </Field>
             </div>
+
             {orders.length === 0 ? (
               // $G$ TODO - also show if filter has no results
-              <Subtitle2 style={titleStyle}>אין בקשות</Subtitle2>
+              <SubHeader2>אין בקשות</SubHeader2>
             ) : (
               orders
                 .filter((order) => !order.hidden)

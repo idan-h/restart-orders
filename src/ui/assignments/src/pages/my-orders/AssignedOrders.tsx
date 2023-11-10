@@ -6,7 +6,6 @@ import {
   CardPreview,
   Body1Stronger,
   Divider,
-  Subtitle2,
 } from "@fluentui/react-components";
 import {
   TextExpand24Regular,
@@ -18,14 +17,13 @@ import { useAuthenticationService } from "../../services/authentication.ts";
 import { OrdersService } from "../../services/Orders.service.ts";
 import { Loading } from "../../components/Loading.tsx";
 import { Header } from "../../components/header.tsx";
-
+import { SubHeader, SubHeader2 } from "../../components/SubHeader.tsx";
 import {
   ConfirmDialog,
   ConfirmDialogProps,
 } from "../../components/ConfirmDialog.tsx";
 import { pageStyle } from "../sharedStyles.ts";
 import { AssignedSubItems } from "./AssignedSubItems.tsx";
-import { SubHeader } from "../../components/SubHeader.tsx";
 
 const useStyles = makeStyles({
   card: {
@@ -149,7 +147,7 @@ export const AssignedOrders = () => {
         {!myOrders ? (
           <Loading />
         ) : myOrders.length === 0 ? (
-          <Subtitle2 style={titleStyle}>אין הזמנות</Subtitle2>
+          <SubHeader2>אין הזמנות</SubHeader2>
         ) : (
           myOrders.map((item, index) => {
             const { id, subItems, comments } = item;
