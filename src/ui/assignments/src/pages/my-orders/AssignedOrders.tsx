@@ -6,13 +6,14 @@ import {
   CardPreview,
   Body1Stronger,
   Divider,
+  Field,
 } from "@fluentui/react-components";
 import {
   TextExpand24Regular,
   TextCollapse24Filled,
 } from "@fluentui/react-icons";
 
-import { DONE_STATUS, Order, SubItem } from "../../types.ts";
+import { DONE_STATUS, VisibleOrder, SubItem } from "../../types.ts";
 import { useAuthenticationService } from "../../services/authentication.ts";
 import { OrdersService } from "../../services/Orders.service.ts";
 import { Loading } from "../../components/Loading.tsx";
@@ -24,6 +25,8 @@ import {
 } from "../../components/ConfirmDialog.tsx";
 import { pageStyle } from "../sharedStyles.ts";
 import { AssignedSubItems } from "./AssignedSubItems.tsx";
+import { SearchBoxDebounce } from "../../components/SearchBoxDebounce.tsx";
+import { filterOrdersByText } from "../../services/filterOrders.ts";
 
 const useStyles = makeStyles({
   card: {
@@ -36,7 +39,7 @@ const useStyles = makeStyles({
 export const AssignedOrders = () => {
   const styles = useStyles();
 
-  const [myOrders, setMyOrders] = useState<Order[] | undefined>();
+  const [myOrders, setMyOrders] = useState<VisibleOrder[] | undefined>();
   const [statusesList, setStatusesList] = useState<string[] | undefined>();
 
   const [openNoteIds, setOpenNoteIds] = useState<number[]>([]);
@@ -76,6 +79,10 @@ export const AssignedOrders = () => {
         .then((_statusesList) => setStatusesList(_statusesList));
     }
   }, []);
+
+  const handleTilterByText = (searchText: string) => {
+    filterOrdersByText(searchText, [myOrders, setMyOrders]);
+  };
 
   const handleSubItemStatusChange = (
     orderId: number,
@@ -200,66 +207,81 @@ export const AssignedOrders = () => {
         <SubHeader>הזמנות{myOrders && ` (${myOrders?.length})`}</SubHeader>
         {!myOrders ? (
           <Loading />
-        ) : myOrders.length === 0 ? (
-          <SubHeader2>אין הזמנות</SubHeader2>
         ) : (
-          myOrders.map((item, index) => {
-            const { id, subItems, comments } = item;
-            return (
-              <Card key={index} className={styles.card}>
-                <CardHeader
-                  header={
-                    <div
-                      style={{
-                        display: "flex",
-                        flexDirection: "column",
-                        width: "-webkit-fill-available",
-                      }}
-                    >
-                      {/* <ContactPersonDetailsTable items={[item]} /> */}
-                      <Body1Stronger>
-                        {item.unit} {item.region}
-                      </Body1Stronger>
-                      <Body1Stronger>{item.name}</Body1Stronger>
-                      <Body1Stronger>{item.phone}</Body1Stronger>
-                      <Divider />
-                      <Divider />
-                    </div>
-                  }
-                />
-                <CardPreview>
-                  <AssignedSubItems
-                    items={subItems}
-                    statusesList={statusesList ?? []}
-                    onStatusChange={(item, status) =>
-                      confirmSubItemStatusChange(id, item, status)
-                    }
-                    onDelete={(item) => confirmSubItemRemove(id, item)}
-                  />
-                  {comments && (
-                    <a
-                      style={{
-                        display: "flex",
-                        alignItems: "center",
-                        margin: 10,
-                      }}
-                      onClick={() => toggleOpenNote(id)}
-                    >
-                      הערות
-                      {openNoteIds.includes(id) ? (
-                        <TextCollapse24Filled />
-                      ) : (
-                        <TextExpand24Regular />
+          <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+            {/* filters */}
+            <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
+              <Field label="חיפוש" style={{ flex: 1 }}>
+                <SearchBoxDebounce onChange={handleTilterByText} />
+              </Field>
+              {/* TODO: ADD TYPE FILTER
+              <Field label="סינון לפי סוג" style={{ flex: 1 }}>
+                <TypeFilter onChange={handleFilterByType} />
+              </Field> */}
+            </div>
+            {myOrders.length === 0 ? (
+              <SubHeader2>אין הזמנות</SubHeader2>
+            ) : (
+              myOrders
+                .filter((order) => !order.hidden)
+                .map((order, index) => (
+                  <Card key={index} className={styles.card}>
+                    <CardHeader
+                      header={
+                        <div
+                          style={{
+                            display: "flex",
+                            flexDirection: "column",
+                            width: "-webkit-fill-available",
+                          }}
+                        >
+                          {/* <ContactPersonDetailsTable items={[item]} /> */}
+                          <Body1Stronger>
+                            {order.unit} {order.region}
+                          </Body1Stronger>
+                          <Body1Stronger>{order.name}</Body1Stronger>
+                          <Body1Stronger>{order.phone}</Body1Stronger>
+                          <Divider />
+                          <Divider />
+                        </div>
+                      }
+                    />
+                    <CardPreview>
+                      <AssignedSubItems
+                        items={order.subItems}
+                        statusesList={statusesList ?? []}
+                        onStatusChange={(item, status) =>
+                          confirmSubItemStatusChange(order.id, item, status)
+                        }
+                        onDelete={(item) =>
+                          confirmSubItemRemove(order.id, item)
+                        }
+                      />
+                      {order.comments && (
+                        <a
+                          style={{
+                            display: "flex",
+                            alignItems: "center",
+                            margin: 10,
+                          }}
+                          onClick={() => toggleOpenNote(order.id)}
+                        >
+                          הערות
+                          {openNoteIds.includes(order.id) ? (
+                            <TextCollapse24Filled />
+                          ) : (
+                            <TextExpand24Regular />
+                          )}
+                        </a>
                       )}
-                    </a>
-                  )}
-                  {openNoteIds.includes(id) ? (
-                    <p style={{ margin: 10 }}>{comments}</p>
-                  ) : null}
-                </CardPreview>
-              </Card>
-            );
-          })
+                      {openNoteIds.includes(order.id) ? (
+                        <p style={{ margin: 10 }}>{order.comments}</p>
+                      ) : null}
+                    </CardPreview>
+                  </Card>
+                ))
+            )}
+          </div>
         )}
       </div>
       {confirmProps && (

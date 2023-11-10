@@ -16,6 +16,7 @@ import {
 import { SubItem, VisibleOrder, VisibleSubItem } from "../../types.ts";
 import { useAuthenticationService } from "../../services/authentication.ts";
 import { OrdersService } from "../../services/Orders.service.ts";
+import { filterOrdersByText } from "../../services/filterOrders.ts";
 import { Header } from "../../components/header.tsx";
 import { Loading } from "../../components/Loading.tsx";
 import { SearchBoxDebounce } from "../../components/SearchBoxDebounce.tsx";
@@ -27,16 +28,6 @@ import {
 } from "../../components/ConfirmDialog.tsx";
 import { SubItems } from "./SubItems.tsx";
 import { pageStyle } from "../sharedStyles.ts";
-
-/** show order and all sub items */
-const showOrder = (order: VisibleOrder): VisibleOrder => ({
-  ...order,
-  subItems: order.subItems.map((subItem) => ({
-    ...subItem,
-    hidden: false,
-  })),
-  hidden: false,
-});
 
 export const Orders = () => {
   const [orders, setOrders] = useState<VisibleOrder[] | undefined>(); // all orders
@@ -73,6 +64,31 @@ export const Orders = () => {
     }
   }, [ordersService]);
 
+  const handleTilterByText = (searchText: string) => {
+    filterOrdersByText(searchText, [orders, setOrders]);
+  };
+
+  const handleFilterByType = (optionValue?: string) => {
+    if (!orders) {
+      console.error("Orders::handleFilterByType: orders empty");
+      return;
+    }
+
+    optionValue === "All"
+      ? setOrders([...orders])
+      : setOrders((_) =>
+          // $G$  BUG HERE! TODO - fix to work with new visible props
+          orders?.filter(
+            (unit) =>
+              unit.subItems.filter((subItem) =>
+                optionValue
+                  ? subItem.product.type.split(",").includes(optionValue)
+                  : true
+              ).length > 0
+          )
+        );
+  };
+
   const handleToggleSubItem = (
     orderId: number,
     subItem: SubItem,
@@ -103,69 +119,6 @@ export const Orders = () => {
     };
 
     setOrders([...orders]);
-  };
-
-  const handleTilterByText = (searchText: string) => {
-    console.debug("Orders::handleTilterByText", searchText);
-
-    if (!orders) {
-      console.error("Orders::handleTilterByText: orders empty");
-      return;
-    }
-
-    if (searchText) {
-      setOrders(
-        orders.map((order) => {
-          if (order.unit?.includes(searchText)) {
-            // title includes search - show order and all sub-items
-            return showOrder(order);
-          } else {
-            let isOrderVisible = false;
-
-            const filteredSubItems = order.subItems.map((subItem) => {
-              const isItemVisible = !subItem.product.name.includes(searchText);
-
-              isOrderVisible = isOrderVisible || isItemVisible; // the order is visible if at least one sub-item is visible
-
-              return {
-                ...subItem,
-                hidden: isItemVisible,
-              };
-            });
-
-            return {
-              ...order,
-              subItems: filteredSubItems,
-              hidden: !isOrderVisible,
-            };
-          }
-        })
-      );
-    } else {
-      // clear search - all items visible
-      setOrders(orders.map(showOrder));
-    }
-  };
-
-  const handleFilterByType = (optionValue?: string) => {
-    if (!orders) {
-      console.error("Orders::handleFilterByType: orders empty");
-      return;
-    }
-
-    optionValue === "All"
-      ? setOrders([...orders])
-      : setOrders((_) =>
-          // $G$  BUG HERE! TODO - fix to work with new visible props
-          orders?.filter(
-            (unit) =>
-              unit.subItems.filter((subItem) =>
-                optionValue
-                  ? subItem.product.type.split(",").includes(optionValue)
-                  : true
-              ).length > 0
-          )
-        );
   };
 
   const toggleOpenNote = (id: number) => {
