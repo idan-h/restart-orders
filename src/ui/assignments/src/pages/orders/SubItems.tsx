@@ -8,12 +8,12 @@ import {
   createTableColumn,
 } from "@fluentui/react-components";
 
-import { SubItem, VisibleSubItem } from "../../types.ts";
+import { VisibleSubItem } from "../../types.ts";
 import React from "react";
 
 export interface SubItemsProps {
   items: VisibleSubItem[];
-  onToggle: (subItem: SubItem, isChecked: boolean) => void;
+  onToggle: (subItem: VisibleSubItem, isChecked: boolean) => void;
 }
 
 export const SubItems: React.FunctionComponent<SubItemsProps> = ({
@@ -22,9 +22,9 @@ export const SubItems: React.FunctionComponent<SubItemsProps> = ({
 }) => {
   const columns = [
     // Info
-    createTableColumn<SubItem>({
+    createTableColumn<VisibleSubItem>({
       columnId: "file",
-      renderCell: (item: SubItem) => {
+      renderCell: (item: VisibleSubItem) => {
         return (
           <DataGridCell>
             <TableCellLayout>{item.product.name}</TableCellLayout>
@@ -33,9 +33,9 @@ export const SubItems: React.FunctionComponent<SubItemsProps> = ({
       },
     }),
     // Quantity
-    createTableColumn<SubItem>({
+    createTableColumn<VisibleSubItem>({
       columnId: "quantity",
-      renderCell: (item: SubItem) => {
+      renderCell: (item: VisibleSubItem) => {
         return (
           <DataGridCell>
             <TableCellLayout>{item.quantity}</TableCellLayout>
@@ -44,9 +44,9 @@ export const SubItems: React.FunctionComponent<SubItemsProps> = ({
       },
     }),
     // Toggle status
-    createTableColumn<SubItem>({
+    createTableColumn<VisibleSubItem>({
       columnId: "status",
-      renderCell: (subItem: SubItem) => {
+      renderCell: (subItem: VisibleSubItem) => {
         return (
           <DataGridCell>
             <TableCellLayout style={{ flexDirection: "row-reverse" }}>
@@ -71,9 +71,9 @@ export const SubItems: React.FunctionComponent<SubItemsProps> = ({
         status: { minWidth: 80 },
       }}
     >
-      <DataGridBody<SubItem>>
+      <DataGridBody<VisibleSubItem>>
         {({ item, rowId }) => (
-          <DataGridRow<SubItem>
+          <DataGridRow<VisibleSubItem>
             key={rowId}
             onClick={() => {
               const isPrevChecked = Boolean(item.userId);

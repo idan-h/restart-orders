@@ -14,25 +14,25 @@ import {
 } from "@fluentui/react-components";
 import { Delete24Regular } from "@fluentui/react-icons";
 
-import { DONE_STATUS, SubItem } from "../../types.ts";
+import { DONE_STATUS, VisibleSubItem } from "../../types.ts";
 
 export interface AssignedSubItemsProps {
-  items: SubItem[];
+  items: VisibleSubItem[];
   statusesList: string[];
-  onStatusChange: (subItem: SubItem, status: string) => void;
-  onDelete: (subItem: SubItem) => void;
+  onStatusChange: (subItem: VisibleSubItem, status: string) => void;
+  onDelete: (subItem: VisibleSubItem) => void;
 }
 
 export const AssignedSubItems: React.FunctionComponent<
   AssignedSubItemsProps
 > = ({ items, statusesList, onStatusChange, onDelete }) => {
   const columns = [
-    createTableColumn<SubItem>({
+    createTableColumn<VisibleSubItem>({
       columnId: "itemDescription",
       renderHeaderCell: () => {
         return "פריט";
       },
-      renderCell: (item: SubItem) => {
+      renderCell: (item: VisibleSubItem) => {
         return (
           <DataGridCell>
             <TableCellLayout>{item.product.name}</TableCellLayout>
@@ -40,7 +40,7 @@ export const AssignedSubItems: React.FunctionComponent<
         );
       },
     }),
-    createTableColumn<SubItem>({
+    createTableColumn<VisibleSubItem>({
       columnId: "quantity",
       renderHeaderCell: () => {
         return "כמות";
@@ -53,7 +53,7 @@ export const AssignedSubItems: React.FunctionComponent<
         );
       },
     }),
-    createTableColumn<SubItem>({
+    createTableColumn<VisibleSubItem>({
       columnId: "status",
       renderHeaderCell: () => {
         return "סטטוס";
@@ -81,7 +81,7 @@ export const AssignedSubItems: React.FunctionComponent<
         );
       },
     }),
-    createTableColumn<SubItem>({
+    createTableColumn<VisibleSubItem>({
       columnId: "delete",
       renderHeaderCell: () => {
         return "";
@@ -119,7 +119,7 @@ export const AssignedSubItems: React.FunctionComponent<
   };
   return (
     <DataGrid
-      items={items}
+      items={items.filter((item) => !item.hidden)}
       columns={columns}
       getRowId={(item) => item.id}
       columnSizingOptions={columnSizing}
@@ -131,9 +131,9 @@ export const AssignedSubItems: React.FunctionComponent<
           )}
         </DataGridRow>
       </DataGridHeader>
-      <DataGridBody<SubItem>>
+      <DataGridBody<VisibleSubItem>>
         {({ item, rowId }) => (
-          <DataGridRow<SubItem> key={rowId}>
+          <DataGridRow<VisibleSubItem> key={rowId}>
             {({ renderCell }) => renderCell(item)}
           </DataGridRow>
         )}

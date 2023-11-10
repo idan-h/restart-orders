@@ -35,13 +35,13 @@ export const filterOrdersByText = (
           let isOrderVisible = false;
 
           const filteredSubItems = order.subItems.map((subItem) => {
-            const isItemVisible = !subItem.product.name.includes(searchText);
+            const isItemVisible = subItem.product.name.includes(searchText);
 
             isOrderVisible = isOrderVisible || isItemVisible; // the order is visible if at least one sub-item is visible
 
             return {
               ...subItem,
-              hidden: isItemVisible,
+              hidden: !isItemVisible,
             };
           });
 
