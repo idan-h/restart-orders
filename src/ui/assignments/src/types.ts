@@ -1,8 +1,16 @@
 export const DONE_STATUS = "בוצע";
 
-interface Visible {
-  /** hidden due to user filter */
-  hidden?: boolean;
+export interface Filter {
+  /** match text filter */
+  text: boolean;
+  /** match status filter */
+  type: boolean;
+  /** match done filter */
+  done: boolean;
+}
+
+export interface Filtered {
+  filter: Filter;
 }
 
 // ---------------------------------------------------
@@ -35,7 +43,7 @@ export type SubItem = BaseSubItem & {
   product: Product;
 };
 
-export type VisibleSubItem = SubItem & Visible;
+export type FilteredSubItem = SubItem & Filtered;
 
 // ---------------------------------------------------
 
@@ -77,11 +85,9 @@ export type Order = {
   subItems: SubItem[];
 };
 
-export type ContactPersonDetails = Order;
-
-export type VisibleOrder = Order &
-  Visible & {
-    subItems: Array<VisibleSubItem>;
+export type FilteredOrder = Order &
+  Filtered & {
+    subItems: Array<FilteredSubItem>;
   };
 
 // ---------------------------------------------------

@@ -5,11 +5,12 @@ import { SearchRegular, DismissRegular } from "@fluentui/react-icons";
 import {
   Button,
   ButtonProps,
+  Field,
   Input,
   InputOnChangeData,
 } from "@fluentui/react-components";
 
-const DEBOUNCE_TIME = 500;
+const DEBOUNCE_TIME = 400;
 
 const debounceChange = debounce((onChange: ChangeFn, searchText = "") => {
   onChange(searchText);
@@ -31,11 +32,13 @@ export type ChangeFn = (searchText: string) => void;
 export interface SearchBoxProps {
   /** Debounced event callback  */
   onChange: ChangeFn;
+  style?: React.CSSProperties;
 }
 
 /** Search box with debounced change event */
 export const SearchBoxDebounce: React.FunctionComponent<SearchBoxProps> = ({
   onChange: notifyChange,
+  style = {},
 }) => {
   const [searchValue, setSearchValue] = useState<string>("");
 
@@ -63,15 +66,19 @@ export const SearchBoxDebounce: React.FunctionComponent<SearchBoxProps> = ({
   );
 
   return (
-    <Input
-      contentBefore={<SearchRegular />}
-      contentAfter={
-        searchValue ? <ClearButton onClick={() => immediateChange("")} /> : null
-      }
-      placeholder="חיפוש"
-      value={searchValue}
-      onChange={inputChange}
-      autoComplete="off"
-    />
+    <Field label="חיפוש" style={style}>
+      <Input
+        contentBefore={<SearchRegular />}
+        contentAfter={
+          searchValue ? (
+            <ClearButton onClick={() => immediateChange("")} />
+          ) : null
+        }
+        placeholder="חיפוש"
+        value={searchValue}
+        onChange={inputChange}
+        autoComplete="off"
+      />
+    </Field>
   );
 };

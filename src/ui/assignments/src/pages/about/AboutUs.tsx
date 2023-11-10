@@ -1,7 +1,7 @@
 import { AddCircle28Regular, Checkmark28Regular } from "@fluentui/react-icons";
 
 import { Microsoft, Monday, Restart, Oracle, Firma } from "./images";
-import { Header } from "../../components/header";
+import { AppHeader } from "../../components/AppHeader";
 import { pageStyle } from "../sharedStyles";
 
 const TextLine = (text: string) => {
@@ -25,7 +25,7 @@ const TextLine2 = (text: string) => {
 export const AboutUs = () => {
   return (
     <>
-      <Header />
+      <AppHeader />
       <div style={pageStyle}>
         <h1 style={{ textAlign: "center" }}>מי אנחנו</h1>
         <p>
@@ -37,7 +37,6 @@ export const AboutUs = () => {
             "עבודה משותפת עם עמותות, ספקים ותורמים על מנת ליצור מערכת משותפת של אספקת הציוד לחיילים בצורה היעילה ביותר"
           )}
           {TextLine("אוטובוס הקסמים- אמלחייה ניידת לתיקון הציוד שלכם")}
-          {TextLine("איסוף תרומות לקניית הציוד")}
         </p>
 
         <h1 style={{ textAlign: "center" }}>איך זה יעבוד</h1>

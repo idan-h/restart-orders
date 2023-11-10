@@ -1,4 +1,4 @@
-import { makeAuthenticationService } from "./authentication";
+import { makeAuthenticationService } from "../services/Authentication";
 
 export function makeFakeAuthenticationService(): ReturnType<
   typeof makeAuthenticationService
@@ -12,7 +12,7 @@ export function makeFakeAuthenticationService(): ReturnType<
       localStorage.setItem("fakeUserId", userId);
     },
     getUserId() {
-      return userId ;
+      return userId;
     },
     logout() {
       userId = undefined;

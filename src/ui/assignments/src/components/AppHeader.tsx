@@ -2,7 +2,8 @@ import React from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Info24Regular, SignOut24Regular } from "@fluentui/react-icons";
 import { Button, tokens } from "@fluentui/react-components";
-import { useAuthenticationService } from "../services/authentication";
+
+import { useAuthenticationService } from "../services/Authentication";
 import { ROUTES } from "../routes-const";
 
 const headerStyle: React.CSSProperties = {
@@ -21,7 +22,7 @@ const selectedRouteStyle: React.CSSProperties = {
   borderRadius: "0px",
 };
 
-export const Header: React.FunctionComponent = () => {
+export const AppHeader: React.FunctionComponent = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { logout, isLoggedIn } = useAuthenticationService();

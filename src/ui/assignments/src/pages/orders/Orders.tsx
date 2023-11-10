@@ -5,7 +5,6 @@ import {
   Card,
   CardHeader,
   CardPreview,
-  Field,
   tokens,
 } from "@fluentui/react-components";
 import {
@@ -13,27 +12,28 @@ import {
   TextCollapse24Filled,
 } from "@fluentui/react-icons";
 
-import { SubItem, VisibleOrder, VisibleSubItem } from "../../types.ts";
-import { useAuthenticationService } from "../../services/authentication.ts";
-import { OrdersService } from "../../services/orders.service.ts";
+import { FilteredOrder, FilteredSubItem } from "../../types.ts";
+import { useAuthenticationService } from "../../services/Authentication.ts";
+import { OrdersService } from "../../services/Orders.service.ts";
 import {
   filterOrdersByText,
   filterOrdersByType,
-} from "../../services/filterOrders.ts";
-import { Header } from "../../components/header.tsx";
+  isVisible,
+  showOrder,
+} from "../../services/Filters.service.ts";
+import { AppHeader } from "../../components/AppHeader.tsx";
 import { Loading } from "../../components/Loading.tsx";
-import { SearchBoxDebounce } from "../../components/SearchBoxDebounce.tsx";
 import { SubHeader, SubHeader2 } from "../../components/SubHeader.tsx";
-import { TypeFilter } from "../../components/TypeFilter.tsx";
 import {
   ConfirmDialog,
   ConfirmDialogProps,
 } from "../../components/ConfirmDialog.tsx";
+import { Filters } from "../../components/filters/Filters.tsx";
 import { SubItems } from "./SubItems.tsx";
 import { pageStyle } from "../sharedStyles.ts";
 
 export const Orders = () => {
-  const [orders, setOrders] = useState<VisibleOrder[] | undefined>(); // all orders
+  const [orders, setOrders] = useState<FilteredOrder[] | undefined>(); // all orders
   const [openNoteIds, setOpenNoteIds] = useState<number[]>([]); // open notes ids (used to toggle open notes)
   const [saving, setSaving] = useState(false); // saving state (used for saving spinner and block submit button)
 
@@ -62,7 +62,7 @@ export const Orders = () => {
 
     if (!orders) {
       ordersService.fetchUnassignedOrders().then((items) => {
-        setOrders(items.orders);
+        setOrders(items.orders.map((order) => showOrder(order)));
       });
     }
   }, [ordersService]);
@@ -77,7 +77,7 @@ export const Orders = () => {
 
   const handleToggleSubItem = (
     orderId: number,
-    subItem: SubItem,
+    subItem: FilteredSubItem,
     isChecked: boolean
   ) => {
     if (!orders) {
@@ -128,17 +128,17 @@ export const Orders = () => {
 
     // The server is slow. We first call the assign method but we still.
     // The filter out the items that where assigned. All the assigned items and orders that don't have any un-assigned items left.
-    let subItemsToAssign: VisibleSubItem[] = [];
-    const ordersToKeep: VisibleOrder[] = [];
+    let subItemsToAssign: FilteredSubItem[] = [];
+    const ordersToKeep: FilteredOrder[] = [];
 
     try {
       setSaving(true);
 
       orders.forEach((order) => {
-        const itemsToKeep: VisibleSubItem[] = []; // will be kept
-        const itemsToRemove: VisibleSubItem[] = []; // will be assigned
+        const itemsToKeep: FilteredSubItem[] = []; // will be kept
+        const itemsToRemove: FilteredSubItem[] = []; // will be assigned
 
-        order.subItems.forEach((subItem) =>
+        order.subItems.forEach((subItem: FilteredSubItem) =>
           subItem.userId
             ? itemsToRemove.push(subItem)
             : itemsToKeep.push(subItem)
@@ -189,7 +189,7 @@ export const Orders = () => {
 
   return (
     <>
-      <Header />
+      <AppHeader />
       <div style={pageStyle}>
         <SubHeader>בקשות{orders && ` (${orders?.length})`}</SubHeader>
         {saving ? (
@@ -198,68 +198,61 @@ export const Orders = () => {
           <Loading />
         ) : (
           <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-            {/* filters */}
-            <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
-              <Field label="חיפוש" style={{ flex: 1 }}>
-                <SearchBoxDebounce onChange={handleTilterByText} />
-              </Field>
-              <Field label="סינון לפי סוג" style={{ flex: 1 }}>
-                <TypeFilter onChange={handleFilterByType} />
-              </Field>
-            </div>
+            <Filters
+              onTextFilter={handleTilterByText}
+              onTypeFilter={handleFilterByType}
+            />
 
             {orders.length === 0 ? (
-              // $G$ TODO - also show if filter has no results
               <SubHeader2>אין בקשות</SubHeader2>
             ) : (
-              orders
-                .filter((order) => !order.hidden)
-                .map(({ id, unit, subItems, comments }) => (
-                  <Card
-                    key={id}
-                    style={{
-                      textAlign: "right",
-                      width: "100%",
-                      marginBottom: "30px",
-                    }}
-                  >
-                    <CardHeader
-                      header={
-                        <Body1 style={{ textAlign: "left" }}>
-                          <b>{unit ?? "no name"}</b>
-                        </Body1>
-                      }
-                    />
-                    <CardPreview>
-                      <SubItems
-                        items={subItems}
-                        onToggle={(subItem: SubItem, isChecked: boolean) =>
-                          handleToggleSubItem(id, subItem, isChecked)
+              <>
+                {orders
+                  .filter(isVisible)
+                  .map(({ id, unit, subItems, comments }, index) => (
+                    <Card key={index} style={{ marginBottom: "30px" }}>
+                      <CardHeader
+                        header={
+                          <Body1 style={{ textAlign: "left" }}>
+                            <b>{unit ?? "no name"}</b>
+                          </Body1>
                         }
                       />
-                      {comments && (
-                        <a
-                          style={{
-                            display: "flex",
-                            alignItems: "center",
-                            margin: 10,
-                          }}
-                          onClick={() => toggleOpenNote(id)}
-                        >
-                          הערות
-                          {openNoteIds.includes(id) ? (
-                            <TextCollapse24Filled />
-                          ) : (
-                            <TextExpand24Regular />
-                          )}
-                        </a>
-                      )}
-                      {openNoteIds.includes(id) ? (
-                        <p style={{ margin: 10 }}>{comments}</p>
-                      ) : null}
-                    </CardPreview>
-                  </Card>
-                ))
+                      <CardPreview>
+                        <SubItems
+                          items={subItems}
+                          onToggle={(
+                            subItem: FilteredSubItem,
+                            isChecked: boolean
+                          ) => handleToggleSubItem(id, subItem, isChecked)}
+                        />
+                        {comments && (
+                          <a
+                            style={{
+                              display: "flex",
+                              alignItems: "center",
+                              margin: 10,
+                            }}
+                            onClick={() => toggleOpenNote(id)}
+                          >
+                            הערות
+                            {openNoteIds.includes(id) ? (
+                              <TextCollapse24Filled />
+                            ) : (
+                              <TextExpand24Regular />
+                            )}
+                          </a>
+                        )}
+                        {openNoteIds.includes(id) ? (
+                          <p style={{ margin: 10 }}>{comments}</p>
+                        ) : null}
+                      </CardPreview>
+                    </Card>
+                  ))}
+                {!orders.some(isVisible) && (
+                  <SubHeader2>אין בקשות תואמת את הסינון</SubHeader2>
+                )}
+              </>
             )}
           </div>
         )}
