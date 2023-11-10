@@ -5,6 +5,7 @@ import {
   CardHeader,
   CardPreview,
   Body1Stronger,
+  Divider,
 } from "@fluentui/react-components";
 import {
   TextExpand24Regular,
@@ -22,6 +23,7 @@ import {
   ConfirmDialog,
   ConfirmDialogProps,
 } from "../../components/ConfirmDialog.tsx";
+import { ContactPersonDetailsTable } from "./ContactPersonDetails.tsx";
 
 const useStyles = makeStyles({
   card: {
@@ -139,24 +141,16 @@ export const AssignedOrders = () => {
         ) : myOrders.length === 0 ? (
           <h3 style={titleStyle}>אין הזמנות</h3>
         ) : (
-          myOrders.map(
-            ({ id, unit, subItems, region, name, phone, comment }, index) => (
+          myOrders.map((item, index) => {
+            const { id, unit, subItems, region, name, phone, comment } = item;
+            return (
               <Card key={index} className={styles.card}>
                 <CardHeader
                   header={
-                    <div
-                      style={{
-                        width: "100%",
-                        display: "flex",
-                        flexDirection: "column",
-                        alignItems: "flex-start",
-                      }}
-                    >
-                      <Body1Stronger style={{ textAlign: "left" }}>
-                        {name}-{unit}-{region ?? "אזור לא ידוע"}
-                      </Body1Stronger>
-                      <Body1Stronger>{phone}</Body1Stronger>
-                    </div>
+                    <>
+                      <ContactPersonDetailsTable items={[item]} />
+                      <Divider />
+                    </>
                   }
                 />
                 <CardPreview>
@@ -216,8 +210,8 @@ export const AssignedOrders = () => {
                   ) : null}
                 </CardPreview>
               </Card>
-            )
-          )
+            );
+          })
         )}
       </div>
       {confirmProps && (

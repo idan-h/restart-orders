@@ -8,6 +8,7 @@ export type BaseOrder = {
   comment: string;
 };
 
+export type ContactPersonDetails = BaseOrder;
 export type Order = BaseOrder & {
   subItems: Array<SubItem>;
 };
