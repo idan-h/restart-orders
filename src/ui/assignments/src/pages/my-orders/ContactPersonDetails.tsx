@@ -14,15 +14,6 @@ import { ContactPersonDetails } from "../../types";
 
 const columns: TableColumnDefinition<ContactPersonDetails>[] = [
   createTableColumn<ContactPersonDetails>({
-    columnId: "name",
-    renderHeaderCell: () => {
-      return "שם";
-    },
-    renderCell: (item) => {
-      return <TableCellLayout>{item.name}</TableCellLayout>;
-    },
-  }),
-  createTableColumn<ContactPersonDetails>({
     columnId: "unit",
     renderHeaderCell: () => {
       return "יחידה";
@@ -31,6 +22,16 @@ const columns: TableColumnDefinition<ContactPersonDetails>[] = [
       return <TableCellLayout>{item.unit}</TableCellLayout>;
     },
   }),
+  createTableColumn<ContactPersonDetails>({
+    columnId: "name",
+    renderHeaderCell: () => {
+      return "שם";
+    },
+    renderCell: (item) => {
+      return <TableCellLayout>{item.name}</TableCellLayout>;
+    },
+  }),
+
   createTableColumn<ContactPersonDetails>({
     columnId: "region",
 
