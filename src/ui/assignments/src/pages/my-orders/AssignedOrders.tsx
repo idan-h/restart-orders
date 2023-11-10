@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import {
   makeStyles,
   Card,
@@ -14,17 +14,18 @@ import {
   TextCollapse24Filled,
 } from "@fluentui/react-icons";
 
-import { pageStyle, titleStyle } from "../sharedStyles.ts";
 import { DONE_STATUS, Order, SubItem } from "../../types.ts";
-import { makeOrdersService } from "../../services/orders.service.ts";
-import { LoginHeader } from "../../components/header.tsx";
-import { Loading } from "../../components/Loading.tsx";
-import { AssignedSubItems } from "./AssignedSubItems.tsx";
 import { useAuthenticationService } from "../../services/authentication.ts";
+import { OrdersService } from "../../services/Orders.service.ts";
+import { Loading } from "../../components/Loading.tsx";
+import { LoginHeader } from "../../components/header.tsx";
+
 import {
   ConfirmDialog,
   ConfirmDialogProps,
 } from "../../components/ConfirmDialog.tsx";
+import { pageStyle, titleStyle } from "../sharedStyles.ts";
+import { AssignedSubItems } from "./AssignedSubItems.tsx";
 
 const useStyles = makeStyles({
   card: {
@@ -40,15 +41,23 @@ export const AssignedOrders = () => {
   const [myOrders, setMyOrders] = useState<Order[] | undefined>();
   const [statusesList, setStatusesList] = useState<string[] | undefined>();
 
-  const [openNoteIds, setOpenNoteIds] = useState<string[]>([]);
-
+  const [openNoteIds, setOpenNoteIds] = useState<number[]>([]);
   const [confirmOpen, setConfirmOpen] = useState<boolean | undefined>(false);
   const [confirmProps, setConfirmProps] = useState<
     Omit<ConfirmDialogProps, "openState"> | undefined
   >();
 
   const { getUserId } = useAuthenticationService();
-  const ordersService = makeOrdersService(getUserId());
+  const userId = getUserId();
+
+  const ordersService = useMemo(() => {
+    if (!userId) {
+      console.error("MyOrders::Init: Not logged in");
+      return undefined;
+    }
+
+    return new OrdersService(userId);
+  }, [userId]);
 
   useEffect(() => {
     if (!ordersService) {
@@ -70,7 +79,7 @@ export const AssignedOrders = () => {
   }, []);
 
   const handleStatusChange = (
-    orderId: string,
+    orderId: number,
     subItem: SubItem,
     status: string
   ) => {
@@ -87,7 +96,7 @@ export const AssignedOrders = () => {
     });
   };
 
-  const handleSubItemRemove = (orderId: string, subItem: SubItem) => {
+  const handleSubItemRemove = (orderId: number, subItem: SubItem) => {
     if (!ordersService) {
       console.error("MyOrders::handleSubItemRemove: ordersService not ready");
       return;
@@ -124,7 +133,7 @@ export const AssignedOrders = () => {
     setMyOrders([...myOrders]);
   };
 
-  const toggleOpenNote = (id: string) => {
+  const toggleOpenNote = (id: number) => {
     setOpenNoteIds((openNoteIds) =>
       openNoteIds.includes(id)
         ? openNoteIds.filter((openNoteId) => openNoteId !== id)
@@ -143,7 +152,7 @@ export const AssignedOrders = () => {
           <Subtitle2 style={titleStyle}>אין הזמנות</Subtitle2>
         ) : (
           myOrders.map((item, index) => {
-            const { id, subItems, comment } = item;
+            const { id, subItems, comments } = item;
             return (
               <Card key={index} className={styles.card}>
                 <CardHeader
@@ -201,7 +210,7 @@ export const AssignedOrders = () => {
                       setConfirmOpen(true);
                     }}
                   />
-                  {comment && (
+                  {comments && (
                     <a
                       style={{
                         display: "flex",
@@ -219,7 +228,7 @@ export const AssignedOrders = () => {
                     </a>
                   )}
                   {openNoteIds.includes(id) ? (
-                    <p style={{ margin: 10 }}>{comment}</p>
+                    <p style={{ margin: 10 }}>{comments}</p>
                   ) : null}
                 </CardPreview>
               </Card>

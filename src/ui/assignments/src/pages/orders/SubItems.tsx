@@ -5,15 +5,14 @@ import {
   DataGridRow,
   Switch,
   TableCellLayout,
-  TableColumnSizingOptions,
   createTableColumn,
 } from "@fluentui/react-components";
 
-import { SubItem } from "../../types.ts";
+import { SubItem, VisibleSubItem } from "../../types.ts";
 import React from "react";
 
 export interface SubItemsProps {
-  items: SubItem[];
+  items: VisibleSubItem[];
   onToggle: (subItem: SubItem, isChecked: boolean) => void;
 }
 
@@ -62,16 +61,15 @@ export const SubItems: React.FunctionComponent<SubItemsProps> = ({
     }),
   ];
 
-  const columnSizingOptions: TableColumnSizingOptions = {
-    file: { minWidth: 200 },
-    status: { minWidth: 80 },
-  };
   return (
     <DataGrid
-      items={items}
+      items={items.filter((item) => !item.hidden)}
       columns={columns}
       getRowId={(item) => item.id}
-      columnSizingOptions={columnSizingOptions}
+      columnSizingOptions={{
+        file: { minWidth: 200 },
+        status: { minWidth: 80 },
+      }}
     >
       <DataGridBody<SubItem>>
         {({ item, rowId }) => (

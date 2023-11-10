@@ -1,5 +1,5 @@
+import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
-
 import {
   Body1,
   Button,
@@ -17,29 +17,45 @@ import {
   TextExpand24Regular,
   TextCollapse24Filled,
 } from "@fluentui/react-icons";
-import { useEffect, useState } from "react";
-import { Order, SubItem } from "../../types.ts";
+
+import { ROUTES } from "../../routes-const.ts";
+import { SubItem, VisibleOrder } from "../../types.ts";
+import { useAuthenticationService } from "../../services/authentication.ts";
+import { OrdersService } from "../../services/Orders.service.ts";
 import { SubItems } from "./SubItems.tsx";
 import { LoginHeader } from "../../components/header.tsx";
 import { Loading } from "../../components/Loading.tsx";
-
-import { ROUTES } from "../../routes-const.ts";
-import { pageStyle, titleStyle } from "../sharedStyles.ts";
-import { makeOrdersService } from "../../services/orders.service.ts";
-import { useAuthenticationService } from "../../services/authentication.ts";
 import { SearchBoxDebounce } from "../../components/SearchBoxDebounce.tsx";
+import { pageStyle, titleStyle } from "../sharedStyles.ts";
+
+/** show order and all sub items */
+const showOrder = (order: VisibleOrder): VisibleOrder => ({
+  ...order,
+  subItems: order.subItems.map((subItem) => ({
+    ...subItem,
+    hidden: false,
+  })),
+  hidden: false,
+});
 
 export const Orders = () => {
   const navigate = useNavigate();
 
-  const { getUserId } = useAuthenticationService();
-  const ordersService = makeOrdersService(getUserId());
-
-  const [orders, setOrders] = useState<Order[] | undefined>(); // all orders
-  const [displayedOrders, setDisplayedOrders] = useState<Order[] | undefined>(); // filtered orders
-  const [search, setSearch] = useState(""); // search text (used to re-calculate displayedOrders after item state change - toggle)
-  const [openNoteIds, setOpenNoteIds] = useState<string[]>([]); // open notes ids (used to toggle open notes)
+  const [orders, setOrders] = useState<VisibleOrder[] | undefined>(); // all orders
+  const [openNoteIds, setOpenNoteIds] = useState<number[]>([]); // open notes ids (used to toggle open notes)
   const [saving, setSaving] = useState(false); // saving state (used for saving spinner and block submit button)
+
+  const { getUserId } = useAuthenticationService();
+  const userId = getUserId();
+
+  const ordersService = useMemo(() => {
+    if (!userId) {
+      console.error("Orders::Init: Not logged in");
+      return undefined;
+    }
+
+    return new OrdersService(userId);
+  }, [userId]);
 
   useEffect(() => {
     if (!ordersService) {
@@ -50,13 +66,12 @@ export const Orders = () => {
     if (!orders) {
       ordersService.fetchUnassignedOrders().then((items) => {
         setOrders(items.orders);
-        setDisplayedOrders(items.orders);
       });
     }
   }, [ordersService]);
 
   const handleToggleSubItem = (
-    orderId: string,
+    orderId: number,
     subItem: SubItem,
     isChecked: boolean
   ) => {
@@ -81,17 +96,14 @@ export const Orders = () => {
 
     orders[orderIndex].subItems[subItemsIndex] = {
       ...subItem,
-      userId: isChecked ? getUserId() : undefined,
+      userId: isChecked ? userId : undefined,
     };
 
     setOrders([...orders]);
-    handleSearch(search); // update displayedOrders with the new toggle state
   };
 
   const handleSearch = (searchText: string) => {
     console.debug("Orders::handleSearch", searchText);
-
-    setSearch(searchText);
 
     if (!orders) {
       console.error("Orders::handleSearch: orders empty");
@@ -99,31 +111,40 @@ export const Orders = () => {
     }
 
     if (searchText) {
-      const filteredOrders: Order[] = [];
+      setOrders(
+        orders.map((order) => {
+          if (order.unit?.includes(searchText)) {
+            // title includes search - show order and all sub-items
+            return showOrder(order);
+          } else {
+            let isOrderVisible = false;
 
-      orders.forEach((order) => {
-        if (order.unit?.includes(searchText)) {
-          // group title includes search text - add all sub items
-          filteredOrders.push(order);
-        } else {
-          // group title does not include search text - filter sub items
-          const filteredSubItems = order.subItems.filter((subItem) =>
-            subItem.name.includes(searchText)
-          );
-          if (filteredSubItems.length) {
-            // add only the sub items that match the search text
-            filteredOrders.push({ ...order, subItems: filteredSubItems });
+            const filteredSubItems = order.subItems.map((subItem) => {
+              const isItemVisible = !subItem.product.name.includes(searchText);
+
+              isOrderVisible = isOrderVisible || isItemVisible; // the order is visible if at least one sub-item is visible
+
+              return {
+                ...subItem,
+                hidden: isItemVisible,
+              };
+            });
+
+            return {
+              ...order,
+              subItems: filteredSubItems,
+              hidden: !isOrderVisible,
+            };
           }
-        }
-      });
-
-      setDisplayedOrders(filteredOrders);
+        })
+      );
     } else {
-      setDisplayedOrders(orders); // clear search
+      // clear search - all items visible
+      setOrders(orders.map(showOrder));
     }
   };
 
-  const toggleOpenNote = (id: string) => {
+  const toggleOpenNote = (id: number) => {
     setOpenNoteIds((openNoteIds) =>
       openNoteIds.includes(id)
         ? openNoteIds.filter((openNoteId) => openNoteId !== id)
@@ -132,8 +153,7 @@ export const Orders = () => {
   };
 
   const handleFilterByTypeChange = (
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    _: any,
+    _: unknown,
     data: {
       optionValue: string | undefined;
       optionText: string | undefined;
@@ -141,13 +161,13 @@ export const Orders = () => {
     }
   ) => {
     data.optionValue === "All"
-      ? setDisplayedOrders(orders)
-      : setDisplayedOrders((_) =>
+      ? setOrders(orders)
+      : setOrders((_) =>
           orders?.filter(
             (unit) =>
               unit.subItems.filter((subItem) =>
                 data.optionValue
-                  ? subItem.type.split(",").includes(data.optionValue)
+                  ? subItem.product.type.split(",").includes(data.optionValue)
                   : true
               ).length > 0
           )
@@ -192,11 +212,11 @@ export const Orders = () => {
       <LoginHeader />
       <div style={pageStyle}>
         <Subtitle1 style={titleStyle}>
-          בקשות{displayedOrders && ` (${displayedOrders?.length})`}
+          בקשות{orders && ` (${orders?.length})`}
         </Subtitle1>
         {saving ? (
           <Loading label="מעדכן..." />
-        ) : !displayedOrders ? (
+        ) : !orders ? (
           <Loading />
         ) : (
           <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
@@ -220,11 +240,13 @@ export const Orders = () => {
                 </Combobox>
               </Field>
             </div>
-            {displayedOrders.length === 0 ? (
+            {orders.length === 0 ? (
+              // $G$ TODO - also show if filter has no results
               <Subtitle2 style={titleStyle}>אין בקשות</Subtitle2>
             ) : (
-              displayedOrders.map(({ id, unit, subItems, comment }) => {
-                return (
+              orders
+                .filter((order) => !order.hidden)
+                .map(({ id, unit, subItems, comments }) => (
                   <Card
                     key={id}
                     style={{
@@ -247,7 +269,7 @@ export const Orders = () => {
                           handleToggleSubItem(id, subItem, isChecked)
                         }
                       />
-                      {comment && (
+                      {comments && (
                         <a
                           style={{
                             display: "flex",
@@ -265,17 +287,16 @@ export const Orders = () => {
                         </a>
                       )}
                       {openNoteIds.includes(id) ? (
-                        <p style={{ margin: 10 }}>{comment}</p>
+                        <p style={{ margin: 10 }}>{comments}</p>
                       ) : null}
                     </CardPreview>
                   </Card>
-                );
-              })
+                ))
             )}
           </div>
         )}
       </div>
-      {displayedOrders?.length && (
+      {orders?.length && (
         <div
           style={{
             position: "fixed",
@@ -292,7 +313,7 @@ export const Orders = () => {
             onClick={handleSubmit}
             disabled={
               saving ||
-              displayedOrders.every((order) =>
+              orders.every((order) =>
                 order.subItems.every((subItem) => !subItem.userId)
               )
             }
