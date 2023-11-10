@@ -3,7 +3,10 @@ import { MondayOrder, Order } from "../types";
 const baseUrl =
   "https://njdfolzzmvnaay5oxqife4tuwy.apigateway.il-jerusalem-1.oci.customer-oci.com/v1/";
 
-let productNames: Map<string, string>;
+let productDetails: Map<
+  string,
+  { name: string; product_number: number; type: string }
+>;
 let statusesList: string[];
 
 export function makeOrdersService(userId?: string) {
@@ -17,7 +20,9 @@ export function makeOrdersService(userId?: string) {
     async fetchUnassignedOrders(): Promise<{ orders: Order[] }> {
       console.debug("OrdersService:fetchUnassignedOrders");
 
-      if (!productNames) productNames = await fetchProductNames();
+      if (!productDetails) {
+        productDetails = await fetchProductDetails();
+      }
 
       const response = await fetch(
         new URL(
@@ -36,11 +41,12 @@ export function makeOrdersService(userId?: string) {
             ...mondayOrders,
             subItems: mondayOrders.subItems
               .filter(
-                (item) => !item.userId && productNames?.has(item.productId)
+                (item) => !item.userId && productDetails?.has(item.productId)
               )
               .map((subItem) => ({
                 ...subItem,
-                productName: productNames!.get(subItem.productId)!,
+                productName: productDetails!.get(subItem.productId)!.name,
+                type: productDetails!.get(subItem.productId)!.type,
               })),
           }))
           .filter((order) => order.subItems.length),
@@ -50,7 +56,7 @@ export function makeOrdersService(userId?: string) {
     async fetchAssignedOrders(): Promise<{ orders: Order[] }> {
       console.debug("OrdersService:fetchAssignedOrders");
 
-      if (!productNames) productNames = await fetchProductNames();
+      if (!productDetails) productDetails = await fetchProductDetails();
 
       const response = await fetch(
         new URL(
@@ -69,11 +75,11 @@ export function makeOrdersService(userId?: string) {
             ...mondayOrders,
             subItems: mondayOrders.subItems
               .filter(
-                (item) => item.userId && productNames?.has(item.productId)
+                (item) => item.userId && productDetails?.has(item.productId)
               )
               .map((subItem) => ({
                 ...subItem,
-                productName: productNames!.get(subItem.productId)!,
+                productName: productDetails!.get(subItem.productId)!,
               })),
           }))
           .filter((order) => order.subItems.length),
@@ -83,7 +89,7 @@ export function makeOrdersService(userId?: string) {
     async fetchOrder(orderId: string): Promise<Order | undefined> {
       console.debug("OrdersService:fetchOrder");
 
-      if (!productNames) productNames = await fetchProductNames();
+      if (!productDetails) productDetails = await fetchProductDetails();
 
       const response = await fetch(
         new URL(
@@ -100,7 +106,7 @@ export function makeOrdersService(userId?: string) {
         ...mondayOrder,
         subItems: mondayOrder.subItems.map((subItem) => ({
           ...subItem,
-          productName: productNames!.get(subItem.productId)!,
+          productName: productDetails!.get(subItem.productId)!,
         })),
       } as Order;
     },
@@ -170,7 +176,9 @@ export function makeOrdersService(userId?: string) {
   };
 
   /** List of all items in the database. */
-  async function fetchProductNames(): Promise<Map<string, string>> {
+  async function fetchProductDetails(): Promise<
+    Map<string, { name: string; product_number: number; type: string }>
+  > {
     if (!userId) {
       console.error("ordersService - failed to load, not logged in");
       return Promise.reject();
@@ -184,9 +192,17 @@ export function makeOrdersService(userId?: string) {
 
     const mondayProducts = await response.json();
 
-    return new Map<string, string>(
+    // map of number -> key = "product_number", value = "product_number", "name", "type"}
+    return new Map(
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      mondayProducts.map((mp: any) => [mp.product_number, mp.name])
+      mondayProducts.map((product: any) => [
+        product.product_number,
+        {
+          name: product.name,
+          product_number: product.product_number,
+          type: product.type,
+        },
+      ])
     );
   }
 }

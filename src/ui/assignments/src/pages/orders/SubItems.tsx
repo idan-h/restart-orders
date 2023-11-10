@@ -63,8 +63,8 @@ export const SubItems: React.FunctionComponent<SubItemsProps> = ({
   ];
 
   const columnSizingOptions: TableColumnSizingOptions = {
-    file: {minWidth: 200},
-    quantity: { minWidth: 50},
+    file: { minWidth: 200 },
+    quantity: { minWidth: 50 },
     status: { minWidth: 80 },
   };
   return (

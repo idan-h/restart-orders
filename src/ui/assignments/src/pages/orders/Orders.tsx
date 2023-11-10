@@ -6,6 +6,9 @@ import {
   Card,
   CardHeader,
   CardPreview,
+  Combobox,
+  Field,
+  Option,
   tokens,
 } from "@fluentui/react-components";
 import {
@@ -163,63 +166,103 @@ export const Orders = () => {
     <>
       <LoginHeader />
       <div style={pageStyle}>
-        <h2 style={titleStyle}>בקשות</h2>
+        <h2 style={titleStyle}>
+          בקשות{displayedOrders && ` (${displayedOrders?.length})`}
+        </h2>
         {saving ? (
           <Loading label="מעדכן..." />
         ) : !displayedOrders ? (
           <Loading />
         ) : (
           <>
-            <SearchBoxDebounce onChange={handleSearch} />
+            <div style={{ display: "flex", gap: 12 }}>
+              <Field label="חיפוש">
+                <SearchBoxDebounce onChange={handleSearch} />
+              </Field>
+              <Field label="סינון לפי סוג">
+                <Combobox
+                  onOptionSelect={(_, data) => {
+                    data.optionValue === "All"
+                      ? setDisplayedOrders(orders)
+                      : setDisplayedOrders((_) =>
+                          orders?.filter(
+                            (unit) =>
+                              unit.subItems.filter((subItem) =>
+                                data.optionValue
+                                  ? subItem.type
+                                      .split(",")
+                                      .includes(data.optionValue)
+                                  : true
+                              ).length > 0
+                          )
+                        );
+                  }}
+                >
+                  {[
+                    { key: "All", value: "הכל" },
+                    { key: "IDF", value: "צהל" },
+                    { key: "EMR", value: "כיתת כוננות" },
+                    { key: "SEW", value: "תיקוני מתפרה" },
+                    { key: "SEWMAN", value: "ייצור מתפרה" },
+                  ].map((option) => (
+                    <Option key={option.key} value={option.key}>
+                      {option.value}
+                    </Option>
+                  ))}
+                </Combobox>
+              </Field>
+            </div>
             {displayedOrders.length === 0 ? (
               <h3 style={titleStyle}>אין בקשות</h3>
             ) : (
-              displayedOrders.map(({ id, unit, subItems, comment }) => (
-                <Card
-                  key={id}
-                  style={{
-                    textAlign: "right",
-                    width: "100%",
-                    marginBottom: "30px",
-                  }}
-                >
-                  <CardHeader
-                    header={
-                      <Body1 style={{ textAlign: "left" }}>
-                        <b>{unit}</b>
-                      </Body1>
-                    }
-                  />
-                  <CardPreview>
-                    <SubItems
-                      items={subItems}
-                      onToggle={(subItem: SubItem, isChecked: boolean) =>
-                        handleToggleSubItem(id, subItem, isChecked)
+              displayedOrders.map(({ id, unit, subItems, comment }) => {
+                return (
+                  <Card
+                    key={id}
+                    style={{
+                      textAlign: "right",
+                      width: "100%",
+                      marginBottom: "30px",
+                    }}
+                  >
+                    <CardHeader
+                      header={
+                        <Body1 style={{ textAlign: "left" }}>
+                          <b>{unit ?? "no name"}</b>
+                        </Body1>
                       }
                     />
-                    {comment && (
-                      <a
-                        style={{
-                          display: "flex",
-                          alignItems: "center",
-                          margin: 10,
-                        }}
-                        onClick={() => toggleOpenNote(id)}
-                      >
-                        הערות
-                        {openNoteIds.includes(id) ? (
-                          <TextCollapse24Filled />
-                        ) : (
-                          <TextExpand24Regular />
-                        )}
-                      </a>
-                    )}
-                    {openNoteIds.includes(id) ? (
-                      <p style={{ margin: 10 }}>{comment}</p>
-                    ) : null}
-                  </CardPreview>
-                </Card>
-              ))
+                    <CardPreview>
+                      <SubItems
+                        items={subItems}
+                        onToggle={(subItem: SubItem, isChecked: boolean) =>
+                          handleToggleSubItem(id, subItem, isChecked)
+                        }
+                      />
+                      {comment && (
+                        <a
+                          style={{
+                            display: "flex",
+                            alignItems: "center",
+                            margin: 10,
+                          }}
+                          onClick={() => toggleOpenNote(id)}
+                        >
+                          הערות
+                          {openNoteIds.includes(id) ? (
+                            <TextCollapse24Filled />
+                          ) : (
+                            <TextExpand24Regular />
+                          )}
+                        </a>
+                      )}
+                      {openNoteIds.includes(id) ? (
+                        <p style={{ margin: 10 }}>{comment}</p>
+                      ) : null}
+                    </CardPreview>
+                  </Card>
+                );
+              })
             )}
           </>
         )}

@@ -31,6 +31,8 @@ export type MondaySubItem = BaseSubItem;
 
 export type SubItem = BaseSubItem & {
   productName: string;
+  type: string;
+  productNumber: string;
 };
 
 export const DONE_STATUS = "בוצע";
