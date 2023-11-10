@@ -26,7 +26,8 @@ import { SubItems } from "./SubItems.tsx";
 import { Header } from "../../components/header.tsx";
 import { Loading } from "../../components/Loading.tsx";
 import { SearchBoxDebounce } from "../../components/SearchBoxDebounce.tsx";
-import { pageStyle, titleStyle } from "../sharedStyles.ts";
+import { pageStyle } from "../sharedStyles.ts";
+import { SubHeader } from "../../components/SubHeader.tsx";
 
 /** show order and all sub items */
 const showOrder = (order: VisibleOrder): VisibleOrder => ({
@@ -211,9 +212,7 @@ export const Orders = () => {
     <>
       <Header />
       <div style={pageStyle}>
-        <Subtitle1 style={titleStyle}>
-          בקשות{orders && ` (${orders?.length})`}
-        </Subtitle1>
+        <SubHeader>בקשות{orders && ` (${orders?.length})`}</SubHeader>
         {saving ? (
           <Loading label="מעדכן..." />
         ) : !orders ? (

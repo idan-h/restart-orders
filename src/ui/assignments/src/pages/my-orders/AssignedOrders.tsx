@@ -6,7 +6,6 @@ import {
   CardPreview,
   Body1Stronger,
   Divider,
-  Subtitle1,
   Subtitle2,
 } from "@fluentui/react-components";
 import {
@@ -24,8 +23,9 @@ import {
   ConfirmDialog,
   ConfirmDialogProps,
 } from "../../components/ConfirmDialog.tsx";
-import { pageStyle, titleStyle } from "../sharedStyles.ts";
+import { pageStyle } from "../sharedStyles.ts";
 import { AssignedSubItems } from "./AssignedSubItems.tsx";
+import { SubHeader } from "../../components/SubHeader.tsx";
 
 const useStyles = makeStyles({
   card: {
@@ -145,7 +145,7 @@ export const AssignedOrders = () => {
     <>
       <Header />
       <div style={pageStyle}>
-        <Subtitle1 style={titleStyle}>הזמנות</Subtitle1>
+        <SubHeader>הזמנות{myOrders && ` (${myOrders?.length})`}</SubHeader>
         {!myOrders ? (
           <Loading />
         ) : myOrders.length === 0 ? (

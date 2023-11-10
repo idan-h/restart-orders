@@ -7,8 +7,3 @@ export const pageStyle: React.CSSProperties = {
   bottom: "44px", // footer height
   overflow: "auto",
 };
-
-export const titleStyle: React.CSSProperties = {
-  textAlign: "center",
-  margin: "20px auto",
-};
