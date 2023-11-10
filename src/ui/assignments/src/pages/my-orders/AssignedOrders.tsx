@@ -147,10 +147,16 @@ export const AssignedOrders = () => {
               <Card key={index} className={styles.card}>
                 <CardHeader
                   header={
-                    <>
+                    <div
+                      style={{
+                        display: "flex",
+                        flexDirection: "column",
+                        width: "-webkit-fill-available",
+                      }}
+                    >
                       <ContactPersonDetailsTable items={[item]} />
                       <Divider />
-                    </>
+                    </div>
                   }
                 />
                 <CardPreview>
