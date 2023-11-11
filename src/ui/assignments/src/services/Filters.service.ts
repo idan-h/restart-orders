@@ -37,6 +37,35 @@ export const showOrder = (
   filter,
 });
 
+const filterOrderBySubItem = (
+  order: FilteredOrder,
+  filterField: keyof Filter,
+  predict: (subItem: SubItem) => boolean
+): FilteredOrder => {
+  // Check sub-items, if at least one sub-item match predict - show order.
+  let isOrderVisible = false;
+  const filteredSubItems: FilteredSubItem[] = order.subItems.map(
+    (subItem: FilteredSubItem) => {
+      const isItemVisible = predict(subItem);
+      isOrderVisible = isOrderVisible || isItemVisible;
+
+      return showSubItem(subItem, {
+        ...subItem.filter,
+        [filterField]: isItemVisible,
+      });
+    }
+  );
+
+  return {
+    ...order,
+    subItems: filteredSubItems,
+    filter: {
+      ...order.filter,
+      [filterField]: isOrderVisible,
+    },
+  };
+};
+
 export const filterOrdersByText = (
   [orders, setOrders]: ReturnType<typeof useState<FilteredOrder[]>>,
   searchText = ""
@@ -59,27 +88,9 @@ export const filterOrdersByText = (
           });
         } else {
           // title does not include search - check sub-items. if at least one sub-item includes search - show order.
-          let isOrderVisible = false;
-          const filteredSubItems: FilteredSubItem[] = order.subItems.map(
-            (subItem: FilteredSubItem) => {
-              const isItemVisible = subItem.product.name.includes(searchText);
-              isOrderVisible = isOrderVisible || isItemVisible;
-
-              return showSubItem(subItem, {
-                text: isItemVisible,
-                type: subItem.filter.type,
-              });
-            }
+          return filterOrderBySubItem(order, "text", (subItem) =>
+            subItem.product.name.includes(searchText)
           );
-
-          return {
-            ...order,
-            subItems: filteredSubItems,
-            filter: {
-              text: isOrderVisible,
-              type: order.filter.type,
-            },
-          };
         }
       })
     );
@@ -118,15 +129,12 @@ export const filterOrdersByType = (
       )
     );
   } else {
-    // $G$  BUG HERE! TODO - fix to work with new visible props
-    setOrders((_) =>
-      orders?.filter(
-        (unit) =>
-          unit.subItems.filter((subItem) =>
-            optionValue
-              ? subItem.product.type.split(",").includes(optionValue)
-              : true
-          ).length > 0
+    setOrders(
+      // Check sub-items. if at least one sub-item includes type - show order.
+      orders.map((order) =>
+        filterOrderBySubItem(order, "type", (subItem) =>
+          subItem.product.type.split(",").includes(optionValue)
+        )
       )
     );
   }
