@@ -21,7 +21,7 @@ import {
   isVisible,
   showOrder,
 } from "../../services/Filters.service.ts";
-import { AppHeader } from "../../components/Header.tsx";
+import { AppHeader } from "../../components/AppHeader.tsx";
 import { Loading } from "../../components/Loading.tsx";
 import { SubHeader, SubHeader2 } from "../../components/SubHeader.tsx";
 import {

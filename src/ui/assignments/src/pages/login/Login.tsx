@@ -4,7 +4,7 @@ import { Button, Field, Input, tokens } from "@fluentui/react-components";
 
 import { ROUTES } from "../../routes-const";
 import { useAuthenticationService } from "../../services/authentication";
-import { AppHeader } from "../../components/Header";
+import { AppHeader } from "../../components/AppHeader";
 import { SubHeader } from "../../components/SubHeader";
 import { Loading } from "../../components/Loading";
 import { pageStyle } from "../sharedStyles";

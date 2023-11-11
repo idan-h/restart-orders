@@ -15,7 +15,7 @@ import { DONE_STATUS, FilteredOrder, FilteredSubItem } from "../../types.ts";
 import { useAuthenticationService } from "../../services/authentication.ts";
 import { OrdersService } from "../../services/Orders.service.ts";
 import { Loading } from "../../components/Loading.tsx";
-import { AppHeader } from "../../components/Header.tsx";
+import { AppHeader } from "../../components/AppHeader.tsx";
 import { SubHeader, SubHeader2 } from "../../components/SubHeader.tsx";
 import {
   ConfirmDialog,

@@ -1,7 +1,7 @@
 import { AddCircle28Regular, Checkmark28Regular } from "@fluentui/react-icons";
 
 import { Microsoft, Monday, Restart, Oracle, Firma } from "./images";
-import { AppHeader } from "../../components/Header";
+import { AppHeader } from "../../components/AppHeader";
 import { pageStyle } from "../sharedStyles";
 
 const TextLine = (text: string) => {
