@@ -25,7 +25,7 @@ const cardContentStyle: React.CSSProperties = {
   width: "min-content",
 };
 
-export const LoginForm = () => {
+export const LoginPage = () => {
   const { login, isLoggedIn } = useAuthenticationService();
   const navigate = useNavigate();
   const [username, setUsername] = useState("");
