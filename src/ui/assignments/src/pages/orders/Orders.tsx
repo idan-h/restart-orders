@@ -28,7 +28,7 @@ import {
   ConfirmDialog,
   ConfirmDialogProps,
 } from "../../components/ConfirmDialog.tsx";
-import { Filters } from "../../components/Filters.tsx";
+import { Filters } from "../../components/filters/Filters.tsx";
 import { SubItems } from "./SubItems.tsx";
 import { pageStyle } from "../sharedStyles.ts";
 
