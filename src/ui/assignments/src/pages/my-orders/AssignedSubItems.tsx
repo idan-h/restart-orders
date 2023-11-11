@@ -6,11 +6,11 @@ import {
   createTableColumn,
   TableCellLayout,
   Button,
-  Dropdown,
   Option,
   TableColumnSizingOptions,
   DataGridHeader,
   DataGridHeaderCell,
+  Combobox,
 } from "@fluentui/react-components";
 import { Delete24Regular } from "@fluentui/react-icons";
 
@@ -54,7 +54,7 @@ export const AssignedSubItems: React.FunctionComponent<
       renderCell: (item) => {
         return (
           <TableCellLayout>
-            <Dropdown
+            <Combobox
               style={{ minWidth: "unset", width: "110px" }}
               defaultValue={item.status}
               disabled={item.status === DONE_STATUS}
@@ -67,7 +67,7 @@ export const AssignedSubItems: React.FunctionComponent<
               {statusesList.map((status, index) => (
                 <Option key={index}>{status}</Option>
               ))}
-            </Dropdown>
+            </Combobox>
           </TableCellLayout>
         );
       },
