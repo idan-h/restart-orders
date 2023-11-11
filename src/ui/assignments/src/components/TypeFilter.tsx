@@ -18,7 +18,7 @@ export const TypeFilter: React.FunctionComponent<TypeFilterProps> = ({
 }) => {
   return (
     <Combobox
-      defaultValue="All"
+      defaultValue={OPTIONS_LIST[0].label}
       onOptionSelect={(_event, data) => onChange(data.optionValue)}
     >
       {OPTIONS_LIST.map((option, index) => (
