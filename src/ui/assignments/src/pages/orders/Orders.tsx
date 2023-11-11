@@ -62,7 +62,7 @@ export const Orders = () => {
 
     if (!orders) {
       ordersService.fetchUnassignedOrders().then((items) => {
-        setOrders(items.orders.map(showOrder));
+        setOrders(items.orders.map((order) => showOrder(order)));
       });
     }
   }, [ordersService]);

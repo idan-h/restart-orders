@@ -63,7 +63,9 @@ export const AssignedOrders = () => {
     if (!myOrders) {
       ordersService
         .fetchAssignedOrders()
-        .then((items) => setMyOrders(items.orders.map(showOrder)));
+        .then((items) =>
+          setMyOrders(items.orders.map((order) => showOrder(order)))
+        );
     }
 
     if (!statusesList) {
