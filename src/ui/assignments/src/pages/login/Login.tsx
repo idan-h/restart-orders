@@ -10,7 +10,7 @@ import {
 } from "@fluentui/react-components";
 import { ROUTES } from "../../routes-const";
 import { useAuthenticationService } from "../../services/authentication";
-import { AppHeader } from "../../components/Header";
+import { AppHeader } from "../../components/header";
 import { pageStyle } from "../sharedStyles";
 import { SubHeader } from "../../components/SubHeader";
 import { Loading } from "../../components/Loading";
