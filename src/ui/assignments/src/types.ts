@@ -1,12 +1,14 @@
 export const DONE_STATUS = "בוצע";
 
+export interface Filter {
+  /** match text filter */
+  text: boolean;
+  /** match status filter */
+  type: boolean;
+}
+
 export interface Filtered {
-  filter: {
-    /** match text filter */
-    text: boolean;
-    /** match status filter */
-    type: boolean;
-  };
+  filter: Filter;
 }
 
 // ---------------------------------------------------
