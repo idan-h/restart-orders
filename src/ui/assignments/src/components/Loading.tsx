@@ -1,8 +1,18 @@
 import React from "react";
-import { Spinner } from "@fluentui/react-components";
+import { Spinner, SpinnerProps } from "@fluentui/react-components";
 
-export const Loading: React.FunctionComponent< { label?: string }> = ({ label = 'טוען...'  }) => (
-  <div style={{ position: "relative", top: "30%" }}>
-    <Spinner label={label} labelPosition="below" />
+export interface LoadingProps {
+  label?: string;
+  size?: SpinnerProps["size"];
+  style?: React.CSSProperties;
+}
+
+export const Loading: React.FunctionComponent<LoadingProps> = ({
+  label = "טוען...",
+  size,
+  style = {},
+}) => (
+  <div style={{ position: "relative", top: "30%", ...style }}>
+    <Spinner label={label} size={size} labelPosition="below" />
   </div>
 );

@@ -15,7 +15,7 @@ import { DONE_STATUS, FilteredOrder, FilteredSubItem } from "../../types.ts";
 import { useAuthenticationService } from "../../services/authentication.ts";
 import { OrdersService } from "../../services/orders.service.ts";
 import { Loading } from "../../components/Loading.tsx";
-import { Header } from "../../components/header.tsx";
+import { AppHeader } from "../../components/Header.tsx";
 import { SubHeader, SubHeader2 } from "../../components/SubHeader.tsx";
 import {
   ConfirmDialog,
@@ -201,7 +201,7 @@ export const AssignedOrders = () => {
 
   return (
     <>
-      <Header />
+      <AppHeader />
       <div style={pageStyle}>
         <SubHeader>הזמנות{myOrders && ` (${myOrders?.length})`}</SubHeader>
         {!myOrders ? (

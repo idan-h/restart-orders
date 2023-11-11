@@ -14,14 +14,14 @@ import {
 
 import { FilteredOrder, FilteredSubItem } from "../../types.ts";
 import { useAuthenticationService } from "../../services/authentication.ts";
-import { OrdersService } from "../../services/orders.service.ts";
+import { OrdersService } from "../../services/Orders.service.ts";
 import {
   filterOrdersByText,
   filterOrdersByType,
   isVisible,
   showOrder,
 } from "../../services/Filters.service.ts";
-import { Header } from "../../components/header.tsx";
+import { AppHeader } from "../../components/Header.tsx";
 import { Loading } from "../../components/Loading.tsx";
 import { SubHeader, SubHeader2 } from "../../components/SubHeader.tsx";
 import {
@@ -189,7 +189,7 @@ export const Orders = () => {
 
   return (
     <>
-      <Header />
+      <AppHeader />
       <div style={pageStyle}>
         <SubHeader>בקשות{orders && ` (${orders?.length})`}</SubHeader>
         {saving ? (
