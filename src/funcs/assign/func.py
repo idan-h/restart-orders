@@ -36,9 +36,9 @@ def handler(ctx: context, data: io.BytesIO = None):
 
         success = assign_product(API_KEY, body["orderId"], body["subItemId"], body["subItemBoardId"] , user_id)
         if success:
-            response_dict = {"success": "Product unassigned successfully"}
+            response_dict = {"success": "Product was assigned successfully"}
         else:
-            response_dict = {"error": "Product unassign failed"}
+            response_dict = {"error": "Product assignment failed"}
 
     except Exception as e:
         logger.info('error: ' + traceback.format_exc().replace('\n', ''))

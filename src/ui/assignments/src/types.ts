@@ -12,7 +12,7 @@ export type BaseSubItem = {
   /** unique id */
   id: number;
   /** parent id */
-  orderId: number;
+  order_id: number;
   /** product id, get the product details by this id */
   productId: number;
   subItemBoardId: number;

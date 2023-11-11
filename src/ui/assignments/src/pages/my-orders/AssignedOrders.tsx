@@ -15,7 +15,7 @@ import {
 
 import { DONE_STATUS, VisibleOrder, SubItem } from "../../types.ts";
 import { useAuthenticationService } from "../../services/authentication.ts";
-import { OrdersService } from "../../services/Orders.service.ts";
+import { OrdersService } from "../../services/orders.service.ts";
 import { Loading } from "../../components/Loading.tsx";
 import { Header } from "../../components/header.tsx";
 import { SubHeader, SubHeader2 } from "../../components/SubHeader.tsx";

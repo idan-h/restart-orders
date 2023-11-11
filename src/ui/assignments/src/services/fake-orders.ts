@@ -38,7 +38,7 @@ export function makeFakeOrdersService(userId: string) {
     },
     async assignSubItem(request: {
       orderId: string;
-      subItemId: string;
+      subItemId: string | number;
       subItemBoardId: string;
     }) {
       const order = orders.get(request.orderId);
@@ -56,7 +56,7 @@ export function makeFakeOrdersService(userId: string) {
     },
     async unAssignSubItem(request: {
       orderId: string;
-      subItemId: string;
+      subItemId: string | number;
       subItemBoardId: string;
     }) {
       const order = orders.get(request.orderId);
@@ -67,14 +67,14 @@ export function makeFakeOrdersService(userId: string) {
       );
       if (!subItem) throw new Error("subItem not found!!!!!");
 
-      subItem.status = undefined;
+      // subItem.status = undefined;
       subItem.userId = undefined;
 
       saveOrders(orders);
     },
     async changeStatus(request: {
       orderId: string;
-      subItemId: string;
+      subItemId: string | number ;
       subItemBoardId: string;
       status: string;
     }) {
