@@ -1,5 +1,5 @@
 import React from "react";
-import { Combobox, Field, Option } from "@fluentui/react-components";
+import { Field, Dropdown, Option } from "@fluentui/react-components";
 
 const OPTIONS_LIST = [
   { value: "All", label: "הכל" },
@@ -20,7 +20,7 @@ export const TypeFilter: React.FunctionComponent<TypeFilterProps> = ({
 }) => {
   return (
     <Field label="סינון לפי סוג" style={style}>
-      <Combobox
+      <Dropdown
         defaultValue={OPTIONS_LIST[0].label}
         onOptionSelect={(_event, data) => onChange(data.optionValue)}
       >
@@ -29,7 +29,7 @@ export const TypeFilter: React.FunctionComponent<TypeFilterProps> = ({
             {option.label}
           </Option>
         ))}
-      </Combobox>
+      </Dropdown>
     </Field>
   );
 };

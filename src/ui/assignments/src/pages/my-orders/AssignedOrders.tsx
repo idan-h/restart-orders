@@ -120,7 +120,7 @@ export const AssignedOrders = () => {
             text: "לא",
             appearance: "secondary",
             onClick: () => {
-              // todo: revert DONE status
+              //TODO: $G$ revert DONE status
             },
           },
           {
@@ -233,7 +233,6 @@ export const AssignedOrders = () => {
                             width: "-webkit-fill-available",
                           }}
                         >
-                          {/* <ContactPersonDetailsTable items={[item]} /> */}
                           <Body1Stronger>
                             {order.unit} {order.region}
                           </Body1Stronger>

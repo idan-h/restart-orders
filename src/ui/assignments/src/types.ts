@@ -85,8 +85,6 @@ export type Order = {
   subItems: SubItem[];
 };
 
-export type ContactPersonDetails = Order;
-
 export type FilteredOrder = Order &
   Filtered & {
     subItems: Array<FilteredSubItem>;
