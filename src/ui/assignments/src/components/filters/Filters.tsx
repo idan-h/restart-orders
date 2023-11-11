@@ -1,5 +1,4 @@
 import React from "react";
-import { Field } from "@fluentui/react-components";
 
 import { SearchBoxDebounce } from "./SearchBoxDebounce";
 import { TypeFilter } from "./TypeFilter";
@@ -19,22 +18,20 @@ export const Filters: React.FunctionComponent<SubHeaderProps> = ({
   return (
     <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
       {onTextFilter && (
-        <Field label="חיפוש" style={{ flex: 1 }}>
-          <SearchBoxDebounce onChange={onTextFilter} />
-        </Field>
+        <SearchBoxDebounce onChange={onTextFilter} style={{ flex: 1 }} />
       )}
       {onTypeFilter && (
         <TypeFilter onChange={onTypeFilter} style={{ flex: 1 }} />
       )}
       {onDoneFilter && (
         <DoneCheckbox
+          onChange={onDoneFilter}
           style={{
             flex: 1,
             display: "flex",
             flexDirection: "column-reverse",
             whiteSpace: "nowrap",
           }}
-          onChange={onDoneFilter}
         />
       )}
     </div>

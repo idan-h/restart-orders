@@ -5,6 +5,8 @@ export interface Filter {
   text: boolean;
   /** match status filter */
   type: boolean;
+  /** match done filter */
+  done: boolean;
 }
 
 export interface Filtered {

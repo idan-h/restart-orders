@@ -25,6 +25,7 @@ import { pageStyle } from "../sharedStyles.ts";
 import { AssignedSubItems } from "./AssignedSubItems.tsx";
 import { Filters } from "../../components/filters/Filters.tsx";
 import {
+  filterOrdersByDone,
   filterOrdersByText,
   filterOrdersByType,
   isVisible,
@@ -75,12 +76,16 @@ export const AssignedOrders = () => {
     }
   }, []);
 
-  const handleTilterByText = (searchText?: string) => {
+  const handleTilterByText = (searchText: string) => {
     filterOrdersByText([myOrders, setMyOrders], searchText);
   };
 
   const handleFilterByType = (optionValue?: string) => {
     filterOrdersByType([myOrders, setMyOrders], optionValue);
+  };
+
+  const handleFilterByDone = (checked: boolean) => {
+    filterOrdersByDone([myOrders, setMyOrders], checked);
   };
 
   const handleSubItemStatusChange = (
@@ -211,7 +216,7 @@ export const AssignedOrders = () => {
             <Filters
               onTextFilter={handleTilterByText}
               onTypeFilter={handleFilterByType}
-              onDoneFilter={(checked) => console.error("!!!!", checked)}
+              onDoneFilter={handleFilterByDone}
             />
             {myOrders.length === 0 ? (
               <SubHeader2>אין הזמנות</SubHeader2>
