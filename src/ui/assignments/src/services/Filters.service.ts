@@ -1,18 +1,24 @@
 import { Dispatch, SetStateAction } from "react";
-import { Filtered, FilteredOrder } from "../types";
-
-/** show order and all sub items */
-const showOrder = (order: VisibleOrder): VisibleOrder => ({
-  ...order,
-  subItems: order.subItems.map((subItem) => ({
-    ...subItem,
-    hidden: false,
-  })),
-  hidden: false,
-});
+import { Filtered, FilteredOrder, Order } from "../types";
 
 export const isVisible = (item: Filtered) =>
   item.filter.text && item.filter.type;
+
+/** show order and all sub items */
+export const showOrder = (order: Order): FilteredOrder => ({
+  ...order,
+  subItems: order.subItems.map((subItem) => ({
+    ...subItem,
+    filter: {
+      text: true,
+      type: true,
+    },
+  })),
+  filter: {
+    text: true,
+    type: true,
+  },
+});
 
 export const filterOrdersByText = (
   [orders, setOrders]: [

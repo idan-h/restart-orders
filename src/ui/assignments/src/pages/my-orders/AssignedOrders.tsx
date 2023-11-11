@@ -1,19 +1,17 @@
 import { useEffect, useState, useMemo } from "react";
 import {
-  makeStyles,
   Card,
   CardHeader,
   CardPreview,
   Body1Stronger,
   Divider,
-  Field,
 } from "@fluentui/react-components";
 import {
   TextExpand24Regular,
   TextCollapse24Filled,
 } from "@fluentui/react-icons";
 
-import { DONE_STATUS, SubItem } from "../../types.ts";
+import { DONE_STATUS, FilteredOrder, FilteredSubItem } from "../../types.ts";
 import { useAuthenticationService } from "../../services/authentication.ts";
 import { OrdersService } from "../../services/orders.service.ts";
 import { Loading } from "../../components/Loading.tsx";
@@ -25,26 +23,16 @@ import {
 } from "../../components/ConfirmDialog.tsx";
 import { pageStyle } from "../sharedStyles.ts";
 import { AssignedSubItems } from "./AssignedSubItems.tsx";
-import { SearchBoxDebounce } from "../../components/SearchBoxDebounce.tsx";
-import { TypeFilter } from "../../components/TypeFilter.tsx";
+import { Filters } from "../../components/Filters.tsx";
 import {
   filterOrdersByText,
   filterOrdersByType,
   isVisible,
+  showOrder,
 } from "../../services/Filters.service.ts";
 
-const useStyles = makeStyles({
-  card: {
-    textAlign: "left",
-    width: "100%",
-    marginBottom: "30px",
-  },
-});
-
 export const AssignedOrders = () => {
-  const styles = useStyles();
-
-  const [myOrders, setMyOrders] = useState<VisibleOrder[] | undefined>();
+  const [myOrders, setMyOrders] = useState<FilteredOrder[] | undefined>();
   const [statusesList, setStatusesList] = useState<string[] | undefined>();
 
   const [openNoteIds, setOpenNoteIds] = useState<number[]>([]);
@@ -75,7 +63,7 @@ export const AssignedOrders = () => {
     if (!myOrders) {
       ordersService
         .fetchAssignedOrders()
-        .then((items) => setMyOrders(items.orders));
+        .then((items) => setMyOrders(items.orders.map(showOrder)));
     }
 
     if (!statusesList) {
@@ -95,7 +83,7 @@ export const AssignedOrders = () => {
 
   const handleSubItemStatusChange = (
     orderId: number,
-    subItem: SubItem,
+    subItem: FilteredSubItem,
     status: string
   ) => {
     if (!ordersService) {
@@ -113,7 +101,7 @@ export const AssignedOrders = () => {
 
   const confirmSubItemStatusChange = (
     orderId: number,
-    subItem: SubItem,
+    subItem: FilteredSubItem,
     status: string
   ) => {
     if (status === DONE_STATUS) {
@@ -143,7 +131,7 @@ export const AssignedOrders = () => {
     }
   };
 
-  const handleSubItemRemove = (orderId: number, subItem: SubItem) => {
+  const handleSubItemRemove = (orderId: number, subItem: FilteredSubItem) => {
     if (!ordersService) {
       console.error("MyOrders::handleSubItemRemove: ordersService not ready");
       return;
@@ -168,7 +156,7 @@ export const AssignedOrders = () => {
 
     myOrders[orderIndex].subItems = [
       ...myOrders[orderIndex].subItems.filter(
-        (_subItem) => _subItem.id !== subItem.id
+        (_subItem: FilteredSubItem) => _subItem.id !== subItem.id
       ),
     ];
 
@@ -180,7 +168,7 @@ export const AssignedOrders = () => {
     setMyOrders([...myOrders]);
   };
 
-  const confirmSubItemRemove = (orderId: number, subItem: SubItem) => {
+  const confirmSubItemRemove = (orderId: number, subItem: FilteredSubItem) => {
     setConfirmProps({
       title: "האם אתה בטוח",
       subText: `האם להסיר את ${subItem.product.name}?`,
@@ -218,72 +206,74 @@ export const AssignedOrders = () => {
           <Loading />
         ) : (
           <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-            {/* filters */}
-            <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
-              <Field label="חיפוש" style={{ flex: 1 }}>
-                <SearchBoxDebounce onChange={handleTilterByText} />
-              </Field>
-              <Field label="סינון לפי סוג" style={{ flex: 1 }}>
-                <TypeFilter onChange={handleFilterByType} />
-              </Field>
-            </div>
+            <Filters
+              onTextFilter={handleTilterByText}
+              onTypeFilter={handleFilterByType}
+            />
             {myOrders.length === 0 ? (
               <SubHeader2>אין הזמנות</SubHeader2>
             ) : (
-              myOrders.filter(isVisible).map((order, index) => (
-                <Card key={index} className={styles.card}>
-                  <CardHeader
-                    header={
-                      <div
-                        style={{
-                          display: "flex",
-                          flexDirection: "column",
-                          width: "-webkit-fill-available",
-                        }}
-                      >
-                        {/* <ContactPersonDetailsTable items={[item]} /> */}
-                        <Body1Stronger>
-                          {order.unit} {order.region}
-                        </Body1Stronger>
-                        <Body1Stronger>{order.name}</Body1Stronger>
-                        <Body1Stronger>{order.phone}</Body1Stronger>
-                        <Divider />
-                        <Divider />
-                      </div>
-                    }
-                  />
-                  <CardPreview>
-                    <AssignedSubItems
-                      items={order.subItems}
-                      statusesList={statusesList ?? []}
-                      onStatusChange={(item, status) =>
-                        confirmSubItemStatusChange(order.id, item, status)
+              <>
+                {myOrders.filter(isVisible).map((order, index) => (
+                  <Card key={index} style={{ marginBottom: "30px" }}>
+                    <CardHeader
+                      header={
+                        <div
+                          style={{
+                            display: "flex",
+                            flexDirection: "column",
+                            width: "-webkit-fill-available",
+                          }}
+                        >
+                          {/* <ContactPersonDetailsTable items={[item]} /> */}
+                          <Body1Stronger>
+                            {order.unit} {order.region}
+                          </Body1Stronger>
+                          <Body1Stronger>{order.name}</Body1Stronger>
+                          <Body1Stronger>{order.phone}</Body1Stronger>
+                          <Divider />
+                          <Divider />
+                        </div>
                       }
-                      onDelete={(item) => confirmSubItemRemove(order.id, item)}
                     />
-                    {order.comments && (
-                      <a
-                        style={{
-                          display: "flex",
-                          alignItems: "center",
-                          margin: 10,
-                        }}
-                        onClick={() => toggleOpenNote(order.id)}
-                      >
-                        הערות
-                        {openNoteIds.includes(order.id) ? (
-                          <TextCollapse24Filled />
-                        ) : (
-                          <TextExpand24Regular />
-                        )}
-                      </a>
-                    )}
-                    {openNoteIds.includes(order.id) ? (
-                      <p style={{ margin: 10 }}>{order.comments}</p>
-                    ) : null}
-                  </CardPreview>
-                </Card>
-              ))
+                    <CardPreview>
+                      <AssignedSubItems
+                        items={order.subItems}
+                        statusesList={statusesList ?? []}
+                        onStatusChange={(item, status) =>
+                          confirmSubItemStatusChange(order.id, item, status)
+                        }
+                        onDelete={(item) =>
+                          confirmSubItemRemove(order.id, item)
+                        }
+                      />
+                      {order.comments && (
+                        <a
+                          style={{
+                            display: "flex",
+                            alignItems: "center",
+                            margin: 10,
+                          }}
+                          onClick={() => toggleOpenNote(order.id)}
+                        >
+                          הערות
+                          {openNoteIds.includes(order.id) ? (
+                            <TextCollapse24Filled />
+                          ) : (
+                            <TextExpand24Regular />
+                          )}
+                        </a>
+                      )}
+                      {openNoteIds.includes(order.id) ? (
+                        <p style={{ margin: 10 }}>{order.comments}</p>
+                      ) : null}
+                    </CardPreview>
+                  </Card>
+                ))}
+                {!myOrders.some(isVisible) && (
+                  <SubHeader2>אין הזמנות תואמת את הסינון</SubHeader2>
+                )}
+              </>
             )}
           </div>
         )}

@@ -12,13 +12,14 @@ import {
   TextCollapse24Filled,
 } from "@fluentui/react-icons";
 
-import { SubItem, FilteredOrder, FilteredSubItem } from "../../types.ts";
+import { FilteredOrder, FilteredSubItem } from "../../types.ts";
 import { useAuthenticationService } from "../../services/authentication.ts";
 import { OrdersService } from "../../services/orders.service.ts";
 import {
   filterOrdersByText,
   filterOrdersByType,
   isVisible,
+  showOrder,
 } from "../../services/Filters.service.ts";
 import { Header } from "../../components/header.tsx";
 import { Loading } from "../../components/Loading.tsx";
@@ -27,7 +28,7 @@ import {
   ConfirmDialog,
   ConfirmDialogProps,
 } from "../../components/ConfirmDialog.tsx";
-import { Filters } from "../../components/Filteres.tsx";
+import { Filters } from "../../components/Filters.tsx";
 import { SubItems } from "./SubItems.tsx";
 import { pageStyle } from "../sharedStyles.ts";
 
@@ -61,7 +62,7 @@ export const Orders = () => {
 
     if (!orders) {
       ordersService.fetchUnassignedOrders().then((items) => {
-        setOrders(items.orders);
+        setOrders(items.orders.map(showOrder));
       });
     }
   }, [ordersService]);
@@ -76,7 +77,7 @@ export const Orders = () => {
 
   const handleToggleSubItem = (
     orderId: number,
-    subItem: SubItem,
+    subItem: FilteredSubItem,
     isChecked: boolean
   ) => {
     if (!orders) {
@@ -137,7 +138,7 @@ export const Orders = () => {
         const itemsToKeep: FilteredSubItem[] = []; // will be kept
         const itemsToRemove: FilteredSubItem[] = []; // will be assigned
 
-        order.subItems.forEach((subItem) =>
+        order.subItems.forEach((subItem: FilteredSubItem) =>
           subItem.userId
             ? itemsToRemove.push(subItem)
             : itemsToKeep.push(subItem)
@@ -203,57 +204,55 @@ export const Orders = () => {
             />
 
             {orders.length === 0 ? (
-              // $G$ TODO - also show if filter has no results
               <SubHeader2>אין בקשות</SubHeader2>
             ) : (
-              orders
-                .filter(isVisible)
-                .map(({ id, unit, subItems, comments }) => (
-                  <Card
-                    key={id}
-                    style={{
-                      textAlign: "right",
-                      width: "100%",
-                      marginBottom: "30px",
-                    }}
-                  >
-                    <CardHeader
-                      header={
-                        <Body1 style={{ textAlign: "left" }}>
-                          <b>{unit ?? "no name"}</b>
-                        </Body1>
-                      }
-                    />
-                    <CardPreview>
-                      <SubItems
-                        items={subItems}
-                        onToggle={(subItem: SubItem, isChecked: boolean) =>
-                          handleToggleSubItem(id, subItem, isChecked)
+              <>
+                {orders
+                  .filter(isVisible)
+                  .map(({ id, unit, subItems, comments }, index) => (
+                    <Card key={index} style={{ marginBottom: "30px" }}>
+                      <CardHeader
+                        header={
+                          <Body1 style={{ textAlign: "left" }}>
+                            <b>{unit ?? "no name"}</b>
+                          </Body1>
                         }
                       />
-                      {comments && (
-                        <a
-                          style={{
-                            display: "flex",
-                            alignItems: "center",
-                            margin: 10,
-                          }}
-                          onClick={() => toggleOpenNote(id)}
-                        >
-                          הערות
-                          {openNoteIds.includes(id) ? (
-                            <TextCollapse24Filled />
-                          ) : (
-                            <TextExpand24Regular />
-                          )}
-                        </a>
-                      )}
-                      {openNoteIds.includes(id) ? (
-                        <p style={{ margin: 10 }}>{comments}</p>
-                      ) : null}
-                    </CardPreview>
-                  </Card>
-                ))
+                      <CardPreview>
+                        <SubItems
+                          items={subItems}
+                          onToggle={(
+                            subItem: FilteredSubItem,
+                            isChecked: boolean
+                          ) => handleToggleSubItem(id, subItem, isChecked)}
+                        />
+                        {comments && (
+                          <a
+                            style={{
+                              display: "flex",
+                              alignItems: "center",
+                              margin: 10,
+                            }}
+                            onClick={() => toggleOpenNote(id)}
+                          >
+                            הערות
+                            {openNoteIds.includes(id) ? (
+                              <TextCollapse24Filled />
+                            ) : (
+                              <TextExpand24Regular />
+                            )}
+                          </a>
+                        )}
+                        {openNoteIds.includes(id) ? (
+                          <p style={{ margin: 10 }}>{comments}</p>
+                        ) : null}
+                      </CardPreview>
+                    </Card>
+                  ))}
+                {!orders.some(isVisible) && (
+                  <SubHeader2>אין בקשות תואמת את הסינון</SubHeader2>
+                )}
+              </>
             )}
           </div>
         )}
