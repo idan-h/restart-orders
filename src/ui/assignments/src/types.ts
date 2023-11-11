@@ -5,6 +5,8 @@ export interface Filter {
   text: boolean;
   /** match status filter */
   type: boolean;
+  /** match done filter */
+  done: boolean;
 }
 
 export interface Filtered {
@@ -82,8 +84,6 @@ export type Order = {
   /** Array of sub-items */
   subItems: SubItem[];
 };
-
-export type ContactPersonDetails = Order;
 
 export type FilteredOrder = Order &
   Filtered & {

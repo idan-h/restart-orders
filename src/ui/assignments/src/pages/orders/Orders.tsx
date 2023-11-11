@@ -13,7 +13,7 @@ import {
 } from "@fluentui/react-icons";
 
 import { FilteredOrder, FilteredSubItem } from "../../types.ts";
-import { useAuthenticationService } from "../../services/authentication.ts";
+import { useAuthenticationService } from "../../services/Authentication.ts";
 import { OrdersService } from "../../services/orders.service.ts";
 import {
   filterOrdersByText,
@@ -21,14 +21,14 @@ import {
   isVisible,
   showOrder,
 } from "../../services/Filters.service.ts";
-import { AppHeader } from "../../components/header.tsx";
+import { AppHeader } from "../../components/AppHeader.tsx";
 import { Loading } from "../../components/Loading.tsx";
 import { SubHeader, SubHeader2 } from "../../components/SubHeader.tsx";
 import {
   ConfirmDialog,
   ConfirmDialogProps,
 } from "../../components/ConfirmDialog.tsx";
-import { Filters } from "../../components/Filters.tsx";
+import { Filters } from "../../components/filters/Filters.tsx";
 import { SubItems } from "./SubItems.tsx";
 import { pageStyle } from "../sharedStyles.ts";
 

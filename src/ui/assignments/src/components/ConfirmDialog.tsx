@@ -36,8 +36,8 @@ export const ConfirmDialog: React.FunctionComponent<ConfirmDialogProps> = ({
           <DialogTitle>{title}</DialogTitle>
           <DialogContent>{subText}</DialogContent>
           <DialogActions>
-            {buttons.map((button) => (
-              <DialogTrigger disableButtonEnhancement>
+            {buttons.map((button, index) => (
+              <DialogTrigger key={index} disableButtonEnhancement>
                 <Button
                   appearance={button.appearance ?? "secondary"}
                   onClick={button.onClick}

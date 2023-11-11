@@ -2,7 +2,8 @@ import React from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Info24Regular, SignOut24Regular } from "@fluentui/react-icons";
 import { Button, tokens } from "@fluentui/react-components";
-import { useAuthenticationService } from "../services/authentication";
+
+import { useAuthenticationService } from "../services/Authentication";
 import { ROUTES } from "../routes-const";
 
 const headerStyle: React.CSSProperties = {

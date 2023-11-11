@@ -1,36 +1,39 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import {
-  Button,
-  Card,
-  CardHeader,
-  CardPreview,
-  Field,
-  Input,
-} from "@fluentui/react-components";
+import { Button, Field, Input, tokens } from "@fluentui/react-components";
+
 import { ROUTES } from "../../routes-const";
-import { useAuthenticationService } from "../../services/authentication";
+import { useAuthenticationService } from "../../services/Authentication";
 import { AppHeader } from "../../components/header";
 import { pageStyle } from "../sharedStyles";
 import { SubHeader } from "../../components/SubHeader";
 import { Loading } from "../../components/Loading";
 
+
 const loginCardStyle: React.CSSProperties = {
+  position: "relative",
+  maxWidth: "360px",
   top: "45%",
   transform: "translateY(-50%)",
+  padding: "4px",
   margin: "0 auto",
-  maxWidth: "360px",
+  borderRadius: "5px",
+  boxShadow: tokens.shadow8Brand,
 };
 
-const cardContentStyle: React.CSSProperties = {
+const inputsContainerStyle: React.CSSProperties = {
   display: "flex",
   flexDirection: "column",
   gap: "12px",
   padding: "12px 12px 18px",
 };
 
-const inputStyle: React.CSSProperties = {
-  display: "block",
+const buttonStyle: React.CSSProperties = {
+  marginTop: "18px",
+};
+
+const spinnerStyle: React.CSSProperties = {
+  margin: "42px 0",
 };
 
 export const LoginPage = () => {
@@ -71,44 +74,41 @@ export const LoginPage = () => {
     <>
       <AppHeader />
       <div style={pageStyle}>
-        <Card style={loginCardStyle}>
-          <CardHeader header={<SubHeader>פורטל Restart לעמותות</SubHeader>} />
-          <CardPreview style={cardContentStyle}>
+        <div style={loginCardStyle}>
+          <SubHeader>פורטל Restart לעמותות</SubHeader>
+          <div style={inputsContainerStyle}>
             {isLoading ? (
               <Loading
                 label="מתחבר..."
                 size="extra-large"
-                style={{ margin: "42px 0" }}
+                style={spinnerStyle}
               />
             ) : (
               <>
                 <Field
                   label="שם משתמש"
-                  orientation="vertical"
                   validationState={loginError ? "error" : undefined}
                 >
                   <Input
                     type="text"
                     value={username}
-                    style={inputStyle}
                     onChange={handleUsernameChange}
                   />
                 </Field>
                 <Field
                   label="סיסמא"
-                  orientation="vertical"
                   validationMessage={loginError}
                   validationState={loginError ? "error" : undefined}
                 >
                   <Input
                     type="password"
                     value={password}
-                    style={inputStyle}
                     onChange={handlePasswordChange}
                   />
                 </Field>
                 <Button
                   appearance="primary"
+                  style={buttonStyle}
                   onClick={() => {
                     setLoginError(undefined);
                     setIsLoading(true);
@@ -119,8 +119,8 @@ export const LoginPage = () => {
                 </Button>
               </>
             )}
-          </CardPreview>
-        </Card>
+          </div>
+        </div>
       </div>
     </>
   );

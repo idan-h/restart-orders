@@ -381,3 +381,29 @@ class MondayBoard:
         else:
             r = json_normalize(self.mondayApi.query(query, return_items_as=return_items_as))
             return r
+        
+    def get_item_id_with_parent_item_id_if_exist(self, return_items_as='dataframe', limit=500, cursor=None):
+        QUERY_TEMPLATE = '''
+              {{
+              boards(ids:{board_id})
+              {{
+                items_page (limit:{limit}{cursor}) {{
+                    cursor,
+                    items
+                    {{
+                        id,
+                        parent_item{{
+                            id
+                        }}
+                    }}
+                  }}
+              }}
+              }}'''
+
+        query = QUERY_TEMPLATE.format(board_id=str(self.board_id), limit=limit,
+                                      cursor=f', cursor: "{cursor}"' if cursor else '')
+
+        if return_items_as == 'json':
+            return self.mondayApi.query(query, return_items_as=return_items_as).json()
+        else:
+            return json_normalize(self.mondayApi.query(query, return_items_as=return_items_as)['boards'][0]['items'])

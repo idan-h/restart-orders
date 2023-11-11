@@ -12,10 +12,10 @@ import {
 } from "@fluentui/react-icons";
 
 import { DONE_STATUS, FilteredOrder, FilteredSubItem } from "../../types.ts";
-import { useAuthenticationService } from "../../services/authentication.ts";
+import { useAuthenticationService } from "../../services/Authentication.ts";
 import { OrdersService } from "../../services/orders.service.ts";
 import { Loading } from "../../components/Loading.tsx";
-import { AppHeader } from "../../components/header.tsx";
+import { AppHeader } from "../../components/AppHeader.tsx";
 import { SubHeader, SubHeader2 } from "../../components/SubHeader.tsx";
 import {
   ConfirmDialog,
@@ -23,8 +23,9 @@ import {
 } from "../../components/ConfirmDialog.tsx";
 import { pageStyle } from "../sharedStyles.ts";
 import { AssignedSubItems } from "./AssignedSubItems.tsx";
-import { Filters } from "../../components/Filters.tsx";
+import { Filters } from "../../components/filters/Filters.tsx";
 import {
+  filterOrdersByDone,
   filterOrdersByText,
   filterOrdersByType,
   isVisible,
@@ -75,12 +76,16 @@ export const AssignedOrders = () => {
     }
   }, []);
 
-  const handleTilterByText = (searchText?: string) => {
+  const handleTilterByText = (searchText: string) => {
     filterOrdersByText([myOrders, setMyOrders], searchText);
   };
 
   const handleFilterByType = (optionValue?: string) => {
     filterOrdersByType([myOrders, setMyOrders], optionValue);
+  };
+
+  const handleFilterByDone = (checked: boolean) => {
+    filterOrdersByDone([myOrders, setMyOrders], checked);
   };
 
   const handleSubItemStatusChange = (
@@ -115,7 +120,7 @@ export const AssignedOrders = () => {
             text: "לא",
             appearance: "secondary",
             onClick: () => {
-              // todo: revert DONE status
+              //TODO: $G$ revert DONE status
             },
           },
           {
@@ -211,6 +216,7 @@ export const AssignedOrders = () => {
             <Filters
               onTextFilter={handleTilterByText}
               onTypeFilter={handleFilterByType}
+              onDoneFilter={handleFilterByDone}
             />
             {myOrders.length === 0 ? (
               <SubHeader2>אין הזמנות</SubHeader2>
@@ -227,7 +233,6 @@ export const AssignedOrders = () => {
                             width: "-webkit-fill-available",
                           }}
                         >
-                          {/* <ContactPersonDetailsTable items={[item]} /> */}
                           <Body1Stronger>
                             {order.unit} {order.region}
                           </Body1Stronger>

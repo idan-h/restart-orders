@@ -1,6 +1,6 @@
-import { Order } from './types';
+import { Order } from "../types";
 
- export default [] as Order[]
+export default [] as Order[];
 //   {
 //     id: "123",
 //     unit: "87",
@@ -97,4 +97,3 @@ import { Order } from './types';
 //       },
 //    ],
 //  },
-
