@@ -15,7 +15,7 @@ import {
 
 import { SubItem, VisibleOrder, VisibleSubItem } from "../../types.ts";
 import { useAuthenticationService } from "../../services/authentication.ts";
-import { OrdersService } from "../../services/Orders.service.ts";
+import { OrdersService } from "../../services/orders.service.ts";
 import {
   filterOrdersByText,
   filterOrdersByType,
@@ -158,7 +158,7 @@ export const Orders = () => {
       await Promise.all(
         subItemsToAssign.map((subItem) =>
           ordersService.assignSubItem({
-            orderId: subItem.orderId,
+            orderId: subItem.order_id,
             subItemId: subItem.id,
             subItemBoardId: subItem.subItemBoardId,
           })
