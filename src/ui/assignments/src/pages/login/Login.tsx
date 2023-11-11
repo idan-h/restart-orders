@@ -3,8 +3,8 @@ import { useNavigate } from "react-router-dom";
 import { Button, Field, Input, tokens } from "@fluentui/react-components";
 
 import { ROUTES } from "../../routes-const";
-import { useAuthenticationService } from "../../services/Authentication";
-import { AppHeader } from "../../components/header";
+import { useAuthenticationService } from "../../services/authentication";
+import { AppHeader } from "../../components/AppHeader";
 import { pageStyle } from "../sharedStyles";
 import { SubHeader } from "../../components/SubHeader";
 import { Loading } from "../../components/Loading";

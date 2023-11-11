@@ -12,7 +12,7 @@ import {
 } from "@fluentui/react-icons";
 
 import { DONE_STATUS, FilteredOrder, FilteredSubItem } from "../../types.ts";
-import { useAuthenticationService } from "../../services/Authentication.ts";
+import { useAuthenticationService } from "../../services/authentication.ts";
 import { OrdersService } from "../../services/orders.service.ts";
 import { Loading } from "../../components/Loading.tsx";
 import { AppHeader } from "../../components/AppHeader.tsx";

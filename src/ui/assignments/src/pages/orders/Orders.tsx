@@ -13,7 +13,7 @@ import {
 } from "@fluentui/react-icons";
 
 import { FilteredOrder, FilteredSubItem } from "../../types.ts";
-import { useAuthenticationService } from "../../services/Authentication.ts";
+import { useAuthenticationService } from "../../services/authentication.ts";
 import { OrdersService } from "../../services/orders.service.ts";
 import {
   filterOrdersByText,
@@ -68,7 +68,7 @@ export const Orders = () => {
   }, [ordersService]);
 
   const handleTilterByText = (searchText?: string) => {
-    filterOrdersByText([orders, setOrders], searchText);
+    filterOrdersByText([orders, setOrders], searchText ?? "");
   };
 
   const handleFilterByType = (optionValue?: string) => {
