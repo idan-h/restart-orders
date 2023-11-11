@@ -80,7 +80,7 @@ export const filterOrdersByText = (
     return;
   }
 
-  if (!searchText) {
+  if (searchText) {
     setOrders(
       orders.map((order) => {
         if (order.unit?.includes(searchText)) {
