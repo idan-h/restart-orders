@@ -13,7 +13,7 @@ import {
 } from "@fluentui/react-icons";
 
 import { FilteredOrder, FilteredSubItem } from "../../types.ts";
-import { useAuthenticationService } from "../../services/authentication.ts";
+import { useAuthenticationService } from "../../services/Authentication.ts";
 import { OrdersService } from "../../services/Orders.service.ts";
 import {
   filterOrdersByText,

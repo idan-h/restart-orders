@@ -106,6 +106,7 @@ export const AssignedSubItems: React.FunctionComponent<
       minWidth: 50,
     },
   };
+
   return (
     <DataGrid
       items={items.filter(isVisible)}

@@ -23,7 +23,7 @@ import {
   AuthenticationService,
   makeAuthenticationService,
   useAuthenticationService,
-} from "./services/authentication.ts";
+} from "./services/Authentication.ts";
 
 import { LoginPage } from "./pages/login/Login.tsx";
 import { Orders } from "./pages/orders/Orders.tsx";
