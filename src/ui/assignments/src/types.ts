@@ -1,6 +1,6 @@
 export const DONE_STATUS = "בוצע";
 
-interface Filtered {
+export interface Filtered {
   filter: {
     /** match text filter */
     text: boolean;

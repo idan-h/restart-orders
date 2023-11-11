@@ -11,6 +11,7 @@ import {
 } from "@fluentui/react-components";
 
 import { FilteredSubItem } from "../../types.ts";
+import { isVisible } from "../../services/Filters.service.ts";
 
 export interface SubItemsProps {
   items: FilteredSubItem[];
@@ -59,7 +60,7 @@ export const SubItems: React.FunctionComponent<SubItemsProps> = ({
 
   return (
     <DataGrid
-      items={items.filter((item) => item.filter.text && item.filter.type)}
+      items={items.filter(isVisible)}
       columns={columns}
       getRowId={(item) => item.id}
       columnSizingOptions={columnSizing}

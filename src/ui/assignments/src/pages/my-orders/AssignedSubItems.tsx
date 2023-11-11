@@ -15,6 +15,7 @@ import {
 import { Delete24Regular } from "@fluentui/react-icons";
 
 import { DONE_STATUS, FilteredSubItem } from "../../types.ts";
+import { isVisible } from "../../services/Filters.service.ts";
 
 export interface AssignedSubItemsProps {
   items: FilteredSubItem[];
@@ -107,7 +108,7 @@ export const AssignedSubItems: React.FunctionComponent<
   };
   return (
     <DataGrid
-      items={items.filter((item) => item.filter.text && item.filter.type)}
+      items={items.filter(isVisible)}
       columns={columns}
       getRowId={(item) => item.id}
       columnSizingOptions={columnSizing}

@@ -13,7 +13,7 @@ import {
   TextCollapse24Filled,
 } from "@fluentui/react-icons";
 
-import { DONE_STATUS, VisibleOrder, SubItem } from "../../types.ts";
+import { DONE_STATUS, SubItem } from "../../types.ts";
 import { useAuthenticationService } from "../../services/authentication.ts";
 import { OrdersService } from "../../services/orders.service.ts";
 import { Loading } from "../../components/Loading.tsx";
@@ -30,7 +30,8 @@ import { TypeFilter } from "../../components/TypeFilter.tsx";
 import {
   filterOrdersByText,
   filterOrdersByType,
-} from "../../services/filterOrders.ts";
+  isVisible,
+} from "../../services/Filters.service.ts";
 
 const useStyles = makeStyles({
   card: {
@@ -229,64 +230,60 @@ export const AssignedOrders = () => {
             {myOrders.length === 0 ? (
               <SubHeader2>אין הזמנות</SubHeader2>
             ) : (
-              myOrders
-                .filter((order) => !order.hidden)
-                .map((order, index) => (
-                  <Card key={index} className={styles.card}>
-                    <CardHeader
-                      header={
-                        <div
-                          style={{
-                            display: "flex",
-                            flexDirection: "column",
-                            width: "-webkit-fill-available",
-                          }}
-                        >
-                          {/* <ContactPersonDetailsTable items={[item]} /> */}
-                          <Body1Stronger>
-                            {order.unit} {order.region}
-                          </Body1Stronger>
-                          <Body1Stronger>{order.name}</Body1Stronger>
-                          <Body1Stronger>{order.phone}</Body1Stronger>
-                          <Divider />
-                          <Divider />
-                        </div>
+              myOrders.filter(isVisible).map((order, index) => (
+                <Card key={index} className={styles.card}>
+                  <CardHeader
+                    header={
+                      <div
+                        style={{
+                          display: "flex",
+                          flexDirection: "column",
+                          width: "-webkit-fill-available",
+                        }}
+                      >
+                        {/* <ContactPersonDetailsTable items={[item]} /> */}
+                        <Body1Stronger>
+                          {order.unit} {order.region}
+                        </Body1Stronger>
+                        <Body1Stronger>{order.name}</Body1Stronger>
+                        <Body1Stronger>{order.phone}</Body1Stronger>
+                        <Divider />
+                        <Divider />
+                      </div>
+                    }
+                  />
+                  <CardPreview>
+                    <AssignedSubItems
+                      items={order.subItems}
+                      statusesList={statusesList ?? []}
+                      onStatusChange={(item, status) =>
+                        confirmSubItemStatusChange(order.id, item, status)
                       }
+                      onDelete={(item) => confirmSubItemRemove(order.id, item)}
                     />
-                    <CardPreview>
-                      <AssignedSubItems
-                        items={order.subItems}
-                        statusesList={statusesList ?? []}
-                        onStatusChange={(item, status) =>
-                          confirmSubItemStatusChange(order.id, item, status)
-                        }
-                        onDelete={(item) =>
-                          confirmSubItemRemove(order.id, item)
-                        }
-                      />
-                      {order.comments && (
-                        <a
-                          style={{
-                            display: "flex",
-                            alignItems: "center",
-                            margin: 10,
-                          }}
-                          onClick={() => toggleOpenNote(order.id)}
-                        >
-                          הערות
-                          {openNoteIds.includes(order.id) ? (
-                            <TextCollapse24Filled />
-                          ) : (
-                            <TextExpand24Regular />
-                          )}
-                        </a>
-                      )}
-                      {openNoteIds.includes(order.id) ? (
-                        <p style={{ margin: 10 }}>{order.comments}</p>
-                      ) : null}
-                    </CardPreview>
-                  </Card>
-                ))
+                    {order.comments && (
+                      <a
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          margin: 10,
+                        }}
+                        onClick={() => toggleOpenNote(order.id)}
+                      >
+                        הערות
+                        {openNoteIds.includes(order.id) ? (
+                          <TextCollapse24Filled />
+                        ) : (
+                          <TextExpand24Regular />
+                        )}
+                      </a>
+                    )}
+                    {openNoteIds.includes(order.id) ? (
+                      <p style={{ margin: 10 }}>{order.comments}</p>
+                    ) : null}
+                  </CardPreview>
+                </Card>
+              ))
             )}
           </div>
         )}

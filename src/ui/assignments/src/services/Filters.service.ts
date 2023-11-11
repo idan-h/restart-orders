@@ -1,5 +1,5 @@
 import { Dispatch, SetStateAction } from "react";
-import { VisibleOrder } from "../types";
+import { Filtered, FilteredOrder } from "../types";
 
 /** show order and all sub items */
 const showOrder = (order: VisibleOrder): VisibleOrder => ({
@@ -10,6 +10,9 @@ const showOrder = (order: VisibleOrder): VisibleOrder => ({
   })),
   hidden: false,
 });
+
+export const isVisible = (item: Filtered) =>
+  item.filter.text && item.filter.type;
 
 export const filterOrdersByText = (
   [orders, setOrders]: [

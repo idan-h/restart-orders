@@ -5,7 +5,6 @@ import {
   Card,
   CardHeader,
   CardPreview,
-  Field,
   tokens,
 } from "@fluentui/react-components";
 import {
@@ -13,27 +12,27 @@ import {
   TextCollapse24Filled,
 } from "@fluentui/react-icons";
 
-import { SubItem, VisibleOrder, VisibleSubItem } from "../../types.ts";
+import { SubItem, FilteredOrder, FilteredSubItem } from "../../types.ts";
 import { useAuthenticationService } from "../../services/authentication.ts";
 import { OrdersService } from "../../services/orders.service.ts";
 import {
   filterOrdersByText,
   filterOrdersByType,
-} from "../../services/filterOrders.ts";
+  isVisible,
+} from "../../services/Filters.service.ts";
 import { Header } from "../../components/header.tsx";
 import { Loading } from "../../components/Loading.tsx";
-import { SearchBoxDebounce } from "../../components/SearchBoxDebounce.tsx";
 import { SubHeader, SubHeader2 } from "../../components/SubHeader.tsx";
-import { TypeFilter } from "../../components/TypeFilter.tsx";
 import {
   ConfirmDialog,
   ConfirmDialogProps,
 } from "../../components/ConfirmDialog.tsx";
+import { Filters } from "../../components/Filteres.tsx";
 import { SubItems } from "./SubItems.tsx";
 import { pageStyle } from "../sharedStyles.ts";
 
 export const Orders = () => {
-  const [orders, setOrders] = useState<VisibleOrder[] | undefined>(); // all orders
+  const [orders, setOrders] = useState<FilteredOrder[] | undefined>(); // all orders
   const [openNoteIds, setOpenNoteIds] = useState<number[]>([]); // open notes ids (used to toggle open notes)
   const [saving, setSaving] = useState(false); // saving state (used for saving spinner and block submit button)
 
@@ -128,15 +127,15 @@ export const Orders = () => {
 
     // The server is slow. We first call the assign method but we still.
     // The filter out the items that where assigned. All the assigned items and orders that don't have any un-assigned items left.
-    let subItemsToAssign: VisibleSubItem[] = [];
-    const ordersToKeep: VisibleOrder[] = [];
+    let subItemsToAssign: FilteredSubItem[] = [];
+    const ordersToKeep: FilteredOrder[] = [];
 
     try {
       setSaving(true);
 
       orders.forEach((order) => {
-        const itemsToKeep: VisibleSubItem[] = []; // will be kept
-        const itemsToRemove: VisibleSubItem[] = []; // will be assigned
+        const itemsToKeep: FilteredSubItem[] = []; // will be kept
+        const itemsToRemove: FilteredSubItem[] = []; // will be assigned
 
         order.subItems.forEach((subItem) =>
           subItem.userId
@@ -198,22 +197,17 @@ export const Orders = () => {
           <Loading />
         ) : (
           <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-            {/* filters */}
-            <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
-              <Field label="חיפוש" style={{ flex: 1 }}>
-                <SearchBoxDebounce onChange={handleTilterByText} />
-              </Field>
-              <Field label="סינון לפי סוג" style={{ flex: 1 }}>
-                <TypeFilter onChange={handleFilterByType} />
-              </Field>
-            </div>
+            <Filters
+              onTextFilter={handleTilterByText}
+              onTypeFilter={handleFilterByType}
+            />
 
             {orders.length === 0 ? (
               // $G$ TODO - also show if filter has no results
               <SubHeader2>אין בקשות</SubHeader2>
             ) : (
               orders
-                .filter((order) => !order.hidden)
+                .filter(isVisible)
                 .map(({ id, unit, subItems, comments }) => (
                   <Card
                     key={id}
