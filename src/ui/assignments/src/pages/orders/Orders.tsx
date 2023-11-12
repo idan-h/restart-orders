@@ -132,6 +132,8 @@ export const Orders = () => {
 
     const newOffset = (pageIndex * PAGE_SIZE) % filteredOrders.length;
     setItemOffset(newOffset);
+
+    // TODO $G$: scroll to top
   };
 
   const handleSubmit = async () => {
