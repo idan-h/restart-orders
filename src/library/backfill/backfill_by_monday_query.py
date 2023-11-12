@@ -7,7 +7,8 @@ import argparse
 import requests
 from ..monday_api import MondayApi, MondayBoard
 from ..consts import API_URL
-
+import urllib3
+urllib3.disable_warnings()
 
 def update_items_and_subitems(item_board_id, subitem_board_id, api_key):
     item_url = 'https://njdfolzzmvnaay5oxqife4tuwy.apigateway.il-jerusalem-1.oci.customer-oci.com/v1/market-place-create-or-update-item'
@@ -15,14 +16,14 @@ def update_items_and_subitems(item_board_id, subitem_board_id, api_key):
 
     subitems_url = 'https://njdfolzzmvnaay5oxqife4tuwy.apigateway.il-jerusalem-1.oci.customer-oci.com/v1/market-place-create-or-update-subitem'
     subitem_json = {"event": {"pulseId": 1, "boardId": 1, "parentItemId": 1}}
-    orders = get_all_items_by_board(item_board_id, api_key)
-    print("orders:")
-    for order in orders:
-        json = item_json
-        json['event']['pulseId'] = int(order['id'])
-        json['event']['boardId'] = int(item_board_id)
-        res = requests.post(item_url, json=json , verify=False)
-        print(f"post :{json} , status code : {res.status_code} , response text : {res.text} ")
+    # orders = get_all_items_by_board(item_board_id, api_key)
+    # print("orders:")
+    # for order in orders:
+    #     json = item_json
+    #     json['event']['pulseId'] = int(order['id'])
+    #     json['event']['boardId'] = int(item_board_id)
+    #     res = requests.post(item_url, json=json , verify=False)
+    #     print(f"post :{json} , status code : {res.status_code} , response text : {res.text} ")
 
     orders = get_all_items_by_board(subitem_board_id, api_key)
     print("subitems::")
@@ -30,7 +31,10 @@ def update_items_and_subitems(item_board_id, subitem_board_id, api_key):
         json = subitem_json
         json['event']['pulseId'] = int(order['id'])
         json['event']['boardId'] = int(subitem_board_id)
-        json['event']['parentItemId'] = int(order['parent_item']['id'])
+        if order['parent_item']:
+            json['event']['parentItemId'] = int(order['parent_item']['id'])
+        else :
+            continue
         res = requests.post(subitems_url, json=json , verify=False)
         print(f"post :{json} , status code : {res.status_code} , response text : {res.text} ")
     
@@ -50,7 +54,7 @@ def get_all_items_by_board(board_id, api_key):
         ).get('data').get('boards')[0].get('items_page')
         all_items += items_page.get('items')
         cursor = items_page.get('cursor')
-        
+
     return all_items
 
 if __name__ == "__main__":
