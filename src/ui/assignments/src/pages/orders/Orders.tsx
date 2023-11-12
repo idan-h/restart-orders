@@ -11,6 +11,7 @@ import {
   TextExpand24Regular,
   TextCollapse24Filled,
 } from "@fluentui/react-icons";
+import ReactPaginate from "react-paginate";
 
 import { FilteredOrder, FilteredSubItem } from "../../types.ts";
 import { useAuthenticationService } from "../../services/authentication.ts";
@@ -32,10 +33,14 @@ import { Filters } from "../../components/filters/Filters.tsx";
 import { SubItems } from "./SubItems.tsx";
 import { pageStyle } from "../sharedStyles.ts";
 
+const PAGE_SIZE = 10;
+
 export const Orders = () => {
   const [orders, setOrders] = useState<FilteredOrder[] | null>(null); // all orders
+
   const [openNoteIds, setOpenNoteIds] = useState<number[]>([]); // open notes ids (used to toggle open notes)
   const [saving, setSaving] = useState(false); // saving state (used for saving spinner and block submit button)
+  const [itemOffset, setItemOffset] = useState(0); // paging offset, display items from this index
 
   const [confirmOpen, setConfirmOpen] = useState<boolean | undefined>(false);
   const [confirmProps, setConfirmProps] = useState<
@@ -71,6 +76,7 @@ export const Orders = () => {
     const filteredOrders = filterOrdersByText(orders, searchText);
     if (filteredOrders != null) {
       setOrders(filteredOrders);
+      setItemOffset(0); // reset paging
     }
   };
 
@@ -78,6 +84,7 @@ export const Orders = () => {
     const filteredOrders = filterOrdersByType(orders, optionValue);
     if (filteredOrders != null) {
       setOrders(filteredOrders);
+      setItemOffset(0); // reset paging
     }
   };
 
@@ -119,6 +126,13 @@ export const Orders = () => {
         ? openNoteIds.filter((openNoteId) => openNoteId !== id)
         : [...openNoteIds, id]
     );
+  };
+
+  const handlePageClick = ({ selected: pageIndex }: { selected: number }) => {
+    console.debug("Orders::handlePageClick", pageIndex);
+
+    const newOffset = (pageIndex * PAGE_SIZE) % filteredOrders.length;
+    setItemOffset(newOffset);
   };
 
   const handleSubmit = async () => {
@@ -193,6 +207,16 @@ export const Orders = () => {
     }
   };
 
+  /** Orders match filter */
+  const filteredOrders = orders?.filter(isVisible) ?? [];
+  /** Orders to render on screen (based on paging) */
+  const visibleOrders = filteredOrders.slice(
+    itemOffset,
+    itemOffset + PAGE_SIZE
+  );
+
+  const pageCount = Math.ceil(filteredOrders.length / PAGE_SIZE);
+
   return (
     <>
       <AppHeader />
@@ -213,9 +237,8 @@ export const Orders = () => {
               <SubHeader2>אין בקשות</SubHeader2>
             ) : (
               <>
-                {orders
-                  .filter(isVisible)
-                  .map(({ id, unit, subItems, comments }, index) => (
+                {visibleOrders.map(
+                  ({ id, unit, subItems, comments }, index) => (
                     <Card key={index} style={{ marginBottom: "30px" }}>
                       <CardHeader
                         header={
@@ -257,8 +280,18 @@ export const Orders = () => {
                         ) : null}
                       </CardPreview>
                     </Card>
-                  ))}
-                {!orders.some(isVisible) && (
+                  )
+                )}
+                {filteredOrders.length > PAGE_SIZE && (
+                  <ReactPaginate
+                    nextLabel="הבא >"
+                    previousLabel="< הקודם"
+                    pageCount={pageCount}
+                    renderOnZeroPageCount={null}
+                    onPageChange={handlePageClick}
+                  />
+                )}
+                {filteredOrders.length === 0 && (
                   <SubHeader2>אין בקשות תואמת את הסינון</SubHeader2>
                 )}
               </>

@@ -10,6 +10,7 @@ import {
   TextExpand24Regular,
   TextCollapse24Filled,
 } from "@fluentui/react-icons";
+import ReactPaginate from "react-paginate";
 
 import { DONE_STATUS, FilteredOrder, FilteredSubItem } from "../../types.ts";
 import { useAuthenticationService } from "../../services/authentication.ts";
@@ -32,11 +33,13 @@ import {
   showOrder,
 } from "../../services/Filters.service.ts";
 
-export const AssignedOrders = () => {
-  const [myOrders, setMyOrders] = useState<FilteredOrder[] | null>(null);
-  const [statusesList, setStatusesList] = useState<string[] | undefined>();
+const PAGE_SIZE = 10;
 
-  const [openNoteIds, setOpenNoteIds] = useState<number[]>([]);
+export const AssignedOrders = () => {
+  const [myOrders, setMyOrders] = useState<FilteredOrder[] | null>(null); // all assigned orders
+  const [statusesList, setStatusesList] = useState<string[] | undefined>(); // static list of status from the server
+  const [openNoteIds, setOpenNoteIds] = useState<number[]>([]); // open notes ids (used to toggle open notes)
+  const [itemOffset, setItemOffset] = useState(0); // paging offset, display items from this index
 
   const [confirmOpen, setConfirmOpen] = useState<boolean | undefined>(false);
   const [confirmProps, setConfirmProps] = useState<
@@ -80,6 +83,7 @@ export const AssignedOrders = () => {
     const filteredOrders = filterOrdersByText(myOrders, searchText);
     if (filteredOrders != null) {
       setMyOrders(filteredOrders);
+      setItemOffset(0); // reset paging
     }
   };
 
@@ -87,6 +91,7 @@ export const AssignedOrders = () => {
     const filteredOrders = filterOrdersByType(myOrders, optionValue);
     if (filteredOrders != null) {
       setMyOrders(filteredOrders);
+      setItemOffset(0); // reset paging
     }
   };
 
@@ -94,6 +99,7 @@ export const AssignedOrders = () => {
     const filteredOrders = filterOrdersByDone(myOrders, checked);
     if (filteredOrders != null) {
       setMyOrders(filteredOrders);
+      setItemOffset(0); // reset paging
     }
   };
 
@@ -213,6 +219,23 @@ export const AssignedOrders = () => {
     );
   };
 
+  const handlePageClick = ({ selected: pageIndex }: { selected: number }) => {
+    console.debug("MyOrders::handlePageClick", pageIndex);
+
+    const newOffset = (pageIndex * PAGE_SIZE) % filteredOrders.length;
+    setItemOffset(newOffset);
+  };
+
+  /** Orders match filter */
+  const filteredOrders = myOrders?.filter(isVisible) ?? [];
+  /** Orders to render on screen (based on paging) */
+  const visibleOrders = filteredOrders.slice(
+    itemOffset,
+    itemOffset + PAGE_SIZE
+  );
+
+  const pageCount = Math.ceil(filteredOrders.length / PAGE_SIZE);
+
   return (
     <>
       <AppHeader />
@@ -231,7 +254,7 @@ export const AssignedOrders = () => {
               <SubHeader2>אין הזמנות</SubHeader2>
             ) : (
               <>
-                {myOrders.filter(isVisible).map((order, index) => (
+                {visibleOrders.filter(isVisible).map((order, index) => (
                   <Card key={index} style={{ marginBottom: "30px" }}>
                     <CardHeader
                       header={
@@ -295,7 +318,16 @@ export const AssignedOrders = () => {
                     </CardPreview>
                   </Card>
                 ))}
-                {!myOrders.some(isVisible) && (
+                {filteredOrders.length > PAGE_SIZE && (
+                  <ReactPaginate
+                    nextLabel="הבא >"
+                    previousLabel="< הקודם"
+                    pageCount={pageCount}
+                    renderOnZeroPageCount={null}
+                    onPageChange={handlePageClick}
+                  />
+                )}
+                {filteredOrders.length === 0 && (
                   <SubHeader2>אין הזמנות תואמת את הסינון</SubHeader2>
                 )}
               </>
