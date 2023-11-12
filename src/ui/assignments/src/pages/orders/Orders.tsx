@@ -214,7 +214,10 @@ export const Orders = () => {
                       <CardHeader
                         header={
                           <Body1 style={{ textAlign: "left" }}>
-                            <b>{unit ?? "no name"}</b>
+                            <b>
+                              {unit ?? "no name"}
+                              {` (${subItems.length} פריטים)`}
+                            </b>
                           </Body1>
                         }
                       />

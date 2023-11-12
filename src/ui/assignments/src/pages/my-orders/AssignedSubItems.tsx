@@ -103,7 +103,7 @@ export const AssignedSubItems: React.FunctionComponent<
     quantity: {},
     status: {},
     delete: {
-      minWidth: 50,
+      defaultWidth: 50,
     },
   };
 

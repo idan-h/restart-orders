@@ -13,6 +13,7 @@
   },
   "dependencies": {
     "@fluentui/react-components": "^9.37.2",
+    "@fluentui-contrib/react-data-grid-react-window":  "^1.1.2",
     "@fluentui/react-icons": "^2.0.222",
     "@types/lodash.debounce": "^4.0.8",
     "lodash.debounce": "^4.0.8",
