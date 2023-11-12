@@ -4,15 +4,11 @@ import {
   TableCellLayout,
   TableColumnSizingOptions,
   createTableColumn,
-} from "@fluentui/react-components";
-
-import {
   DataGridBody,
   DataGrid,
   DataGridRow,
   DataGridCell,
-  RowRenderer,
-} from "@fluentui-contrib/react-data-grid-react-window";
+} from "@fluentui/react-components";
 
 import { FilteredSubItem } from "../../types.ts";
 import { isVisible } from "../../services/Filters.service.ts";
@@ -21,12 +17,6 @@ export interface SubItemsProps {
   items: FilteredSubItem[];
   onToggle: (subItem: FilteredSubItem, isChecked: boolean) => void;
 }
-
-const renderRow: RowRenderer<FilteredSubItem> = ({ item, rowId }, style) => (
-  <DataGridRow<FilteredSubItem> key={rowId} style={style}>
-    {({ renderCell }) => <DataGridCell>{renderCell(item)}</DataGridCell>}
-  </DataGridRow>
-);
 
 export const SubItems: React.FunctionComponent<SubItemsProps> = ({
   items,
@@ -76,7 +66,7 @@ export const SubItems: React.FunctionComponent<SubItemsProps> = ({
       getRowId={(item) => item.id}
       columnSizingOptions={columnSizing}
     >
-      {/* <DataGridBody<FilteredSubItem>>
+      <DataGridBody<FilteredSubItem>>
         {({ item, rowId }) => (
           <DataGridRow<FilteredSubItem>
             key={rowId}
@@ -90,9 +80,6 @@ export const SubItems: React.FunctionComponent<SubItemsProps> = ({
             )}
           </DataGridRow>
         )}
-      </DataGridBody> */}
-      <DataGridBody<FilteredSubItem> itemSize={50} height={200}>
-        {renderRow}
       </DataGridBody>
     </DataGrid>
   );
