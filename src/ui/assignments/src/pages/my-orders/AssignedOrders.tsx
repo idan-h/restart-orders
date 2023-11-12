@@ -13,7 +13,7 @@ import {
 
 import { DONE_STATUS, FilteredOrder, FilteredSubItem } from "../../types.ts";
 import { useAuthenticationService } from "../../services/authentication.ts";
-import { OrdersService } from "../../services/orders.service.ts";
+import { OrdersService } from "../../services/Orders.service.ts";
 import { Loading } from "../../components/Loading.tsx";
 import { AppHeader } from "../../components/AppHeader.tsx";
 import { SubHeader, SubHeader2 } from "../../components/SubHeader.tsx";
@@ -33,7 +33,7 @@ import {
 } from "../../services/Filters.service.ts";
 
 export const AssignedOrders = () => {
-  const [myOrders, setMyOrders] = useState<FilteredOrder[] | undefined>();
+  const [myOrders, setMyOrders] = useState<FilteredOrder[] | null>(null);
   const [statusesList, setStatusesList] = useState<string[] | undefined>();
 
   const [openNoteIds, setOpenNoteIds] = useState<number[]>([]);
@@ -77,15 +77,24 @@ export const AssignedOrders = () => {
   }, []);
 
   const handleTilterByText = (searchText: string) => {
-    filterOrdersByText([myOrders, setMyOrders], searchText);
+    const filteredOrders = filterOrdersByText(myOrders, searchText);
+    if (filteredOrders != null) {
+      setMyOrders(filteredOrders);
+    }
   };
 
   const handleFilterByType = (optionValue?: string) => {
-    filterOrdersByType([myOrders, setMyOrders], optionValue);
+    const filteredOrders = filterOrdersByType(myOrders, optionValue);
+    if (filteredOrders != null) {
+      setMyOrders(filteredOrders);
+    }
   };
 
   const handleFilterByDone = (checked: boolean) => {
-    filterOrdersByDone([myOrders, setMyOrders], checked);
+    const filteredOrders = filterOrdersByDone(myOrders, checked);
+    if (filteredOrders != null) {
+      setMyOrders(filteredOrders);
+    }
   };
 
   const handleSubItemStatusChange = (
@@ -234,10 +243,18 @@ export const AssignedOrders = () => {
                           }}
                         >
                           <Body1Stronger>{order.unit}</Body1Stronger>
-                          <Body1Stronger>{order.region ?? "ללא איזור מוגדר" }</Body1Stronger>
+                          <Body1Stronger>
+                            {order.region ?? "ללא איזור מוגדר"}
+                          </Body1Stronger>
                           <Body1Stronger>{order.name}</Body1Stronger>
                           <Body1Stronger>
-                            <a href={`tel:${(order.phone ?? "").startsWith("972") ? '+' : ""}${order.phone}`} >{order.phone}</a>
+                            <a
+                              href={`tel:${
+                                (order.phone ?? "").startsWith("972") ? "+" : ""
+                              }${order.phone}`}
+                            >
+                              {order.phone}
+                            </a>
                           </Body1Stronger>
                           <Divider />
                           <Divider />

@@ -14,7 +14,7 @@ import {
 
 import { FilteredOrder, FilteredSubItem } from "../../types.ts";
 import { useAuthenticationService } from "../../services/authentication.ts";
-import { OrdersService } from "../../services/orders.service.ts";
+import { OrdersService } from "../../services/Orders.service.ts";
 import {
   filterOrdersByText,
   filterOrdersByType,
@@ -33,7 +33,7 @@ import { SubItems } from "./SubItems.tsx";
 import { pageStyle } from "../sharedStyles.ts";
 
 export const Orders = () => {
-  const [orders, setOrders] = useState<FilteredOrder[] | undefined>(); // all orders
+  const [orders, setOrders] = useState<FilteredOrder[] | null>(null); // all orders
   const [openNoteIds, setOpenNoteIds] = useState<number[]>([]); // open notes ids (used to toggle open notes)
   const [saving, setSaving] = useState(false); // saving state (used for saving spinner and block submit button)
 
@@ -67,12 +67,18 @@ export const Orders = () => {
     }
   }, [ordersService]);
 
-  const handleTilterByText = (searchText?: string) => {
-    filterOrdersByText([orders, setOrders], searchText ?? "");
+  const handleTilterByText = (searchText: string) => {
+    const filteredOrders = filterOrdersByText(orders, searchText);
+    if (filteredOrders != null) {
+      setOrders(filteredOrders);
+    }
   };
 
   const handleFilterByType = (optionValue?: string) => {
-    filterOrdersByType([orders, setOrders], optionValue);
+    const filteredOrders = filterOrdersByType(orders, optionValue);
+    if (filteredOrders != null) {
+      setOrders(filteredOrders);
+    }
   };
 
   const handleToggleSubItem = (
@@ -215,7 +221,7 @@ export const Orders = () => {
                         header={
                           <Body1 style={{ textAlign: "left" }}>
                             <b>
-                              {unit ?? "no name"}
+                              {unit ?? "(ללא כותרת)"}
                               {` (${subItems.length} פריטים)`}
                             </b>
                           </Body1>

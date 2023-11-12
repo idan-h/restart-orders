@@ -1,4 +1,3 @@
-import { useState } from "react";
 import {
   Filter,
   Filtered,
@@ -40,11 +39,11 @@ export const showOrder = (
   filter,
 });
 
-const filterOrderBySubItem = (
+function _filterOrderBySubItem(
   order: FilteredOrder,
   filterField: keyof Filter,
   predict: (subItem: SubItem) => boolean
-): FilteredOrder => {
+): FilteredOrder {
   // Check sub-items, if at least one sub-item match predict - show order.
   let isOrderVisible = false;
   const filteredSubItems: FilteredSubItem[] = order.subItems.map(
@@ -67,108 +66,100 @@ const filterOrderBySubItem = (
       [filterField]: isOrderVisible,
     },
   };
-};
+}
 
-export const filterOrdersByText = (
-  [orders, setOrders]: ReturnType<typeof useState<FilteredOrder[]>>,
+export function filterOrdersByText(
+  orders: FilteredOrder[] | null,
   searchText: string
-) => {
+): FilteredOrder[] | null {
   console.debug("Filter.service::filterOrdersByText", searchText);
 
   if (!orders) {
     console.error("Filter.service::filterOrdersByText: orders empty");
-    return;
+    return null;
   }
 
   if (searchText) {
-    setOrders(
-      orders.map((order) => {
-        if (order.unit?.includes(searchText)) {
-          // title includes search - show order and all sub-items.
-          return showOrder(order, {
-            ...order.filter,
-            text: true,
-          });
-        } else {
-          // if at least one sub-item match filter - show order.
-          return filterOrderBySubItem(order, "text", (subItem) =>
-            subItem.product.name.includes(searchText)
-          );
-        }
-      })
-    );
-  } else {
-    // clear search - all items visible
-    setOrders(
-      orders.map((order) =>
-        showOrder(order, {
+    return orders.map((order) => {
+      if (order.unit?.includes(searchText)) {
+        // title includes search - show order and all sub-items.
+        return showOrder(order, {
           ...order.filter,
           text: true,
-        })
-      )
+        });
+      } else {
+        // if at least one sub-item match filter - show order.
+        return _filterOrderBySubItem(order, "text", (subItem) =>
+          subItem.product.name.includes(searchText)
+        );
+      }
+    });
+  } else {
+    // clear search - all items visible
+    return orders.map((order) =>
+      showOrder(order, {
+        ...order.filter,
+        text: true,
+      })
     );
   }
-};
+}
 
-export const filterOrdersByType = (
-  [orders, setOrders]: ReturnType<typeof useState<FilteredOrder[]>>,
+export function filterOrdersByType(
+  orders: FilteredOrder[] | null,
   optionValue = "All"
-) => {
+): FilteredOrder[] | null {
   console.debug("Filter.service::filterOrdersByType", optionValue);
 
   if (!orders) {
     console.error("Filter.service::filterOrdersByType: orders empty");
-    return;
+    return null;
   }
 
   if (optionValue === "All") {
     // clear search - all items visible
-    setOrders(
-      orders.map((order) =>
-        showOrder(order, {
-          ...order.filter,
-          type: true,
-        })
-      )
+    return orders.map((order) =>
+      showOrder(order, {
+        ...order.filter,
+        type: true,
+      })
     );
   } else {
-    setOrders(
+    return (
       // if at least one sub-item match filter - show order.
       orders.map((order) =>
-        filterOrderBySubItem(order, "type", (subItem) =>
+        _filterOrderBySubItem(order, "type", (subItem) =>
           subItem.product.type.split(",").includes(optionValue)
         )
       )
     );
   }
-};
+}
 
-export const filterOrdersByDone = (
-  [orders, setOrders]: ReturnType<typeof useState<FilteredOrder[]>>,
+export function filterOrdersByDone(
+  orders: FilteredOrder[] | null,
   checked: boolean
-) => {
+): FilteredOrder[] | null {
   console.debug("Filter.service::filterOrdersByDone", checked);
 
   if (!orders) {
     console.error("Filter.service::filterOrdersByDone: orders empty");
-    return;
+    return null;
   }
 
   if (checked) {
     // clear search - all items visible
-    setOrders(
-      orders.map((order) =>
-        showOrder(order, {
-          ...order.filter,
-          done: true,
-        })
-      )
+    return orders.map((order) =>
+      showOrder(order, {
+        ...order.filter,
+        done: true,
+      })
     );
   } else {
-    setOrders(
+    return (
       // if at least one sub-item match filter - show order.
       orders.map((order) =>
-        filterOrderBySubItem(
+        _filterOrderBySubItem(
           order,
           "done",
           (subItem) => checked || subItem.status !== DONE_STATUS
@@ -176,4 +167,4 @@ export const filterOrdersByDone = (
       )
     );
   }
-};
+}
