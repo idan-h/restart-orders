@@ -22,7 +22,6 @@ import {
   ConfirmDialog,
   ConfirmDialogProps,
 } from "../../components/ConfirmDialog.tsx";
-import { pageStyle } from "../sharedStyles.ts";
 import { AssignedSubItems } from "./AssignedSubItems.tsx";
 import { Filters } from "../../components/filters/Filters.tsx";
 import {
@@ -239,7 +238,7 @@ export const AssignedOrders = () => {
   return (
     <>
       <AppHeader />
-      <div style={pageStyle}>
+      <div className="app-page">
         <SubHeader>הזמנות{myOrders && ` (${myOrders?.length})`}</SubHeader>
         {!myOrders ? (
           <Loading />
@@ -325,6 +324,16 @@ export const AssignedOrders = () => {
                     pageCount={pageCount}
                     renderOnZeroPageCount={null}
                     onPageChange={handlePageClick}
+                    containerClassName="pagination"
+                    pageClassName="page-item"
+                    previousClassName="page-item"
+                    nextClassName="page-item"
+                    breakClassName="page-item"
+                    pageLinkClassName="page-link"
+                    previousLinkClassName="page-link"
+                    nextLinkClassName="page-link"
+                    breakLinkClassName="page-link"
+                    activeClassName="page-active"
                   />
                 )}
                 {filteredOrders.length === 0 && (

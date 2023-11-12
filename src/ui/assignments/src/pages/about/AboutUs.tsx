@@ -2,7 +2,6 @@ import { AddCircle28Regular, Checkmark28Regular } from "@fluentui/react-icons";
 
 import { Microsoft, Monday, Restart, Oracle, Firma } from "./images";
 import { AppHeader } from "../../components/AppHeader";
-import { pageStyle } from "../sharedStyles";
 
 const TextLine = (text: string) => {
   return (
@@ -26,7 +25,7 @@ export const AboutUs = () => {
   return (
     <>
       <AppHeader />
-      <div style={pageStyle}>
+      <div className="app-page">
         <h1 style={{ textAlign: "center" }}>מי אנחנו</h1>
         <p>
           <b style={{ marginBottom: "10px" }}>

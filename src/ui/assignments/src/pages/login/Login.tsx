@@ -5,10 +5,8 @@ import { Button, Field, Input, tokens } from "@fluentui/react-components";
 import { ROUTES } from "../../routes-const";
 import { useAuthenticationService } from "../../services/authentication";
 import { AppHeader } from "../../components/AppHeader";
-import { pageStyle } from "../sharedStyles";
 import { SubHeader } from "../../components/SubHeader";
 import { Loading } from "../../components/Loading";
-
 
 const loginCardStyle: React.CSSProperties = {
   position: "relative",
@@ -73,7 +71,7 @@ export const LoginPage = () => {
   return (
     <>
       <AppHeader />
-      <div style={pageStyle}>
+      <div className="app-page">
         <div style={loginCardStyle}>
           <SubHeader>פורטל Restart לעמותות</SubHeader>
           <div style={inputsContainerStyle}>

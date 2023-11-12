@@ -31,7 +31,6 @@ import {
 } from "../../components/ConfirmDialog.tsx";
 import { Filters } from "../../components/filters/Filters.tsx";
 import { SubItems } from "./SubItems.tsx";
-import { pageStyle } from "../sharedStyles.ts";
 
 const PAGE_SIZE = 10;
 
@@ -220,7 +219,7 @@ export const Orders = () => {
   return (
     <>
       <AppHeader />
-      <div style={pageStyle}>
+      <div className="app-page">
         <SubHeader>בקשות{orders && ` (${orders?.length})`}</SubHeader>
         {saving ? (
           <Loading label="מעדכן..." />
@@ -289,6 +288,16 @@ export const Orders = () => {
                     pageCount={pageCount}
                     renderOnZeroPageCount={null}
                     onPageChange={handlePageClick}
+                    containerClassName="pagination"
+                    pageClassName="page-item"
+                    previousClassName="page-item"
+                    nextClassName="page-item"
+                    breakClassName="page-item"
+                    pageLinkClassName="page-link"
+                    previousLinkClassName="page-link"
+                    nextLinkClassName="page-link"
+                    breakLinkClassName="page-link"
+                    activeClassName="page-active"
                   />
                 )}
                 {filteredOrders.length === 0 && (
