@@ -256,14 +256,20 @@ const Form = ({ updateForm }) => {
       {getErrorPage()}
       <div className='form-container'>
         <div className='header'>
-          <img src='/content/Logo.png' alt='LOGO' className='logo' />
+          <div className='main-logo'>
+            <img src='/content/Logo.png' alt='LOGO' className='logo' />
+          </div>
+          <div className='sub-logos'>
+            <img src='/content/LevEchad.png' alt='LOGO' className={'lev-echad-logo'} />
+            <img src='/content/DeVinchi.jpg' alt='LOGO' className={'de-vinchi-logo'} />
+          </div>
           <div className='title'>
-            {updateForm ? 'עדכון הזמנה' : (formType == 'EMR' ? 'דרישת ציוד לכח כוננות' : 'רכישה ותיקון של ציוד טקטי ')}
+            {updateForm ? 'עדכון הזמנה' : (formType == 'EMR' ? 'דרישת ציוד לכח כוננות' : 'תיקון וייצור אמל"ח בשטח')}
           </div>
           <div className='description' hidden={updateForm || formType != 'IDF'}>
             טופס זה מיועד למשרתים פעילים בצה״ל סדיר ,מילואים וקבע. אם הינך אדם
-            פרטי וברצונך לסייע לכח לוחם בהשלמת ציוד , אנא הפנה טופס זה לקצין
-            האמל״ח או לגורם רלוונטי ביחידה. נא לרכז את כל הפריטים בטופס אחד
+            פרטי וברצונך לסייע לכח לוחם בתיקון ו/או ייצור ציוד , אנא הפנה טופס זה לקצין
+            האמל״ח, רס״פ או לגורם רלוונטי ביחידה. נא לרכז את כל הפריטים בטופס אחד
           </div>
           <div className='description' hidden={updateForm || formType != 'EMR'}>
             טופס זה מיועד לכחות כוננות קיימים ובהתהוות.
@@ -384,7 +390,7 @@ const Form = ({ updateForm }) => {
             </div>
           </div>
 
-          <ChooseItem
+          { formType === 'EMR' ? <ChooseItem
             lable="בחירת פריטי ציוד לרכישה:"
             itemType={equipmentItems}
             selectedItems={selectedEquipmentItems}
@@ -392,7 +398,7 @@ const Form = ({ updateForm }) => {
             setAvailableItems={setAvailableEquipmentItems}
             setModalToOpen={setModalToOpen}
             setItemToEdit={setItemToEdit}
-          />
+          /> : null }
 
           <ChooseItem
             lable={"בחירת פריטי ציוד לתיקון:"}

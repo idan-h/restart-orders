@@ -28,7 +28,19 @@
       gap: 1em;
       padding: 1em;
       .logo {
-        width: 100%;
+        width: 80%;
+      }
+      .sub-logos {
+        display: flex;
+        position: relative;
+        gap: 20px;
+        align-items: center;
+        .lev-echad-logo {
+          height: 150px;
+        }
+        .de-vinchi-logo {
+          width: 250px;
+        }
       }
       .title {
         font-size: 1.3em;
