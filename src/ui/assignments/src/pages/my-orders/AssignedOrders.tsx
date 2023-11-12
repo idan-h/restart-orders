@@ -233,11 +233,12 @@ export const AssignedOrders = () => {
                             width: "-webkit-fill-available",
                           }}
                         >
-                          <Body1Stronger>
-                            {order.unit} {order.region}
-                          </Body1Stronger>
+                          <Body1Stronger>{order.unit}</Body1Stronger>
+                          <Body1Stronger>{order.region ?? "ללא איזור מוגדר" }</Body1Stronger>
                           <Body1Stronger>{order.name}</Body1Stronger>
-                          <Body1Stronger>{order.phone}</Body1Stronger>
+                          <Body1Stronger>
+                            <a href={`tel:${(order.phone ?? "").startsWith("972") ? '+' : ""}${order.phone}`} >{order.phone}</a>
+                          </Body1Stronger>
                           <Divider />
                           <Divider />
                         </div>
