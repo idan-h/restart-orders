@@ -1,18 +1,3 @@
-export const DONE_STATUS = "בוצע";
-
-export interface Filter {
-  /** match text filter */
-  text: boolean;
-  /** match status filter */
-  type: boolean;
-  /** match done filter */
-  done: boolean;
-}
-
-export interface Filtered {
-  filter: Filter;
-}
-
 // ---------------------------------------------------
 
 // Single item to deliver
@@ -42,8 +27,6 @@ export interface Product {
 export type SubItem = BaseSubItem & {
   product: Product;
 };
-
-export type FilteredSubItem = SubItem & Filtered;
 
 // ---------------------------------------------------
 
@@ -84,10 +67,5 @@ export type Order = {
   /** Array of sub-items */
   subItems: SubItem[];
 };
-
-export type FilteredOrder = Order &
-  Filtered & {
-    subItems: Array<FilteredSubItem>;
-  };
 
 // ---------------------------------------------------

@@ -11,20 +11,21 @@ import {
   TextExpand24Regular,
   TextCollapse24Filled,
 } from "@fluentui/react-icons";
-import ReactPaginate from "react-paginate";
 
-import { FilteredOrder, FilteredSubItem } from "../../types.ts";
 import { useAuthenticationService } from "../../services/authentication.ts";
 import { OrdersService } from "../../services/Orders.service.ts";
 import {
-  filterOrdersByText,
-  filterOrdersByType,
+  FilteredOrder,
+  FilteredSubItem,
   isVisible,
   showOrder,
+  filterOrdersByText,
+  filterOrdersByType,
 } from "../../services/Filters.service.ts";
 import { AppHeader } from "../../components/AppHeader.tsx";
 import { Loading } from "../../components/Loading.tsx";
 import { SubHeader, SubHeader2 } from "../../components/SubHeader.tsx";
+import { Pagination } from "../../components/Pagination.tsx";
 import {
   ConfirmDialog,
   ConfirmDialogProps,
@@ -127,7 +128,7 @@ export const Orders = () => {
     );
   };
 
-  const handlePageClick = ({ selected: pageIndex }: { selected: number }) => {
+  const handlePageClick = (pageIndex: number) => {
     console.debug("Orders::handlePageClick", pageIndex);
 
     const newOffset = (pageIndex * PAGE_SIZE) % filteredOrders.length;
@@ -284,22 +285,9 @@ export const Orders = () => {
                   )
                 )}
                 {filteredOrders.length > PAGE_SIZE && (
-                  <ReactPaginate
-                    nextLabel="הבא >"
-                    previousLabel="< הקודם"
+                  <Pagination
                     pageCount={pageCount}
-                    renderOnZeroPageCount={null}
-                    onPageChange={handlePageClick}
-                    containerClassName="pagination"
-                    pageClassName="page-item"
-                    previousClassName="page-item"
-                    nextClassName="page-item"
-                    breakClassName="page-item"
-                    pageLinkClassName="page-link"
-                    previousLinkClassName="page-link"
-                    nextLinkClassName="page-link"
-                    breakLinkClassName="page-link"
-                    activeClassName="page-active"
+                    onPageClick={handlePageClick}
                   />
                 )}
                 {filteredOrders.length === 0 && (

@@ -1,12 +1,32 @@
-import {
-  Filter,
-  Filtered,
-  Order,
-  FilteredOrder,
-  SubItem,
-  FilteredSubItem,
-  DONE_STATUS,
-} from "../types";
+import { Order, SubItem } from "../types";
+
+// ---------------------------------------------------
+// Types
+
+export const DONE_STATUS = "בוצע";
+
+export interface Filter {
+  /** match text filter */
+  text: boolean;
+  /** match status filter */
+  type: boolean;
+  /** match done filter */
+  done: boolean;
+}
+
+export interface Filtered {
+  filter: Filter;
+}
+
+export type FilteredSubItem = SubItem & Filtered;
+
+export type FilteredOrder = Order &
+  Filtered & {
+    subItems: Array<FilteredSubItem>;
+  };
+
+// ---------------------------------------------------
+// Helpers
 
 /** check if item is visible */
 export const isVisible = (item: Filtered) =>
@@ -67,6 +87,9 @@ function _filterOrderBySubItem(
     },
   };
 }
+
+// ---------------------------------------------------
+// Filters
 
 export function filterOrdersByText(
   orders: FilteredOrder[] | null,

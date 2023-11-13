@@ -10,8 +10,7 @@ import {
   DataGridCell,
 } from "@fluentui/react-components";
 
-import { FilteredSubItem } from "../../types.ts";
-import { isVisible } from "../../services/Filters.service.ts";
+import { FilteredSubItem, isVisible } from "../../services/Filters.service.ts";
 
 export interface SubItemsProps {
   items: FilteredSubItem[];

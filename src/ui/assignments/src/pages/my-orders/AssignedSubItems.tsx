@@ -14,8 +14,11 @@ import {
 } from "@fluentui/react-components";
 import { Delete24Regular } from "@fluentui/react-icons";
 
-import { DONE_STATUS, FilteredSubItem } from "../../types.ts";
-import { isVisible } from "../../services/Filters.service.ts";
+import {
+  DONE_STATUS,
+  FilteredSubItem,
+  isVisible,
+} from "../../services/Filters.service.ts";
 
 export interface AssignedSubItemsProps {
   items: FilteredSubItem[];

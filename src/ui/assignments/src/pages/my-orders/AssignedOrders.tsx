@@ -10,11 +10,19 @@ import {
   TextExpand24Regular,
   TextCollapse24Filled,
 } from "@fluentui/react-icons";
-import ReactPaginate from "react-paginate";
 
-import { DONE_STATUS, FilteredOrder, FilteredSubItem } from "../../types.ts";
 import { useAuthenticationService } from "../../services/authentication.ts";
 import { OrdersService } from "../../services/Orders.service.ts";
+import {
+  DONE_STATUS,
+  FilteredOrder,
+  FilteredSubItem,
+  isVisible,
+  showOrder,
+  filterOrdersByDone,
+  filterOrdersByText,
+  filterOrdersByType,
+} from "../../services/Filters.service.ts";
 import { Loading } from "../../components/Loading.tsx";
 import { AppHeader } from "../../components/AppHeader.tsx";
 import { SubHeader, SubHeader2 } from "../../components/SubHeader.tsx";
@@ -22,15 +30,9 @@ import {
   ConfirmDialog,
   ConfirmDialogProps,
 } from "../../components/ConfirmDialog.tsx";
-import { AssignedSubItems } from "./AssignedSubItems.tsx";
+import { Pagination } from "../../components/Pagination.tsx";
 import { Filters } from "../../components/filters/Filters.tsx";
-import {
-  filterOrdersByDone,
-  filterOrdersByText,
-  filterOrdersByType,
-  isVisible,
-  showOrder,
-} from "../../services/Filters.service.ts";
+import { AssignedSubItems } from "./AssignedSubItems.tsx";
 
 const PAGE_SIZE = 10;
 
@@ -218,7 +220,7 @@ export const AssignedOrders = () => {
     );
   };
 
-  const handlePageClick = ({ selected: pageIndex }: { selected: number }) => {
+  const handlePageClick = (pageIndex: number) => {
     console.debug("MyOrders::handlePageClick", pageIndex);
 
     const newOffset = (pageIndex * PAGE_SIZE) % filteredOrders.length;
@@ -318,22 +320,9 @@ export const AssignedOrders = () => {
                   </Card>
                 ))}
                 {filteredOrders.length > PAGE_SIZE && (
-                  <ReactPaginate
-                    nextLabel="הבא >"
-                    previousLabel="< הקודם"
+                  <Pagination
                     pageCount={pageCount}
-                    renderOnZeroPageCount={null}
-                    onPageChange={handlePageClick}
-                    containerClassName="pagination"
-                    pageClassName="page-item"
-                    previousClassName="page-item"
-                    nextClassName="page-item"
-                    breakClassName="page-item"
-                    pageLinkClassName="page-link"
-                    previousLinkClassName="page-link"
-                    nextLinkClassName="page-link"
-                    breakLinkClassName="page-link"
-                    activeClassName="page-active"
+                    onPageClick={handlePageClick}
                   />
                 )}
                 {filteredOrders.length === 0 && (
