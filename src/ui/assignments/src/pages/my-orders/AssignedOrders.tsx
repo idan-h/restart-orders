@@ -1,4 +1,4 @@
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState, useMemo, useRef } from "react";
 import {
   Card,
   CardHeader,
@@ -46,6 +46,8 @@ export const AssignedOrders = () => {
   const [confirmProps, setConfirmProps] = useState<
     Omit<ConfirmDialogProps, "openState"> | undefined
   >();
+
+  const pageRef = useRef<HTMLDivElement>(null);
 
   const { getUserId } = useAuthenticationService();
   const userId = getUserId();
@@ -225,6 +227,9 @@ export const AssignedOrders = () => {
 
     const newOffset = (pageIndex * PAGE_SIZE) % filteredOrders.length;
     setItemOffset(newOffset);
+
+    // scroll to top
+    pageRef.current?.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   /** Orders match filter */
@@ -240,7 +245,7 @@ export const AssignedOrders = () => {
   return (
     <>
       <AppHeader />
-      <div className="app-page">
+      <div className="app-page" ref={pageRef}>
         <SubHeader>הזמנות{myOrders && ` (${myOrders?.length})`}</SubHeader>
         {!myOrders ? (
           <Loading />
