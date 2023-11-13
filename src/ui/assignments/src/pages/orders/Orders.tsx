@@ -13,7 +13,7 @@ import {
 } from "@fluentui/react-icons";
 
 import { useAuthenticationService } from "../../services/authentication.ts";
-import { OrdersService } from "../../services/Orders.service.ts";
+import { OrdersService } from "../../services/orders.service.ts";
 import {
   FilteredOrder,
   FilteredSubItem,
