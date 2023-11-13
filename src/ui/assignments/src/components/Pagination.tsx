@@ -16,15 +16,15 @@ export const Pagination: React.FunctionComponent<PaginationProps> = ({
     pageCount={pageCount}
     renderOnZeroPageCount={null}
     onPageChange={(data) => onPageClick(data.selected)}
-    containerClassName="pagination"
-    pageClassName="page-item"
-    previousClassName="page-item"
-    nextClassName="page-item"
-    breakClassName="page-item"
-    pageLinkClassName="page-link"
-    previousLinkClassName="page-link"
-    nextLinkClassName="page-link"
-    breakLinkClassName="page-link"
-    activeClassName="page-active"
+    containerClassName="pagination-container"
+    pageClassName="pagination-list-item"
+    previousClassName="pagination-list-item"
+    nextClassName="pagination-list-item"
+    breakClassName="pagination-list-item"
+    pageLinkClassName="pagination-button"
+    previousLinkClassName="pagination-button"
+    nextLinkClassName="pagination-button"
+    breakLinkClassName="pagination-button"
+    activeClassName="pagination-active"
   />
 );
