@@ -1,19 +1,19 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import {
-  Body1,
-  Button,
+  tokens,
   Card,
   CardHeader,
   CardPreview,
-  tokens,
+  Button,
+  Subtitle1,
 } from "@fluentui/react-components";
 import {
   TextExpand24Regular,
   TextCollapse24Filled,
 } from "@fluentui/react-icons";
 
-import { useAuthenticationService } from "../../services/authentication.ts";
-import { OrdersService } from "../../services/orders.service.ts";
+import { useAuthenticationService } from "../../services/Authentication.ts";
+import { OrdersService } from "../../services/Orders.service.ts";
 import {
   FilteredOrder,
   FilteredSubItem,
@@ -224,36 +224,37 @@ export const Orders = () => {
 
   return (
     <>
+      {/* HEADER */}
       <AppHeader />
-      <div className="app-page" ref={pageRef}>
+      {/* CONTENT */}
+      <div className="app-page" style={{ bottom: "44px" }} ref={pageRef}>
+        {/* SUB-HEADER */}
         <SubHeader>בקשות{orders && ` (${orders?.length})`}</SubHeader>
         {saving ? (
+          // SPINNER: ASSIGNING...
           <Loading label="מעדכן..." />
         ) : !orders ? (
+          // SPINNER: LOADING...
           <Loading />
         ) : (
           <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+            {/* FILTERS */}
             <Filters
               onTextFilter={handleTilterByText}
               onTypeFilter={handleFilterByType}
             />
-
             {orders.length === 0 ? (
+              // EMPTY STATE: NO DATA
               <SubHeader2>אין בקשות</SubHeader2>
             ) : (
               <>
+                {/* ITEMS LIST */}
                 {visibleOrders.map(
                   ({ id, unit, subItems, comments }, index) => (
-                    <Card key={index} style={{ marginBottom: "30px" }}>
+                    <Card key={index}>
                       <CardHeader
-                        header={
-                          <Body1 style={{ textAlign: "left" }}>
-                            <b>
-                              {unit ?? "(ללא כותרת)"}
-                              {` (${subItems.length} פריטים)`}
-                            </b>
-                          </Body1>
-                        }
+                        header={<Subtitle1>{unit ?? "(ללא כותרת)"}</Subtitle1>}
+                        description={`(${subItems.length} פריטים)`}
                       />
                       <CardPreview>
                         <SubItems
@@ -265,11 +266,7 @@ export const Orders = () => {
                         />
                         {comments && (
                           <a
-                            style={{
-                              display: "flex",
-                              alignItems: "center",
-                              margin: 10,
-                            }}
+                            className="order-comments-button"
                             onClick={() => toggleOpenNote(id)}
                           >
                             הערות
@@ -280,19 +277,21 @@ export const Orders = () => {
                             )}
                           </a>
                         )}
-                        {openNoteIds.includes(id) ? (
-                          <p style={{ margin: 10 }}>{comments}</p>
-                        ) : null}
+                        {openNoteIds.includes(id) && (
+                          <p className="order-comments">{comments}</p>
+                        )}
                       </CardPreview>
                     </Card>
                   )
                 )}
+                {/* PAGINATION */}
                 {filteredOrders.length > PAGE_SIZE && (
                   <Pagination
                     pageCount={pageCount}
                     onPageClick={handlePageClick}
                   />
                 )}
+                {/* EMPTY STATE: NO FILTER RESULTS */}
                 {filteredOrders.length === 0 && (
                   <SubHeader2>אין בקשות תואמת את הסינון</SubHeader2>
                 )}
@@ -301,6 +300,7 @@ export const Orders = () => {
           </div>
         )}
       </div>
+      {/* BUTTON: ASSIGN */}
       {orders?.length && (
         <div
           style={{
@@ -310,6 +310,7 @@ export const Orders = () => {
             left: 0,
             right: 0,
             backgroundColor: tokens.colorNeutralBackground1,
+            boxShadow: tokens.shadow28,
           }}
         >
           <Button
@@ -327,6 +328,7 @@ export const Orders = () => {
           </Button>
         </div>
       )}
+      {/* POPUP */}
       {confirmProps && (
         <ConfirmDialog
           openState={[confirmOpen, setConfirmOpen]}

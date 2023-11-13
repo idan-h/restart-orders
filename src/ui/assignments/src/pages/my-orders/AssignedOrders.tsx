@@ -5,14 +5,15 @@ import {
   CardPreview,
   Body1Stronger,
   Divider,
+  Subtitle1,
 } from "@fluentui/react-components";
 import {
   TextExpand24Regular,
   TextCollapse24Filled,
 } from "@fluentui/react-icons";
 
-import { useAuthenticationService } from "../../services/authentication.ts";
-import { OrdersService } from "../../services/orders.service.ts";
+import { useAuthenticationService } from "../../services/Authentication.ts";
+import { OrdersService } from "../../services/Orders.service.ts";
 import {
   DONE_STATUS,
   FilteredOrder,
@@ -244,49 +245,53 @@ export const AssignedOrders = () => {
 
   return (
     <>
+      {/* HEADER */}
       <AppHeader />
+      {/* CONTENT */}
       <div className="app-page" ref={pageRef}>
+        {/* SUB-HEADER */}
         <SubHeader>הזמנות{myOrders && ` (${myOrders?.length})`}</SubHeader>
         {!myOrders ? (
+          // SPINNER: LOADING...
           <Loading />
         ) : (
           <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+            {/* FILTERS */}
             <Filters
               onTextFilter={handleTilterByText}
               onTypeFilter={handleFilterByType}
               onDoneFilter={handleFilterByDone}
             />
             {myOrders.length === 0 ? (
+              // EMPTY STATE: NO DATA
               <SubHeader2>אין הזמנות</SubHeader2>
             ) : (
               <>
+                {/* ITEMS LIST */}
                 {visibleOrders.filter(isVisible).map((order, index) => (
-                  <Card key={index} style={{ marginBottom: "30px" }}>
+                  <Card key={index}>
                     <CardHeader
                       header={
-                        <div
-                          style={{
-                            display: "flex",
-                            flexDirection: "column",
-                            width: "-webkit-fill-available",
-                          }}
-                        >
-                          <Body1Stronger>{order.unit}</Body1Stronger>
-                          <Body1Stronger>
-                            {order.region ?? "ללא איזור מוגדר"}
-                          </Body1Stronger>
-                          <Body1Stronger>{order.name}</Body1Stronger>
-                          <Body1Stronger>
-                            <a
-                              href={`tel:${
-                                (order.phone ?? "").startsWith("972") ? "+" : ""
-                              }${order.phone}`}
-                            >
-                              {order.phone}
-                            </a>
-                          </Body1Stronger>
-                          <Divider />
-                          <Divider />
+                        <Subtitle1>{order.unit ?? "(ללא כותרת)"}</Subtitle1>
+                      }
+                      description={
+                        <div style={{ width: "100%" }}>
+                          <div>איזור: {order.region ?? "ללא איזור מוגדר"}</div>
+                          <div>
+                            איש קשר: {order.name}, טלפון:{" "}
+                            <Body1Stronger>
+                              <a
+                                href={`tel:${
+                                  (order.phone ?? "").startsWith("972")
+                                    ? "+"
+                                    : ""
+                                }${order.phone}`}
+                              >
+                                {order.phone}
+                              </a>
+                            </Body1Stronger>
+                          </div>
+                          <Divider appearance="strong" />
                         </div>
                       }
                     />
@@ -303,11 +308,7 @@ export const AssignedOrders = () => {
                       />
                       {order.comments && (
                         <a
-                          style={{
-                            display: "flex",
-                            alignItems: "center",
-                            margin: 10,
-                          }}
+                          className="order-comments-button"
                           onClick={() => toggleOpenNote(order.id)}
                         >
                           הערות
@@ -318,18 +319,20 @@ export const AssignedOrders = () => {
                           )}
                         </a>
                       )}
-                      {openNoteIds.includes(order.id) ? (
-                        <p style={{ margin: 10 }}>{order.comments}</p>
-                      ) : null}
+                      {openNoteIds.includes(order.id) && (
+                        <p className="order-comments">{order.comments}</p>
+                      )}
                     </CardPreview>
                   </Card>
                 ))}
+                {/* PAGINATION */}
                 {filteredOrders.length > PAGE_SIZE && (
                   <Pagination
                     pageCount={pageCount}
                     onPageClick={handlePageClick}
                   />
                 )}
+                {/* EMPTY STATE: NO FILTER RESULTS */}
                 {filteredOrders.length === 0 && (
                   <SubHeader2>אין הזמנות תואמת את הסינון</SubHeader2>
                 )}
@@ -338,6 +341,7 @@ export const AssignedOrders = () => {
           </div>
         )}
       </div>
+      {/* POPUP */}
       {confirmProps && (
         <ConfirmDialog
           openState={[confirmOpen, setConfirmOpen]}
