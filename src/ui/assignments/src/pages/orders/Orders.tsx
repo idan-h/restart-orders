@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
   Body1,
   Button,
@@ -46,6 +46,8 @@ export const Orders = () => {
   const [confirmProps, setConfirmProps] = useState<
     Omit<ConfirmDialogProps, "openState"> | undefined
   >();
+
+  const pageRef = useRef<HTMLDivElement>(null);
 
   const { getUserId } = useAuthenticationService();
   const userId = getUserId();
@@ -134,7 +136,8 @@ export const Orders = () => {
     const newOffset = (pageIndex * PAGE_SIZE) % filteredOrders.length;
     setItemOffset(newOffset);
 
-    // TODO $G$: scroll to top
+    // scroll to top
+    pageRef.current?.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   const handleSubmit = async () => {
@@ -222,7 +225,7 @@ export const Orders = () => {
   return (
     <>
       <AppHeader />
-      <div className="app-page">
+      <div className="app-page" ref={pageRef}>
         <SubHeader>בקשות{orders && ` (${orders?.length})`}</SubHeader>
         {saving ? (
           <Loading label="מעדכן..." />
