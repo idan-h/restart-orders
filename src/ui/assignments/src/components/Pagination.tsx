@@ -1,5 +1,13 @@
-import React from "react";
+import React, { CSSProperties } from "react";
+import {
+  NextFrame20Filled,
+  PreviousFrame20Filled,
+} from "@fluentui/react-icons/lib/fonts";
 import ReactPaginate from "react-paginate";
+
+const iconStyle: CSSProperties = {
+  verticalAlign: "text-bottom",
+};
 
 export interface PaginationProps {
   pageCount: number;
@@ -11,8 +19,8 @@ export const Pagination: React.FunctionComponent<PaginationProps> = ({
   onPageClick,
 }) => (
   <ReactPaginate
-    nextLabel="הבא >"
-    previousLabel="< הקודם"
+    nextLabel={<PreviousFrame20Filled style={iconStyle} />}
+    previousLabel={<NextFrame20Filled style={iconStyle} />}
     pageCount={pageCount}
     renderOnZeroPageCount={null}
     onPageChange={(data) => onPageClick(data.selected)}
@@ -26,5 +34,6 @@ export const Pagination: React.FunctionComponent<PaginationProps> = ({
     nextLinkClassName="pagination-button"
     breakLinkClassName="pagination-button"
     activeClassName="pagination-active"
+    disabledClassName="pagination-disabled"
   />
 );
