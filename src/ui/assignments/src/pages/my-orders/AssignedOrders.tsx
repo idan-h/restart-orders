@@ -12,8 +12,7 @@ import {
   TextCollapse24Filled,
 } from "@fluentui/react-icons";
 
-import { useAuthenticationService } from "../../services/authentication.ts";
-import { OrdersService } from "../../services/orders.service.ts";
+import { useOrdersService } from "../../services/Orders.srv.ts";
 import {
   DONE_STATUS,
   FilteredOrder,
@@ -50,17 +49,7 @@ export const AssignedOrders = () => {
 
   const pageRef = useRef<HTMLDivElement>(null);
 
-  const { getUserId } = useAuthenticationService();
-  const userId = getUserId();
-
-  const ordersService = useMemo(() => {
-    if (!userId) {
-      console.error("MyOrders::Init: Not logged in");
-      return undefined;
-    }
-
-    return new OrdersService(userId);
-  }, [userId]);
+  const ordersService = useOrdersService();
 
   useEffect(() => {
     if (!ordersService) {

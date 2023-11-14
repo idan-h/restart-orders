@@ -2,13 +2,13 @@ import React from "react";
 
 import { SearchBoxDebounce } from "./SearchBoxDebounce";
 import { TypeFilter } from "./TypeFilter";
+import { ProductFilter } from "./ProductFilter";
 import { DoneCheckbox } from "./DoneCheckbox";
-import { ProductFilter } from "./ProcuctFilter";
 
 export interface SubHeaderProps {
   onTextFilter?: (text: string) => void;
   onTypeFilter?: (type?: string) => void;
-  onProductFilter?: (productName?: string[]) => void;
+  onProductFilter?: (productNumbers: number[]) => void;
   onDoneFilter?: (checked: boolean) => void;
 }
 

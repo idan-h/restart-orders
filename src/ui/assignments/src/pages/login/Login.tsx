@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { Button, Field, Input, tokens } from "@fluentui/react-components";
 
 import { ROUTES } from "../../routes-const";
-import { useAuthenticationService } from "../../services/authentication";
+import { useAuthenticationService } from "../../services/Authentication.service";
 import { AppHeader } from "../../components/AppHeader";
 import { SubHeader } from "../../components/SubHeader";
 import { Loading } from "../../components/Loading";

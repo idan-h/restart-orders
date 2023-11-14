@@ -1,19 +1,24 @@
+import { useMemo } from "react";
 import { Order, Product } from "../types";
+import { useAuthenticationService } from "./Authentication.service";
 
 const baseUrl =
   "https://njdfolzzmvnaay5oxqife4tuwy.apigateway.il-jerusalem-1.oci.customer-oci.com/v1/";
 
 // cache this data
-export let productDetails: Map<number, Product>;
+let productDetails: Map<number, Product>;
 let statusesList: string[];
 
 export class OrdersService {
   constructor(private _userId: string) {}
 
-
   /** List of all items in the database. */
-  private async _fetchProductDetails(): Promise<Map<number, Product>> {
+  public async fetchProductDetails(): Promise<Map<number, Product>> {
     console.debug("OrdersService:fetchProductNames");
+
+    if (productDetails) {
+      return productDetails;
+    }
 
     const response = await fetch(
       new URL(
@@ -24,7 +29,7 @@ export class OrdersService {
 
     const backendProducts = await response.json();
 
-    return new Map(
+    productDetails = new Map(
       backendProducts.map((product: Product) => [
         product.product_number,
         {
@@ -34,13 +39,15 @@ export class OrdersService {
         },
       ])
     );
+
+    return productDetails;
   }
 
   /** Get all orders for the orders page */
   public async fetchUnassignedOrders(): Promise<{ orders: Order[] }> {
     console.debug("OrdersService:fetchUnassignedOrders");
 
-    if (!productDetails) productDetails = await this._fetchProductDetails();
+    if (!productDetails) await this.fetchProductDetails();
 
     const response = await fetch(
       new URL(
@@ -73,7 +80,7 @@ export class OrdersService {
   public async fetchAssignedOrders(): Promise<{ orders: Order[] }> {
     console.debug("OrdersService:fetchAssignedOrders");
 
-    if (!productDetails) productDetails = await this._fetchProductDetails();
+    if (!productDetails) await this.fetchProductDetails();
 
     const response = await fetch(
       new URL(
@@ -106,7 +113,7 @@ export class OrdersService {
   public async fetchOrder(orderId: string): Promise<Order> {
     console.debug("OrdersService:fetchOrder");
 
-    if (!productDetails) productDetails = await this._fetchProductDetails();
+    if (!productDetails) await this.fetchProductDetails();
 
     const response = await fetch(
       new URL(
@@ -197,4 +204,20 @@ export class OrdersService {
 
     await response.json();
   }
+}
+
+export function useOrdersService() {
+  const { getUserId } = useAuthenticationService();
+  const userId = getUserId();
+
+  const ordersService = useMemo(() => {
+    if (!userId) {
+      console.error("OrdersService::Init: Not logged in");
+      return undefined;
+    }
+
+    return new OrdersService(userId);
+  }, [userId]);
+
+  return ordersService;
 }
