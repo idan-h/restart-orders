@@ -1,4 +1,4 @@
-import { Order, SubItem } from "../types";
+import { Order, Product, SubItem } from "../types";
 
 // ---------------------------------------------------
 // Types
@@ -12,6 +12,8 @@ export interface Filter {
   type: boolean;
   /** match done filter */
   done: boolean;
+  /** match product filter */
+  product: boolean;
 }
 
 export interface Filtered {
@@ -39,6 +41,7 @@ export const showSubItem = (
     text: true,
     type: true,
     done: true,
+    product: true,
   }
 ): FilteredSubItem => ({
   ...subItem,
@@ -52,6 +55,7 @@ export const showOrder = (
     text: true,
     type: true,
     done: true,
+    product: true,
   }
 ): FilteredOrder => ({
   ...order,
@@ -126,6 +130,29 @@ export function filterOrdersByText(
       })
     );
   }
+}
+
+export function filterOrdersByProduct(
+  orders: FilteredOrder[] | null,
+  optionValue?: string[]
+): FilteredOrder[] | null {
+  console.debug("Filter.service::filterOrdersByProduct", optionValue);
+
+  if (!orders) {
+    console.error("Filter.service::filterOrdersByText: orders empty");
+    return null;
+  }
+  if (optionValue?.length === 0) {
+    return orders;
+  }
+  return orders
+    .map((order: FilteredOrder) => ({
+      ...order,
+      subItems: order.subItems.filter((subItem: FilteredSubItem) =>
+        optionValue?.includes(subItem.product.name)
+      ),
+    }))
+    .filter((order: FilteredOrder) => order.subItems.length);
 }
 
 export function filterOrdersByType(
