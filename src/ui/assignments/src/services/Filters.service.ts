@@ -1,4 +1,4 @@
-import { Order, Product, SubItem } from "../types";
+import { Order, SubItem } from "../types";
 
 // ---------------------------------------------------
 // Types
@@ -10,10 +10,10 @@ export interface Filter {
   text: boolean;
   /** match status filter */
   type: boolean;
-  /** match done filter */
-  done: boolean;
   /** match product filter */
   product: boolean;
+  /** match done filter */
+  done: boolean;
 }
 
 export interface Filtered {
@@ -32,7 +32,10 @@ export type FilteredOrder = Order &
 
 /** check if item is visible */
 export const isVisible = (item: Filtered) =>
-  item.filter.text && item.filter.type && item.filter.done;
+  item.filter.text &&
+  item.filter.type &&
+  item.filter.product &&
+  item.filter.done;
 
 /** set sub item visibility filter */
 export const showSubItem = (
@@ -40,8 +43,8 @@ export const showSubItem = (
   filter: Filter = {
     text: true,
     type: true,
-    done: true,
     product: true,
+    done: true,
   }
 ): FilteredSubItem => ({
   ...subItem,
@@ -54,8 +57,8 @@ export const showOrder = (
   filter: Filter = {
     text: true,
     type: true,
-    done: true,
     product: true,
+    done: true,
   }
 ): FilteredOrder => ({
   ...order,
@@ -132,29 +135,6 @@ export function filterOrdersByText(
   }
 }
 
-export function filterOrdersByProduct(
-  orders: FilteredOrder[] | null,
-  optionValue?: string[]
-): FilteredOrder[] | null {
-  console.debug("Filter.service::filterOrdersByProduct", optionValue);
-
-  if (!orders) {
-    console.error("Filter.service::filterOrdersByText: orders empty");
-    return null;
-  }
-  if (optionValue?.length === 0) {
-    return orders;
-  }
-  return orders
-    .map((order: FilteredOrder) => ({
-      ...order,
-      subItems: order.subItems.filter((subItem: FilteredSubItem) =>
-        optionValue?.includes(subItem.product.name)
-      ),
-    }))
-    .filter((order: FilteredOrder) => order.subItems.length);
-}
-
 export function filterOrdersByType(
   orders: FilteredOrder[] | null,
   optionValue = "All"
@@ -181,6 +161,35 @@ export function filterOrdersByType(
         _filterOrderBySubItem(order, "type", (subItem) =>
           subItem.product.type.split(",").includes(optionValue)
         )
+      )
+    );
+  }
+}
+
+export function filterOrdersByProduct(
+  orders: FilteredOrder[] | null,
+  productNumbers: number[]
+): FilteredOrder[] | null {
+  console.debug("Filter.service::filterOrdersByProduct", productNumbers);
+
+  if (!orders) {
+    console.error("Filter.service::filterOrdersByProduct: orders empty");
+    return null;
+  }
+
+  if (productNumbers.length === 0) {
+    // clear search - all items visible
+    return orders.map((order) =>
+      showOrder(order, {
+        ...order.filter,
+        type: true,
+      })
+    );
+  } else {
+    // if at least one sub-item match filter - show order.
+    return orders.map((order) =>
+      _filterOrderBySubItem(order, "product", (subItem) =>
+        productNumbers.includes(subItem.product.product_number)
       )
     );
   }
