@@ -1,4 +1,4 @@
-import { useEffect, useState, useMemo, useRef } from "react";
+import { useEffect, useState, useRef } from "react";
 import {
   Card,
   CardHeader,
@@ -19,9 +19,10 @@ import {
   FilteredSubItem,
   isVisible,
   showOrder,
-  filterOrdersByDone,
   filterOrdersByText,
   filterOrdersByType,
+  filterOrdersByProduct,
+  filterOrdersByDone,
 } from "../../services/Filters.service.ts";
 import { Loading } from "../../components/Loading.tsx";
 import { AppHeader } from "../../components/AppHeader.tsx";
@@ -36,10 +37,17 @@ import { AssignedSubItems } from "./AssignedSubItems.tsx";
 
 const PAGE_SIZE = 25;
 
+interface WithNote {
+  noteOpen?: boolean;
+}
+
 export const AssignedOrders = () => {
-  const [myOrders, setMyOrders] = useState<FilteredOrder[] | null>(null); // all assigned orders
+  // all assigned orders
+  const [myOrders, setMyOrders] = useState<(FilteredOrder & WithNote)[] | null>(
+    null
+  );
+
   const [statusesList, setStatusesList] = useState<string[] | undefined>(); // static list of status from the server
-  const [openNoteIds, setOpenNoteIds] = useState<number[]>([]); // open notes ids (used to toggle open notes)
   const [itemOffset, setItemOffset] = useState(0); // paging offset, display items from this index
 
   const [confirmOpen, setConfirmOpen] = useState<boolean | undefined>(false);
@@ -83,6 +91,14 @@ export const AssignedOrders = () => {
   const handleFilterByType = (optionValue?: string) => {
     const filteredOrders = filterOrdersByType(myOrders, optionValue);
     if (filteredOrders != null) {
+      setMyOrders(filteredOrders);
+      setItemOffset(0); // reset paging
+    }
+  };
+
+  const handleFilterByProduct = (productNumbers: number[]) => {
+    const filteredOrders = filterOrdersByProduct(myOrders, productNumbers);
+    if (filteredOrders !== null) {
       setMyOrders(filteredOrders);
       setItemOffset(0); // reset paging
     }
@@ -204,12 +220,22 @@ export const AssignedOrders = () => {
     setConfirmOpen(true);
   };
 
-  const toggleOpenNote = (id: number) => {
-    setOpenNoteIds((openNoteIds) =>
-      openNoteIds.includes(id)
-        ? openNoteIds.filter((openNoteId) => openNoteId !== id)
-        : [...openNoteIds, id]
-    );
+  const toggleOpenNote = (orderId: number) => {
+    if (!myOrders) {
+      console.error("MyOrders::toggleOpenNote: orders empty");
+      return;
+    }
+
+    const orderIndex = myOrders.findIndex((order) => order.id === orderId);
+    if (orderIndex === -1) {
+      console.error("MyOrders::toggleOpenNote: order not found");
+      return;
+    }
+
+    myOrders[orderIndex].noteOpen = !myOrders[orderIndex].noteOpen;
+
+    myOrders.splice(orderIndex, 1, myOrders[orderIndex]);
+    setMyOrders([...myOrders]);
   };
 
   const handlePageClick = (pageIndex: number) => {
@@ -249,6 +275,7 @@ export const AssignedOrders = () => {
             <Filters
               onTextFilter={handleTilterByText}
               onTypeFilter={handleFilterByType}
+              onProductFilter={handleFilterByProduct}
               onDoneFilter={handleFilterByDone}
             />
             {myOrders.length === 0 ? (
@@ -301,14 +328,14 @@ export const AssignedOrders = () => {
                           onClick={() => toggleOpenNote(order.id)}
                         >
                           הערות
-                          {openNoteIds.includes(order.id) ? (
+                          {order.noteOpen ? (
                             <TextCollapse24Filled />
                           ) : (
                             <TextExpand24Regular />
                           )}
                         </a>
                       )}
-                      {openNoteIds.includes(order.id) && (
+                      {order.noteOpen && (
                         <p className="order-comments">{order.comments}</p>
                       )}
                     </CardPreview>

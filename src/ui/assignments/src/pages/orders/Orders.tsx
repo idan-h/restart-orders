@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   tokens,
   Card,
@@ -36,10 +36,16 @@ import { SubItems } from "./SubItems.tsx";
 
 const PAGE_SIZE = 25;
 
-export const Orders = () => {
-  const [orders, setOrders] = useState<FilteredOrder[] | null>(null); // all orders
+interface WithNote {
+  noteOpen?: boolean;
+}
 
-  const [openNoteIds, setOpenNoteIds] = useState<number[]>([]); // open notes ids (used to toggle open notes)
+export const Orders = () => {
+  // all orders
+  const [orders, setOrders] = useState<(FilteredOrder & WithNote)[] | null>(
+    null
+  );
+
   const [saving, setSaving] = useState(false); // saving state (used for saving spinner and block submit button)
   const [itemOffset, setItemOffset] = useState(0); // paging offset, display items from this index
 
@@ -124,12 +130,22 @@ export const Orders = () => {
     setOrders([...orders]);
   };
 
-  const toggleOpenNote = (id: number) => {
-    setOpenNoteIds((openNoteIds) =>
-      openNoteIds.includes(id)
-        ? openNoteIds.filter((openNoteId) => openNoteId !== id)
-        : [...openNoteIds, id]
-    );
+  const toggleOpenNote = (orderId: number) => {
+    if (!orders) {
+      console.error("Orders::toggleOpenNote: orders empty");
+      return;
+    }
+
+    const orderIndex = orders.findIndex((order) => order.id === orderId);
+    if (orderIndex === -1) {
+      console.error("Orders::toggleOpenNote: order not found");
+      return;
+    }
+
+    orders[orderIndex].noteOpen = !orders[orderIndex].noteOpen;
+
+    orders.splice(orderIndex, 1, orders[orderIndex]);
+    setOrders([...orders]);
   };
 
   const handlePageClick = (pageIndex: number) => {
@@ -253,7 +269,7 @@ export const Orders = () => {
               <>
                 {/* ITEMS LIST */}
                 {visibleOrders.map(
-                  ({ id, unit, subItems, comments }, index) => (
+                  ({ id, unit, subItems, comments, noteOpen }, index) => (
                     <Card key={index}>
                       <CardHeader
                         header={<Subtitle1>{unit ?? "(ללא כותרת)"}</Subtitle1>}
@@ -273,14 +289,14 @@ export const Orders = () => {
                             onClick={() => toggleOpenNote(id)}
                           >
                             הערות
-                            {openNoteIds.includes(id) ? (
+                            {noteOpen ? (
                               <TextCollapse24Filled />
                             ) : (
                               <TextExpand24Regular />
                             )}
                           </a>
                         )}
-                        {openNoteIds.includes(id) && (
+                        {noteOpen && (
                           <p className="order-comments">{comments}</p>
                         )}
                       </CardPreview>
