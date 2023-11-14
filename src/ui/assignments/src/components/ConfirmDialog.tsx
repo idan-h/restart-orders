@@ -8,20 +8,25 @@ import {
   DialogActions,
   DialogContent,
   Button,
+  ButtonProps,
 } from "@fluentui/react-components";
 
 export interface ConfirmDialogProps {
   openState: ReturnType<typeof React.useState<boolean>>;
   title: string;
   subText: string;
-  onConfirm: (result: boolean) => void;
+  buttons: {
+    text: string;
+    appearance?: ButtonProps["appearance"];
+    onClick?: () => void;
+  }[];
 }
 
 export const ConfirmDialog: React.FunctionComponent<ConfirmDialogProps> = ({
   openState,
   title,
   subText,
-  onConfirm,
+  buttons,
 }) => {
   const [open, setOpen] = openState;
   return (
@@ -31,16 +36,16 @@ export const ConfirmDialog: React.FunctionComponent<ConfirmDialogProps> = ({
           <DialogTitle>{title}</DialogTitle>
           <DialogContent>{subText}</DialogContent>
           <DialogActions>
-            <DialogTrigger disableButtonEnhancement>
-              <Button appearance="secondary" onClick={() => onConfirm(false)}>
-                לא
-              </Button>
-            </DialogTrigger>
-            <DialogTrigger disableButtonEnhancement>
-              <Button appearance="primary" onClick={() => onConfirm(true)}>
-                כן
-              </Button>
-            </DialogTrigger>
+            {buttons.map((button, index) => (
+              <DialogTrigger key={index} disableButtonEnhancement>
+                <Button
+                  appearance={button.appearance ?? "secondary"}
+                  onClick={button.onClick}
+                >
+                  {button.text}
+                </Button>
+              </DialogTrigger>
+            ))}
           </DialogActions>
         </DialogBody>
       </DialogSurface>

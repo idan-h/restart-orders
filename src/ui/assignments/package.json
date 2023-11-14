@@ -4,6 +4,7 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
+    "start": "vite",
     "dev": "vite",
     "build": "tsc && vite build",
     "test": "tsc && npm run lint",
@@ -14,8 +15,11 @@
   "dependencies": {
     "@fluentui/react-components": "^9.37.2",
     "@fluentui/react-icons": "^2.0.222",
+    "@types/lodash.debounce": "^4.0.8",
+    "lodash.debounce": "^4.0.8",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
+    "react-paginate": "^8.2.0",
     "react-router-dom": "^6.18.0"
   },
   "devDependencies": {

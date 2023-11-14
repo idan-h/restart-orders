@@ -14,18 +14,13 @@ import {
   webLightTheme,
 } from "@fluentui/react-components";
 
-// import { makeFakeAuthenticationService } from "./services/fake-authentication.ts";
-// import { makeFakeOrdersService } from "./services/fake-orders.ts";
-
-import "./App.css";
-
 import {
   AuthenticationService,
   makeAuthenticationService,
   useAuthenticationService,
-} from "./services/authentication.ts";
+} from "./services/Authentication.ts";
 
-import { LoginForm } from "./pages/login/LoginForm";
+import { LoginPage } from "./pages/login/Login.tsx";
 import { Orders } from "./pages/orders/Orders.tsx";
 import { AssignedOrders } from "./pages/my-orders/AssignedOrders.tsx";
 import { AboutUs } from "./pages/about/AboutUs.tsx";
@@ -56,7 +51,7 @@ function App() {
         <div style={appStyle}>
           <Router>
             <Routes>
-              <Route path={ROUTES.LOGIN} Component={LoginForm} />
+              <Route path={ROUTES.LOGIN} Component={LoginPage} />
               <Route path={ROUTES.ABOUT} Component={AboutUs} />
               <Route path={ROUTES.MAIN}>
                 <Route

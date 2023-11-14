@@ -248,8 +248,10 @@ def get_subitem_statuses(api_key):
     return statuses
 
 
-def assign_product(api_key , order_id , subitem_id ,subitem_board_id ,  user_id ):
+def assign_product(api_key , order_id , subitem_id ,subitem_board_id ,  user_id, db_user, db_password, db_dsn):
     try:
+        oracle = OracleDB(db_user, db_password, db_dsn)
+        oracle.connect()
         monday_api = MondayApi(api_key, API_URL)
         monday_board = MondayBoard(monday_api, id=subitem_board_id)
         columnVals = {
@@ -257,6 +259,17 @@ def assign_product(api_key , order_id , subitem_id ,subitem_board_id ,  user_id 
             "status" : {"label": "בטיפול"}
         }
         monday_board.change_multiple_column_values( columnVals ,subitem_id )
+        
+        print("assign_product: monday done")
+
+        # update db ORDER_SUBITEMS set USERID = user_id and status = "בטיפול" where id = subitem_id
+        query = """
+        UPDATE ORDER_SUBITEMS SET USERID = :1 , status = 'בטיפול' WHERE ID = :2
+        """ 
+        params = (user_id, subitem_id)
+        oracle.execute(query, params)
+
+        print("assign_product: db done")
 
         return True
     except Exception as e:
@@ -264,8 +277,10 @@ def assign_product(api_key , order_id , subitem_id ,subitem_board_id ,  user_id 
         return False
 
 
-def unassign_product(api_key , order_id , subitem_id ,subitem_board_id ):
+def unassign_product(api_key , order_id , subitem_id ,subitem_board_id, db_user, db_password, db_dsn):
     try:
+        oracle = OracleDB(db_user, db_password, db_dsn)
+        oracle.connect()
         monday_api = MondayApi(api_key, API_URL)
         monday_board = MondayBoard(monday_api, id=subitem_board_id)
         columnVals = {
@@ -274,19 +289,42 @@ def unassign_product(api_key , order_id , subitem_id ,subitem_board_id ):
         }
         monday_board.change_multiple_column_values( columnVals ,subitem_id )
 
+        print("unassign_product: monday done")
+
+        # update db ORDER_SUBITEMS set USERID = null and status = "ממתין" where id = subitem_id
+        query = """
+        UPDATE ORDER_SUBITEMS SET USERID = null , status = 'ממתין' WHERE ID = :1
+        """
+        params = (subitem_id,)
+        oracle.execute(query, params)
+
+        print("unassign_product: db done")
         return True
     except Exception as e:
         print(e)
         return False
 
-def update_order_status(api_key , order_id , subitem_id ,subitem_board_id, subitem_status ):
+def update_order_status(api_key , order_id , subitem_id ,subitem_board_id, subitem_status, db_user, db_password, db_dsn ):
     try:
+        oracle = OracleDB(db_user, db_password, db_dsn)
+        oracle.connect()
         monday_api = MondayApi(api_key, API_URL)
         monday_board = MondayBoard(monday_api, id=subitem_board_id)
         columnVals = {
             "status" : { "label": subitem_status }
         }
         monday_board.change_multiple_column_values( columnVals ,subitem_id )
+
+        print("update_order_status: monday done")
+
+        # update db ORDER_SUBITEMS set status = subitem_status where id = subitem_id
+        query = """
+        UPDATE ORDER_SUBITEMS SET status = :1 WHERE ID = :2
+        """
+        params = (subitem_status, subitem_id)
+        oracle.execute(query, params)
+
+        print("update_order_status: db done")
 
         return True
     except Exception as e:
@@ -331,6 +369,49 @@ def orders_table_rows_to_array(rows):
         orders[order_id]["subItems"].append(sub_item)
 
     return orders
+
+def get_market_place_order(order_id, user, password, dsn):
+    oracle = OracleDB(user, password, dsn)
+    oracle.connect()
+
+    query = """
+    SELECT
+        o.ID as "orderId",
+        o.NAME as "name",
+        o.PHONE as "phone",
+        o.REGION as "region",
+        o.UNIT as "unit",
+        o.ROLE as "role",
+        o.COMMENTS as "orderComments",
+        o.ORDERVALIDATIONSTATUS as "orderValidationStatus",
+        o.ORDERSTATUS as "orderStatus",
+        o.PRIORITY as "priority",
+        o.EMAIL as "email",
+        o.CREATEDAT as "createdAt",
+        o.LASTUPDATED as "lastUpdated",
+        o.BOARD_ID as "boardId",
+        s.ID as "subItemId",
+        s.SUBITEMBOARDID as "subItemBoardId",
+        s.PRODUCTID as "productId",
+        s.QUANTITY as "quantity",
+        s.USERID as "userId",
+        s.STATUS as "subItemStatus",
+        s.COMMENTS as "subItemComments"
+    FROM
+        ORDERS o
+    JOIN
+        ORDER_SUBITEMS s ON o.ID = s.ORDER_ID 
+    WHERE o.ID = :1
+    """
+
+    params = (order_id,) # {'order_id': int(order_id)}
+
+    # Execute the query and fetch all results.
+    rows = oracle.execute(query, params, return_rows=True)
+    orders = orders_table_rows_to_array(rows)
+    orders_list = list(orders.values())
+
+    return orders_list
 
 
 def get_unassigned_orders(user, password, dsn):
@@ -499,14 +580,14 @@ def get_last_updated_from_value(value):
 # get json from connect_boards column and return the product id
 def get_product_id_from_connect_boards(connect_boards_object):
     if connect_boards_object is None:
-        return "None"
+        return None
     connect_boards_object = json.loads(connect_boards_object)
     if connect_boards_object['linkedPulseIds'] is None:
-        return "None"
+        return None
     if connect_boards_object['linkedPulseIds'][0] is None:
-        return "None"
+        return None
     if connect_boards_object['linkedPulseIds'][0]['linkedPulseId'] is None:
-        return "None"
+        return None
     
     return connect_boards_object['linkedPulseIds'][0]['linkedPulseId']
 

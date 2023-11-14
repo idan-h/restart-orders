@@ -1,14 +1,15 @@
 import { Order, SubItem } from "../types";
-import FAKE_ORDERS from "../fake-orders";
+// import FAKE_ORDERS from "../fake-orders";
 
 export function makeFakeOrdersService(userId: string) {
   const ordersFromStorage = JSON.parse(
     localStorage.getItem("orders") ?? "null"
   );
 
-  const orders = ordersFromStorage
-    ? new Map<string, Order>(ordersFromStorage)
-    : new Map<string, Order>(FAKE_ORDERS.map((o) => [o.id, o]));
+ 
+  const orders = new Map<string, Order>(ordersFromStorage)
+ // const orders = ordersFromStorage ? new Map<string, Order>(ordersFromStorage)
+ //   : new Map<string, Order>(FAKE_ORDERS.map((o) => [o.id, o]));
 
   saveOrders(orders);
 
@@ -37,7 +38,7 @@ export function makeFakeOrdersService(userId: string) {
     },
     async assignSubItem(request: {
       orderId: string;
-      subItemId: string;
+      subItemId: string | number;
       subItemBoardId: string;
     }) {
       const order = orders.get(request.orderId);
@@ -55,7 +56,7 @@ export function makeFakeOrdersService(userId: string) {
     },
     async unAssignSubItem(request: {
       orderId: string;
-      subItemId: string;
+      subItemId: string | number;
       subItemBoardId: string;
     }) {
       const order = orders.get(request.orderId);
@@ -66,14 +67,14 @@ export function makeFakeOrdersService(userId: string) {
       );
       if (!subItem) throw new Error("subItem not found!!!!!");
 
-      subItem.status = undefined;
+      // subItem.status = undefined;
       subItem.userId = undefined;
 
       saveOrders(orders);
     },
     async changeStatus(request: {
       orderId: string;
-      subItemId: string;
+      subItemId: string | number ;
       subItemBoardId: string;
       status: string;
     }) {

@@ -1,4 +1,4 @@
-import { makeAuthenticationService } from "./authentication";
+import { makeAuthenticationService } from "../services/authentication";
 
 export function makeFakeAuthenticationService(): ReturnType<
   typeof makeAuthenticationService

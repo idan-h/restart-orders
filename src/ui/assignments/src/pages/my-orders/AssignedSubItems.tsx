@@ -6,59 +6,59 @@ import {
   createTableColumn,
   TableCellLayout,
   Button,
-  Dropdown,
   Option,
+  TableColumnSizingOptions,
+  DataGridHeader,
+  DataGridHeaderCell,
+  Dropdown,
 } from "@fluentui/react-components";
 import { Delete24Regular } from "@fluentui/react-icons";
 
-import { DONE_STATUS, SubItem } from "../../types.ts";
+import {
+  DONE_STATUS,
+  FilteredSubItem,
+  isVisible,
+} from "../../services/Filters.service.ts";
 
 export interface AssignedSubItemsProps {
-  items: SubItem[];
+  items: FilteredSubItem[];
   statusesList: string[];
-  onStatusChange: (subItem: SubItem, status: string) => void;
-  onDelete: (subItem: SubItem) => void;
+  onStatusChange: (subItem: FilteredSubItem, status: string) => void;
+  onDelete: (subItem: FilteredSubItem) => void;
 }
 
 export const AssignedSubItems: React.FunctionComponent<
   AssignedSubItemsProps
 > = ({ items, statusesList, onStatusChange, onDelete }) => {
   const columns = [
-    // Info
-    createTableColumn<SubItem>({
-      columnId: "file",
-      renderCell: (item) => {
-        return (
-          <TableCellLayout>
-            <div
-              style={{
-                maxWidth: 200,
-                textOverflow: "ellipsis",
-                overflow: "hidden",
-                wordWrap: "break-word",
-                whiteSpace: "nowrap",
-              }}
-            >
-              {item.productName}
-            </div>
-          </TableCellLayout>
-        );
+    createTableColumn<FilteredSubItem>({
+      columnId: "itemDescription",
+      renderHeaderCell: () => {
+        return "פריט";
+      },
+      renderCell: (item: FilteredSubItem) => {
+        return <TableCellLayout>{item.product.name}</TableCellLayout>;
       },
     }),
-    // Quantity
-    createTableColumn<SubItem>({
+    createTableColumn<FilteredSubItem>({
       columnId: "quantity",
+      renderHeaderCell: () => {
+        return "כמות";
+      },
       renderCell: (item) => {
         return <TableCellLayout>{item.quantity}</TableCellLayout>;
       },
     }),
-    // Status
-    createTableColumn<SubItem>({
+    createTableColumn<FilteredSubItem>({
       columnId: "status",
+      renderHeaderCell: () => {
+        return "סטטוס";
+      },
       renderCell: (item) => {
         return (
           <TableCellLayout>
             <Dropdown
+              style={{ minWidth: "unset", width: "110px" }}
               defaultValue={item.status}
               disabled={item.status === DONE_STATUS}
               onOptionSelect={(_event, data) => {
@@ -75,16 +75,18 @@ export const AssignedSubItems: React.FunctionComponent<
         );
       },
     }),
-    // Delete button
-    createTableColumn<SubItem>({
-      columnId: "unassign",
+    createTableColumn<FilteredSubItem>({
+      columnId: "delete",
+      renderHeaderCell: () => {
+        return "";
+      },
       renderCell: (item) => {
         if (item.status === DONE_STATUS) {
-          return null;
+          return;
         }
 
         return (
-          <TableCellLayout>
+          <TableCellLayout style={{ flexDirection: "row-reverse" }}>
             <Button
               appearance="transparent"
               onClick={() => onDelete(item)}
@@ -96,14 +98,35 @@ export const AssignedSubItems: React.FunctionComponent<
     }),
   ];
 
+  const columnSizing: TableColumnSizingOptions = {
+    itemDescription: {
+      minWidth: 50,
+      defaultWidth: 50,
+    },
+    quantity: {},
+    status: {},
+    delete: {
+      defaultWidth: 50,
+    },
+  };
+
   return (
-    <DataGrid items={items} columns={columns} getRowId={(item) => item.id}>
-      <DataGridBody<SubItem>>
+    <DataGrid
+      items={items.filter(isVisible)}
+      columns={columns}
+      getRowId={(item) => item.id}
+      columnSizingOptions={columnSizing}
+    >
+      <DataGridHeader>
+        <DataGridRow selectionCell={{ style: { display: "none" } }}>
+          {({ renderHeaderCell }) => (
+            <DataGridHeaderCell>{renderHeaderCell()}</DataGridHeaderCell>
+          )}
+        </DataGridRow>
+      </DataGridHeader>
+      <DataGridBody<FilteredSubItem>>
         {({ item, rowId }) => (
-          <DataGridRow<SubItem>
-            key={rowId}
-            selectionCell={{ style: { display: "none" } }}
-          >
+          <DataGridRow<FilteredSubItem> key={rowId}>
             {({ renderCell }) => (
               <DataGridCell>{renderCell(item)}</DataGridCell>
             )}

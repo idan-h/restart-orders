@@ -1,19 +1,20 @@
+import React from "react";
 import {
-  DataGrid,
-  DataGridBody,
-  DataGridCell,
-  DataGridRow,
   Switch,
   TableCellLayout,
+  TableColumnSizingOptions,
   createTableColumn,
+  DataGridBody,
+  DataGrid,
+  DataGridRow,
+  DataGridCell,
 } from "@fluentui/react-components";
 
-import { SubItem } from "../../types.ts";
-import React from "react";
+import { FilteredSubItem, isVisible } from "../../services/Filters.service.ts";
 
 export interface SubItemsProps {
-  items: SubItem[];
-  onToggle: (subItem: SubItem, isChecked: boolean) => void;
+  items: FilteredSubItem[];
+  onToggle: (subItem: FilteredSubItem, isChecked: boolean) => void;
 }
 
 export const SubItems: React.FunctionComponent<SubItemsProps> = ({
@@ -22,39 +23,25 @@ export const SubItems: React.FunctionComponent<SubItemsProps> = ({
 }) => {
   const columns = [
     // Info
-    createTableColumn<SubItem>({
+    createTableColumn<FilteredSubItem>({
       columnId: "file",
-      renderCell: (item: SubItem) => {
-        return (
-          <TableCellLayout>
-            <div
-              style={{
-                maxWidth: 200,
-                textOverflow: "ellipsis",
-                overflow: "hidden",
-                wordWrap: "break-word",
-                whiteSpace: "nowrap",
-              }}
-            >
-              {item.productName}
-            </div>
-          </TableCellLayout>
-        );
+      renderCell: (item: FilteredSubItem) => {
+        return <TableCellLayout>{item.product.name}</TableCellLayout>;
       },
     }),
     // Quantity
-    createTableColumn<SubItem>({
+    createTableColumn<FilteredSubItem>({
       columnId: "quantity",
-      renderCell: (item: SubItem) => {
+      renderCell: (item: FilteredSubItem) => {
         return <TableCellLayout>{item.quantity}</TableCellLayout>;
       },
     }),
     // Toggle status
-    createTableColumn<SubItem>({
+    createTableColumn<FilteredSubItem>({
       columnId: "status",
-      renderCell: (subItem: SubItem) => {
+      renderCell: (subItem: FilteredSubItem) => {
         return (
-          <TableCellLayout>
+          <TableCellLayout style={{ flexDirection: "row-reverse" }}>
             <Switch
               onChange={(_, data) => onToggle(subItem, data.checked)}
               checked={Boolean(subItem.userId)}
@@ -65,13 +52,27 @@ export const SubItems: React.FunctionComponent<SubItemsProps> = ({
     }),
   ];
 
+  const columnSizing: TableColumnSizingOptions = {
+    file: { minWidth: 200 },
+    quantity: { defaultWidth: 80 },
+    status: { defaultWidth: 100 },
+  };
+
   return (
-    <DataGrid items={items} columns={columns} getRowId={(item) => item.id}>
-      <DataGridBody<SubItem>>
+    <DataGrid
+      items={items.filter(isVisible)}
+      columns={columns}
+      getRowId={(item) => item.id}
+      columnSizingOptions={columnSizing}
+    >
+      <DataGridBody<FilteredSubItem>>
         {({ item, rowId }) => (
-          <DataGridRow<SubItem>
+          <DataGridRow<FilteredSubItem>
             key={rowId}
-            selectionCell={{ style: { display: "none" } }}
+            onClick={() => {
+              const isPrevChecked = Boolean(item.userId);
+              onToggle(item, !isPrevChecked);
+            }}
           >
             {({ renderCell }) => (
               <DataGridCell>{renderCell(item)}</DataGridCell>
