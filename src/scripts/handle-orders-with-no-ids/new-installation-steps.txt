@@ -1,0 +1,35 @@
+
+# Generate key, and add to github ssh keys or the repo deploy keys
+
+ssh-keygen -t rsa -b 4096 -C "github"
+cat ~/.ssh/id_rsa.pub
+
+
+# Install dependencies
+
+sudo apt update
+sudo apt install git
+sudo apt install python3
+sudo apt install python3-pip
+sudo apt install python3-venv
+sudo apt install cron
+sudo systemctl enable cron
+sudo systemctl start cron
+
+
+# Setup python symlink
+
+sudo ln -s $(which python3) /usr/bin/python
+
+
+# Set the api key (REPALCE WITH ACTUAL API KEY)
+
+export MONDAY_API_KEY="eyJhbGciOiJIUzI1NiJ9.eyJ0aWQiOjI5MjgwMzI1MSwiYWFpIjoxMSwidWlkIjo1MTA1MDU5MCwiaWFkIjoiMjAyMy0xMC0zMFQxODo1Mzo1OC4zNzBaIiwicGVyIjoibWU6d3JpdGUiLCJhY3RpZCI6MTkyNjA2MDEsInJnbiI6ImV1YzEifQ.mxqN-Ssk3Nq9od3sxKok9NCGoS_QNypagnqqRkvBoWA"
+echo "export MONDAY_API_KEY=$MONDAY_API_KEY" >> ~/.profile
+
+
+# Clone repo and run setup script
+
+git clone git@github.com:idan-h/restart-orders.git ./repo
+chmod +x ./repo/src/scripts/handle-orders-with-no-ids/setup.sh
+./repo/src/scripts/handle-orders-with-no-ids/setup.sh

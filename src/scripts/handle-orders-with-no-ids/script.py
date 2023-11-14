@@ -1,0 +1,8 @@
+import os
+import sys
+
+sys.path.append("../../")
+from library.functions import handle_orders_with_no_ids
+
+API_KEY = 'eyJhbGciOiJIUzI1NiJ9.eyJ0aWQiOjI5MjgwMzI1MSwiYWFpIjoxMSwidWlkIjo1MTA1MDU5MCwiaWFkIjoiMjAyMy0xMC0zMFQxODo1Mzo1OC4zNzBaIiwicGVyIjoibWU6d3JpdGUiLCJhY3RpZCI6MTkyNjA2MDEsInJnbiI6ImV1YzEifQ.mxqN-Ssk3Nq9od3sxKok9NCGoS_QNypagnqqRkvBoWA'
+handle_orders_with_no_ids(API_KEY)
