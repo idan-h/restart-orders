@@ -12,8 +12,8 @@ import {
   TextCollapse24Filled,
 } from "@fluentui/react-icons";
 
-import { useAuthenticationService } from "../../services/Authentication.ts";
-import { OrdersService } from "../../services/Orders.service.ts";
+import { useAuthenticationService } from "../../services/authentication.ts";
+import { OrdersService } from "../../services/orders.service.ts";
 import {
   DONE_STATUS,
   FilteredOrder,
@@ -35,7 +35,7 @@ import { Pagination } from "../../components/Pagination.tsx";
 import { Filters } from "../../components/filters/Filters.tsx";
 import { AssignedSubItems } from "./AssignedSubItems.tsx";
 
-const PAGE_SIZE = 10;
+const PAGE_SIZE = 25;
 
 export const AssignedOrders = () => {
   const [myOrders, setMyOrders] = useState<FilteredOrder[] | null>(null); // all assigned orders
