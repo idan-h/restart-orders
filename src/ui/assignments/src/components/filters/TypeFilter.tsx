@@ -19,7 +19,7 @@ export const TypeFilter: React.FunctionComponent<TypeFilterProps> = ({
   style = {},
 }) => {
   return (
-    <Field label="סינון לפי סוג" style={style}>
+    <Field label="סינון לפי סוג בקשה" style={style}>
       <Dropdown
         defaultValue={OPTIONS_LIST[0].label}
         onOptionSelect={(_event, data) => onChange(data.optionValue)}

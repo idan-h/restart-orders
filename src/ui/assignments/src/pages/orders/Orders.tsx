@@ -21,6 +21,7 @@ import {
   showOrder,
   filterOrdersByText,
   filterOrdersByType,
+  filterOrdersByProduct,
 } from "../../services/Filters.service.ts";
 import { AppHeader } from "../../components/AppHeader.tsx";
 import { Loading } from "../../components/Loading.tsx";
@@ -76,7 +77,7 @@ export const Orders = () => {
 
   const handleTilterByText = (searchText: string) => {
     const filteredOrders = filterOrdersByText(orders, searchText);
-    if (filteredOrders != null) {
+    if (filteredOrders !== null) {
       setOrders(filteredOrders);
       setItemOffset(0); // reset paging
     }
@@ -84,7 +85,15 @@ export const Orders = () => {
 
   const handleFilterByType = (optionValue?: string) => {
     const filteredOrders = filterOrdersByType(orders, optionValue);
-    if (filteredOrders != null) {
+    if (filteredOrders !== null) {
+      setOrders(filteredOrders);
+      setItemOffset(0); // reset paging
+    }
+  };
+
+  const handleFilterByProduct = (productName?: string[]) => {
+    const filteredOrders = filterOrdersByProduct(orders, productName);
+    if (filteredOrders !== null) {
       setOrders(filteredOrders);
       setItemOffset(0); // reset paging
     }
@@ -242,6 +251,7 @@ export const Orders = () => {
             <Filters
               onTextFilter={handleTilterByText}
               onTypeFilter={handleFilterByType}
+              onProductFilter={handleFilterByProduct}
             />
             {orders.length === 0 ? (
               // EMPTY STATE: NO DATA

@@ -4,11 +4,12 @@ const baseUrl =
   "https://njdfolzzmvnaay5oxqife4tuwy.apigateway.il-jerusalem-1.oci.customer-oci.com/v1/";
 
 // cache this data
-let productDetails: Map<number, Product>;
+export let productDetails: Map<number, Product>;
 let statusesList: string[];
 
 export class OrdersService {
   constructor(private _userId: string) {}
+
 
   /** List of all items in the database. */
   private async _fetchProductDetails(): Promise<Map<number, Product>> {

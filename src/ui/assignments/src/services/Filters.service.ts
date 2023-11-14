@@ -1,4 +1,4 @@
-import { Order, SubItem } from "../types";
+import { Order, Product, SubItem } from "../types";
 
 // ---------------------------------------------------
 // Types
@@ -12,6 +12,8 @@ export interface Filter {
   type: boolean;
   /** match done filter */
   done: boolean;
+  /** match product filter */
+  product: boolean;
 }
 
 export interface Filtered {
@@ -126,6 +128,34 @@ export function filterOrdersByText(
       })
     );
   }
+}
+
+export function filterOrdersByProduct(
+  orders: FilteredOrder[] | null,
+  optionValue?: string[]
+): FilteredOrder[] | null {
+  console.debug("Filter.service::filterOrdersByProduct", optionValue);
+
+  if (!orders) {
+    console.error("Filter.service::filterOrdersByText: orders empty");
+    return null;
+  }
+  // return orders.filter((order: FilteredOrder) => {
+  //   order.subItems.filter((subItem: FilteredSubItem) => {
+  //     if (typeof optionValue === "string") {
+  //       subItem.product.name === optionValue;
+  //     } else {
+  //       optionValue?.includes(subItem.product.name);
+  //     }
+  //   }).length > 0;
+  // });
+
+  // filter by product name, keep only orders with at least one sub-item that match filter by product name.
+  return orders.map((order) =>
+    _filterOrderBySubItem(order, "product", (subItem) =>
+      (optionValue ?? []).includes(subItem.product.name)
+    )
+  );
 }
 
 export function filterOrdersByType(
