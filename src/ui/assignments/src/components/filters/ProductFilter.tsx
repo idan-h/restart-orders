@@ -30,7 +30,7 @@ const useStyles = makeStyles({
     display: "flex",
     flexDirection: "column",
     flexWrap: "wrap",
-    gridTemplateRows: "repeat(1fr)",
+    ...shorthands.flex(1),
     justifyItems: "start",
     ...shorthands.gap("8px"),
   },
@@ -65,10 +65,19 @@ export const ProductFilter: React.FunctionComponent<ProductFilterProps> = ({
   const onSelect: ComboboxProps["onOptionSelect"] = (_, data) => {
     onChange(data.selectedOptions.map((option) => Number(option)));
     if (data.optionText && data.optionValue) {
-      setSelectedOptions((prev) => [
-        ...prev,
-        { value: data.optionValue!, text: data.optionText! },
-      ]);
+      setSelectedOptions((prev) => {
+        if (selectedOptions.length === 0) {
+          return [{ text: data.optionText!, value: data.optionValue! }];
+        }
+
+        if (!prev.find((option) => option.value === data.optionValue)) {
+          return [
+            ...prev,
+            { text: data.optionText!, value: data.optionValue! },
+          ];
+        }
+        return prev;
+      });
     }
   };
 
@@ -111,6 +120,9 @@ export const ProductFilter: React.FunctionComponent<ProductFilterProps> = ({
         <Combobox
           ref={comboboxInputRef}
           multiselect
+          listbox={{
+            style: { maxHeight: 200 },
+          }}
           placeholder="הכל"
           selectedOptions={selectedOptionsList}
           onOptionSelect={onSelect}
