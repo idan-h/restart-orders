@@ -43,7 +43,7 @@ const useStyles = makeStyles({
     flexWrap: "wrap",
   },
   listbox: {
-    maxHeight: "250px",
+    maxHeight: "150px",
   },
 });
 export const ProductFilter: React.FunctionComponent<ProductFilterProps> = ({
@@ -124,7 +124,6 @@ export const ProductFilter: React.FunctionComponent<ProductFilterProps> = ({
           autoComplete="off"
           multiselect
           listbox={{ className: styles.listbox }}
-          placeholder="הכל"
           selectedOptions={selectedOptionsList}
           onOptionSelect={onSelect}
         >
