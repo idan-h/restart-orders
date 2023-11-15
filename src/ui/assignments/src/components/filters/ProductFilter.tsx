@@ -58,11 +58,18 @@ export const ProductFilter: React.FunctionComponent<ProductFilterProps> = ({
   const ordersService = useOrdersService();
   // Handle selectedOptions both when an option is selected or deselected in the Combobox,
   // and when an option is removed by clicking on a tag
-  const [selectedOptions, setSelectedOptions] = React.useState<string[]>([]);
+  const [selectedOptions, setSelectedOptions] = React.useState<
+    { text: string; value: string }[]
+  >([]);
   const [products, setProducts] = useState<ProductOption[]>([]);
   const onSelect: ComboboxProps["onOptionSelect"] = (_, data) => {
-    setSelectedOptions(data.selectedOptions);
     onChange(data.selectedOptions.map((option) => Number(option)));
+    if (data.optionText && data.optionValue) {
+      setSelectedOptions((prev) => [
+        ...prev,
+        { value: data.optionValue!, text: data.optionText! },
+      ]);
+    }
   };
 
   useEffect(() => {
@@ -83,7 +90,7 @@ export const ProductFilter: React.FunctionComponent<ProductFilterProps> = ({
 
   const onTagClick = (option: string, index: number) => {
     // remove selected option
-    setSelectedOptions(selectedOptions.filter((o) => o !== option));
+    setSelectedOptions(selectedOptions.filter((o) => o.text !== option));
 
     // focus previous or next option, defaulting to focusing back to the combo input
     const indexToFocus = index === 0 ? 1 : index - 1;
@@ -97,7 +104,7 @@ export const ProductFilter: React.FunctionComponent<ProductFilterProps> = ({
     }
   };
   const styles = useStyles();
-
+  const selectedOptionsList = selectedOptions.map((option) => option.value);
   return (
     <div className={styles.root}>
       <Field label="סינון לפי שם פריט" style={style}>
@@ -105,7 +112,7 @@ export const ProductFilter: React.FunctionComponent<ProductFilterProps> = ({
           ref={comboboxInputRef}
           multiselect
           placeholder="הכל"
-          selectedOptions={selectedOptions}
+          selectedOptions={selectedOptionsList}
           onOptionSelect={onSelect}
         >
           {products.map((option, index) => (
@@ -126,18 +133,18 @@ export const ProductFilter: React.FunctionComponent<ProductFilterProps> = ({
             Remove
           </span>
           {selectedOptions.map((option, i) => (
-            <li key={option}>
+            <li key={option.value}>
               <Button
                 size="small"
                 shape="circular"
                 appearance="primary"
                 icon={<Dismiss12Regular />}
                 iconPosition="after"
-                onClick={() => onTagClick(option, i)}
+                onClick={() => onTagClick(option.text, i)}
                 id={`${comboId}-remove-${i}`}
                 aria-labelledby={`${comboId}-remove ${comboId}-remove-${i}`}
               >
-                {option}
+                {option.text}
               </Button>
             </li>
           ))}
