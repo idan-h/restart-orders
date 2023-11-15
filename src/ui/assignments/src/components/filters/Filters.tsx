@@ -19,7 +19,14 @@ export const Filters: React.FunctionComponent<SubHeaderProps> = ({
   onDoneFilter,
 }) => {
   return (
-    <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
+    <div
+      style={{
+        display: "flex",
+        gap: 12,
+        flexWrap: "wrap",
+        alignItems: "flex-start",
+      }}
+    >
       {onTextFilter && (
         <SearchBoxDebounce onChange={onTextFilter} style={{ flex: 1 }} />
       )}

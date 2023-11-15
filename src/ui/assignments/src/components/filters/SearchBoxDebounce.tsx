@@ -68,6 +68,7 @@ export const SearchBoxDebounce: React.FunctionComponent<SearchBoxProps> = ({
   return (
     <Field label="חיפוש" style={style}>
       <Input
+        style={{ maxHeight: 32 }}
         contentBefore={<SearchRegular />}
         contentAfter={
           searchValue ? (
