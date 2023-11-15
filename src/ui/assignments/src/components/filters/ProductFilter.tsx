@@ -23,7 +23,6 @@ export interface ProductFilterProps {
   onChange: (value: number[]) => void;
   style?: React.CSSProperties;
 }
-
 const useStyles = makeStyles({
   root: {
     // Stack the label above the field with a gap
@@ -42,6 +41,9 @@ const useStyles = makeStyles({
     display: "flex",
     gridGap: tokens.spacingHorizontalXXS,
     flexWrap: "wrap",
+  },
+  listbox: {
+    maxHeight: "250px",
   },
 });
 export const ProductFilter: React.FunctionComponent<ProductFilterProps> = ({
@@ -119,10 +121,9 @@ export const ProductFilter: React.FunctionComponent<ProductFilterProps> = ({
       <Field label="סינון לפי שם פריט" style={style}>
         <Combobox
           ref={comboboxInputRef}
+          autoComplete="off"
           multiselect
-          listbox={{
-            style: { maxHeight: 200 },
-          }}
+          listbox={{ className: styles.listbox }}
           placeholder="הכל"
           selectedOptions={selectedOptionsList}
           onOptionSelect={onSelect}
