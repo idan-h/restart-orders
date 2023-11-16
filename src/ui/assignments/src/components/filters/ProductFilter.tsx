@@ -23,6 +23,7 @@ export interface ProductFilterProps {
   onChange: (value: number[]) => void;
   style?: React.CSSProperties;
 }
+
 const useStyles = makeStyles({
   root: {
     // Stack the label above the field with a gap
@@ -46,6 +47,7 @@ const useStyles = makeStyles({
     maxHeight: "150px",
   },
 });
+
 export const ProductFilter: React.FunctionComponent<ProductFilterProps> = ({
   onChange,
   style = {},
@@ -120,6 +122,7 @@ export const ProductFilter: React.FunctionComponent<ProductFilterProps> = ({
       comboboxInputRef.current?.focus();
     }
   };
+
   const styles = useStyles();
   const selectedOptionsList = selectedOptions.map((option) => option.value);
   return (

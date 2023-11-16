@@ -182,7 +182,7 @@ export function filterOrdersByProduct(
     return orders.map((order) =>
       showOrder(order, {
         ...order.filter,
-        type: true,
+        product: true,
       })
     );
   } else {
