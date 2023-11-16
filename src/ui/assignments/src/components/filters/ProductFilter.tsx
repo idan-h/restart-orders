@@ -78,7 +78,7 @@ export const ProductFilter: React.FunctionComponent<ProductFilterProps> = ({
             { text: data.optionText!, value: data.optionValue! },
           ];
         }
-        return prev;
+        return prev.filter((option) => option.value !== data.optionValue);
       });
     }
   };
@@ -100,6 +100,12 @@ export const ProductFilter: React.FunctionComponent<ProductFilterProps> = ({
   }, [ordersService]);
 
   const onTagClick = (option: string, index: number) => {
+    onChange(
+      selectedOptions
+        .filter((o) => o.text !== option)
+        .map((option) => Number(option.value))
+    );
+
     // remove selected option
     setSelectedOptions(selectedOptions.filter((o) => o.text !== option));
 
