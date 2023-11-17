@@ -7,10 +7,6 @@ import {
   Button,
   Subtitle1,
 } from "@fluentui/react-components";
-import {
-  TextExpand24Regular,
-  TextCollapse24Filled,
-} from "@fluentui/react-icons";
 
 import { useAuthenticationService } from "../../services/Authentication.service.ts";
 import { useOrdersService } from "../../services/Orders.srv.ts";
@@ -32,13 +28,10 @@ import {
   ConfirmDialogProps,
 } from "../../components/ConfirmDialog.tsx";
 import { Filters } from "../../components/filters/Filters.tsx";
+import { OrderComments, WithNote } from "../../components/OrderComments.tsx";
 import { SubItems } from "./SubItems.tsx";
 
 const PAGE_SIZE = 25;
-
-interface WithNote {
-  noteOpen?: boolean;
-}
 
 export const Orders = () => {
   // all orders
@@ -268,41 +261,29 @@ export const Orders = () => {
             ) : (
               <>
                 {/* ITEMS LIST */}
-                {visibleOrders.map(
-                  ({ id, unit, subItems, comments, noteOpen }, index) => (
-                    <Card key={index}>
-                      <CardHeader
-                        header={<Subtitle1>{unit ?? "(ללא כותרת)"}</Subtitle1>}
-                        description={`(${subItems.length} פריטים)`}
+                {visibleOrders.map((order, index) => (
+                  <Card key={index}>
+                    <CardHeader
+                      header={
+                        <Subtitle1>{order.unit ?? "(ללא כותרת)"}</Subtitle1>
+                      }
+                      description={`(${order.subItems.length} פריטים)`}
+                    />
+                    <CardPreview>
+                      <SubItems
+                        items={order.subItems}
+                        onToggle={(
+                          subItem: FilteredSubItem,
+                          isChecked: boolean
+                        ) => handleToggleSubItem(order.id, subItem, isChecked)}
                       />
-                      <CardPreview>
-                        <SubItems
-                          items={subItems}
-                          onToggle={(
-                            subItem: FilteredSubItem,
-                            isChecked: boolean
-                          ) => handleToggleSubItem(id, subItem, isChecked)}
-                        />
-                        {comments && (
-                          <a
-                            className="order-comments-button"
-                            onClick={() => toggleOpenNote(id)}
-                          >
-                            הערות
-                            {noteOpen ? (
-                              <TextCollapse24Filled />
-                            ) : (
-                              <TextExpand24Regular />
-                            )}
-                          </a>
-                        )}
-                        {noteOpen && (
-                          <p className="order-comments">{comments}</p>
-                        )}
-                      </CardPreview>
-                    </Card>
-                  )
-                )}
+                      <OrderComments
+                        order={order}
+                        onToggleNote={toggleOpenNote}
+                      />
+                    </CardPreview>
+                  </Card>
+                ))}
                 {/* PAGINATION */}
                 {filteredOrders.length > PAGE_SIZE && (
                   <Pagination

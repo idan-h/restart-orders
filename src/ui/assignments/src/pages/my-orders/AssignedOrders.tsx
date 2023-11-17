@@ -7,10 +7,6 @@ import {
   Divider,
   Subtitle1,
 } from "@fluentui/react-components";
-import {
-  TextExpand24Regular,
-  TextCollapse24Filled,
-} from "@fluentui/react-icons";
 
 import { useOrdersService } from "../../services/Orders.srv.ts";
 import {
@@ -31,15 +27,12 @@ import {
   ConfirmDialog,
   ConfirmDialogProps,
 } from "../../components/ConfirmDialog.tsx";
+import { OrderComments, WithNote } from "../../components/OrderComments.tsx";
 import { Pagination } from "../../components/Pagination.tsx";
 import { Filters } from "../../components/filters/Filters.tsx";
 import { AssignedSubItems } from "./AssignedSubItems.tsx";
 
 const PAGE_SIZE = 25;
-
-interface WithNote {
-  noteOpen?: boolean;
-}
 
 export const AssignedOrders = () => {
   // all assigned orders
@@ -326,22 +319,10 @@ export const AssignedOrders = () => {
                           confirmSubItemRemove(order.id, item)
                         }
                       />
-                      {order.comments && (
-                        <a
-                          className="order-comments-button"
-                          onClick={() => toggleOpenNote(order.id)}
-                        >
-                          הערות
-                          {order.noteOpen ? (
-                            <TextCollapse24Filled />
-                          ) : (
-                            <TextExpand24Regular />
-                          )}
-                        </a>
-                      )}
-                      {order.noteOpen && (
-                        <p className="order-comments">{order.comments}</p>
-                      )}
+                      <OrderComments
+                        order={order}
+                        onToggleNote={toggleOpenNote}
+                      />
                     </CardPreview>
                   </Card>
                 ))}

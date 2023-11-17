@@ -20,16 +20,6 @@ body {
   overflow: auto;
 }
 
-.order-comments-button {
-  display: flex !important; /* override defaults */
-  align-items: center;
-  margin: 10px;
-}
-.order-comments {
-  width: unset !important; /* override defaults */
-  padding: 0 10px;
-}
-
 /* Pagination Style */
 .pagination-container {
   display: flex;
