@@ -29,6 +29,7 @@ import {
 } from "../../components/ConfirmDialog.tsx";
 import { Filters } from "../../components/filters/Filters.tsx";
 import { OrderComments, WithNote } from "../../components/OrderComments.tsx";
+import { ItemsCount } from "../../components/ItemsCount.tsx";
 import { SubItems } from "./SubItems.tsx";
 
 const PAGE_SIZE = 25;
@@ -225,13 +226,22 @@ export const Orders = () => {
 
   /** Orders match filter */
   const filteredOrders = orders?.filter(isVisible) ?? [];
+
   /** Orders to render on screen (based on paging) */
   const visibleOrders = filteredOrders.slice(
     itemOffset,
     itemOffset + PAGE_SIZE
   );
 
+  const pageNumber = Math.floor(itemOffset / PAGE_SIZE) + 1;
   const pageCount = Math.ceil(filteredOrders.length / PAGE_SIZE);
+
+  const selectedItems = orders?.reduce((acc, order) => {
+    const selectedSubItems = order.subItems.filter(
+      (subItem) => subItem.userId
+    ).length;
+    return acc + selectedSubItems;
+  }, 0);
 
   return (
     <>
@@ -240,7 +250,7 @@ export const Orders = () => {
       {/* CONTENT */}
       <div className="app-page" style={{ bottom: "44px" }} ref={pageRef}>
         {/* SUB-HEADER */}
-        <SubHeader>בקשות{orders && ` (${orders?.length})`}</SubHeader>
+        <SubHeader>בקשות</SubHeader>
         {saving ? (
           // SPINNER: ASSIGNING...
           <Loading label="מעדכן..." />
@@ -260,6 +270,14 @@ export const Orders = () => {
               <SubHeader2>אין בקשות</SubHeader2>
             ) : (
               <>
+                {/* ITEMS COUNT */}
+                <ItemsCount
+                  itemName="בקשות"
+                  itemsCount={orders.length}
+                  filteredItemsCount={filteredOrders.length}
+                  pageNumber={pageNumber}
+                  pageCount={pageCount}
+                />
                 {/* ITEMS LIST */}
                 {visibleOrders.map((order, index) => (
                   <Card key={index}>
@@ -324,7 +342,7 @@ export const Orders = () => {
               )
             }
           >
-            הוסף להזמנות שלי
+            {`הוסף להזמנות שלי ${selectedItems ? `(${selectedItems})` : ""}`}
           </Button>
         </div>
       )}

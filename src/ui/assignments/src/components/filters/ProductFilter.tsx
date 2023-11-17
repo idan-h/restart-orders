@@ -131,11 +131,12 @@ export const ProductFilter: React.FunctionComponent<ProductFilterProps> = ({
       <Field label="סינון לפי שם פריט" style={style}>
         <Combobox
           ref={comboboxInputRef}
+          placeholder="בחר פריטים"
+          selectedOptions={selectedOptionsList}
+          onOptionSelect={onSelect}
           autoComplete="off"
           multiselect
           listbox={{ className: styles.listbox }}
-          selectedOptions={selectedOptionsList}
-          onOptionSelect={onSelect}
         >
           {products.map((option, index) => (
             <Option key={index} value={option.value}>

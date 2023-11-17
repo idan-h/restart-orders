@@ -30,6 +30,7 @@ import {
 import { OrderComments, WithNote } from "../../components/OrderComments.tsx";
 import { Pagination } from "../../components/Pagination.tsx";
 import { Filters } from "../../components/filters/Filters.tsx";
+import { ItemsCount } from "../../components/ItemsCount.tsx";
 import { AssignedSubItems } from "./AssignedSubItems.tsx";
 
 const PAGE_SIZE = 25;
@@ -242,12 +243,14 @@ export const AssignedOrders = () => {
 
   /** Orders match filter */
   const filteredOrders = myOrders?.filter(isVisible) ?? [];
+
   /** Orders to render on screen (based on paging) */
   const visibleOrders = filteredOrders.slice(
     itemOffset,
     itemOffset + PAGE_SIZE
   );
 
+  const pageNumber = Math.floor(itemOffset / PAGE_SIZE) + 1;
   const pageCount = Math.ceil(filteredOrders.length / PAGE_SIZE);
 
   return (
@@ -257,7 +260,7 @@ export const AssignedOrders = () => {
       {/* CONTENT */}
       <div className="app-page" ref={pageRef}>
         {/* SUB-HEADER */}
-        <SubHeader>הזמנות{myOrders && ` (${myOrders?.length})`}</SubHeader>
+        <SubHeader>הזמנות</SubHeader>
         {!myOrders ? (
           // SPINNER: LOADING...
           <Loading />
@@ -275,6 +278,14 @@ export const AssignedOrders = () => {
               <SubHeader2>אין הזמנות</SubHeader2>
             ) : (
               <>
+                {/* ITEMS COUNT */}
+                <ItemsCount
+                  itemName="הזמנות"
+                  itemsCount={myOrders.length}
+                  filteredItemsCount={filteredOrders.length}
+                  pageNumber={pageNumber}
+                  pageCount={pageCount}
+                />
                 {/* ITEMS LIST */}
                 {visibleOrders.filter(isVisible).map((order, index) => (
                   <Card key={index}>
