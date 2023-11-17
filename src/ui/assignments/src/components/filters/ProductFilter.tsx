@@ -44,7 +44,7 @@ const useStyles = makeStyles({
     flexWrap: "wrap",
   },
   listbox: {
-    maxHeight: "150px",
+    maxHeight: "240px",
   },
 });
 
@@ -125,6 +125,7 @@ export const ProductFilter: React.FunctionComponent<ProductFilterProps> = ({
 
   const styles = useStyles();
   const selectedOptionsList = selectedOptions.map((option) => option.value);
+
   return (
     <div className={styles.root}>
       <Field label="סינון לפי שם פריט" style={style}>

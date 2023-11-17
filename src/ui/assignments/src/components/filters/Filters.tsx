@@ -40,6 +40,7 @@ export const Filters: React.FunctionComponent<SubHeaderProps> = ({
         <DoneCheckbox
           onChange={onDoneFilter}
           style={{
+            height: "58px", // same as other filters
             flex: 1,
             display: "flex",
             flexDirection: "column-reverse",
