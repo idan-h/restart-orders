@@ -133,7 +133,8 @@ export const AssignedOrders = () => {
   const confirmSubItemStatusChange = (
     orderId: number,
     subItem: FilteredSubItem,
-    status: string
+    status: string,
+    onCancel: () => void
   ) => {
     if (status === DONE_STATUS) {
       setConfirmProps({
@@ -143,9 +144,7 @@ export const AssignedOrders = () => {
           {
             text: "לא",
             appearance: "secondary",
-            onClick: () => {
-              //TODO: $G$ revert DONE status
-            },
+            onClick: onCancel,
           },
           {
             text: "כן",
@@ -315,8 +314,13 @@ export const AssignedOrders = () => {
                       <AssignedSubItems
                         items={order.subItems}
                         statusesList={statusesList ?? []}
-                        onStatusChange={(item, status) =>
-                          confirmSubItemStatusChange(order.id, item, status)
+                        onStatusChange={(subItem, status, onCancel) =>
+                          confirmSubItemStatusChange(
+                            order.id,
+                            subItem,
+                            status,
+                            onCancel
+                          )
                         }
                         onDelete={(item) =>
                           confirmSubItemRemove(order.id, item)

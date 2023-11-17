@@ -6,11 +6,9 @@ import {
   createTableColumn,
   TableCellLayout,
   Button,
-  Option,
   TableColumnSizingOptions,
   DataGridHeader,
   DataGridHeaderCell,
-  Dropdown,
 } from "@fluentui/react-components";
 import { Delete24Regular } from "@fluentui/react-icons";
 
@@ -19,11 +17,16 @@ import {
   FilteredSubItem,
   isVisible,
 } from "../../services/Filters.service.ts";
+import { StatusDropdown } from "../../components/StatusDropdown.tsx";
 
 export interface AssignedSubItemsProps {
   items: FilteredSubItem[];
   statusesList: string[];
-  onStatusChange: (subItem: FilteredSubItem, status: string) => void;
+  onStatusChange: (
+    subItem: FilteredSubItem,
+    status: string,
+    onCancel: () => void
+  ) => void;
   onDelete: (subItem: FilteredSubItem) => void;
 }
 
@@ -57,20 +60,11 @@ export const AssignedSubItems: React.FunctionComponent<
       renderCell: (item) => {
         return (
           <TableCellLayout>
-            <Dropdown
-              style={{ minWidth: "unset", width: "110px" }}
-              defaultValue={item.status}
-              disabled={item.status === DONE_STATUS}
-              onOptionSelect={(_event, data) => {
-                if (data.optionValue) {
-                  onStatusChange(item, data.optionValue);
-                }
-              }}
-            >
-              {statusesList.map((status, index) => (
-                <Option key={index}>{status}</Option>
-              ))}
-            </Dropdown>
+            <StatusDropdown
+              item={item}
+              statusesList={statusesList}
+              onStatusChange={onStatusChange}
+            />
           </TableCellLayout>
         );
       },
