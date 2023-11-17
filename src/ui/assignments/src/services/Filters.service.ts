@@ -111,7 +111,10 @@ export function filterOrdersByText(
 
   if (searchText) {
     return orders.map((order) => {
-      if (order.unit?.includes(searchText)) {
+      if (
+        order.unit?.includes(searchText) ||
+        order.name?.includes(searchText)
+      ) {
         // title includes search - show order and all sub-items.
         return showOrder(order, {
           ...order.filter,

@@ -267,7 +267,7 @@ export const Orders = () => {
                       header={
                         <Subtitle1>{order.unit ?? "(ללא כותרת)"}</Subtitle1>
                       }
-                      description={`(${order.subItems.length} פריטים)`}
+                      description={`איש קשר: ${order.name}`}
                     />
                     <CardPreview>
                       <SubItems
