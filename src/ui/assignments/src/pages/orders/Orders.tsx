@@ -224,6 +224,42 @@ export const Orders = () => {
     }
   };
 
+  const handleReset = () => {
+    if (!orders) {
+      console.error("Orders::handleReset: orders empty");
+      return;
+    }
+
+    orders.forEach((order) => {
+      order.subItems.forEach((subItem) => {
+        subItem.userId = undefined;
+      });
+    });
+
+    setOrders([...orders]);
+  };
+
+  const confirmReset = () => {
+    setConfirmProps({
+      title: "איפוס בחירה",
+      subText: "האם אתה בטוח שברצונך לאפס את הבחירה?",
+      buttons: [
+        {
+          text: "ביטול",
+          appearance: "outline",
+        },
+        {
+          text: "אישור",
+          appearance: "primary",
+          onClick: () => {
+            handleReset();
+          },
+        },
+      ],
+    });
+    setConfirmOpen(true);
+  };
+
   /** Orders match filter */
   const filteredOrders = orders?.filter(isVisible) ?? [];
 
@@ -322,27 +358,32 @@ export const Orders = () => {
       {orders?.length && (
         <div
           style={{
+            backgroundColor: tokens.colorNeutralBackground1,
             position: "fixed",
             padding: "6px 24px",
             bottom: 0,
             left: 0,
             right: 0,
-            backgroundColor: tokens.colorNeutralBackground1,
+            display: "flex",
+            gap: "8px",
             boxShadow: tokens.shadow28,
           }}
         >
           <Button
             appearance="primary"
-            style={{ width: "100%" }}
+            style={{ flex: 3, whiteSpace: "nowrap" }}
             onClick={handleSubmit}
-            disabled={
-              saving ||
-              orders.every((order) =>
-                order.subItems.every((subItem) => !subItem.userId)
-              )
-            }
+            disabled={!selectedItems || saving}
           >
             {`הוסף להזמנות שלי ${selectedItems ? `(${selectedItems})` : ""}`}
+          </Button>
+          <Button
+            appearance="outline"
+            style={{ flex: 1, whiteSpace: "nowrap" }}
+            onClick={confirmReset}
+            disabled={!selectedItems || saving}
+          >
+            אפס בחירה
           </Button>
         </div>
       )}

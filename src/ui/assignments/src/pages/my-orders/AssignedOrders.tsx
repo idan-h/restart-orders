@@ -136,12 +136,12 @@ export const AssignedOrders = () => {
         subText: `האם לסמן את ${subItem.product.name} כבוצע?`,
         buttons: [
           {
-            text: "לא",
-            appearance: "secondary",
+            text: "ביטול",
+            appearance: "outline",
             onClick: onCancel,
           },
           {
-            text: "כן",
+            text: "אישור",
             appearance: "primary",
             onClick: () => {
               handleSubItemStatusChange(orderId, subItem, status);
@@ -198,11 +198,11 @@ export const AssignedOrders = () => {
       subText: `האם להסיר את ${subItem.product.name}?`,
       buttons: [
         {
-          text: "לא",
-          appearance: "secondary",
+          text: "ביטול",
+          appearance: "outline",
         },
         {
-          text: "כן",
+          text: "אישור",
           appearance: "primary",
           onClick: () => {
             handleSubItemRemove(orderId, subItem);
