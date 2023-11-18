@@ -8,7 +8,7 @@ import { DoneCheckbox } from "./DoneCheckbox";
 export interface SubHeaderProps {
   onTextFilter?: (text: string) => void;
   onTypeFilter?: (type?: string) => void;
-  onProductFilter?: (productNumbers: number[]) => void;
+  onProductFilter?: (productsNames: string[]) => void;
   onDoneFilter?: (checked: boolean) => void;
 }
 

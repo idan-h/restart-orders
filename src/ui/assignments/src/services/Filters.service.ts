@@ -171,16 +171,16 @@ export function filterOrdersByType(
 
 export function filterOrdersByProduct(
   orders: FilteredOrder[] | null,
-  productNumbers: number[]
+  productsNames: string[]
 ): FilteredOrder[] | null {
-  console.debug("Filter.service::filterOrdersByProduct", productNumbers);
+  console.debug("Filter.service::filterOrdersByProduct", productsNames);
 
   if (!orders) {
     console.error("Filter.service::filterOrdersByProduct: orders empty");
     return null;
   }
 
-  if (productNumbers.length === 0) {
+  if (productsNames.length === 0) {
     // clear search - all items visible
     return orders.map((order) =>
       showOrder(order, {
@@ -192,7 +192,7 @@ export function filterOrdersByProduct(
     // if at least one sub-item match filter - show order.
     return orders.map((order) =>
       _filterOrderBySubItem(order, "product", (subItem) =>
-        productNumbers.includes(subItem.product.product_number)
+        productsNames.includes(subItem.product.name)
       )
     );
   }

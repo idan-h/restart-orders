@@ -68,28 +68,23 @@ export const Orders = () => {
     }
   }, [ordersService]);
 
-  const handleTilterByText = (searchText: string) => {
-    const filteredOrders = filterOrdersByText(orders, searchText);
+  const _applyFilter = (filteredOrders: FilteredOrder[] | null) => {
     if (filteredOrders !== null) {
       setOrders(filteredOrders);
       setItemOffset(0); // reset paging
     }
+  };
+
+  const handleTilterByText = (searchText: string) => {
+    _applyFilter(filterOrdersByText(orders, searchText));
   };
 
   const handleFilterByType = (optionValue?: string) => {
-    const filteredOrders = filterOrdersByType(orders, optionValue);
-    if (filteredOrders !== null) {
-      setOrders(filteredOrders);
-      setItemOffset(0); // reset paging
-    }
+    _applyFilter(filterOrdersByType(orders, optionValue));
   };
 
-  const handleFilterByProduct = (productNumbers: number[]) => {
-    const filteredOrders = filterOrdersByProduct(orders, productNumbers);
-    if (filteredOrders !== null) {
-      setOrders(filteredOrders);
-      setItemOffset(0); // reset paging
-    }
+  const handleFilterByProduct = (productsNames: string[]) => {
+    _applyFilter(filterOrdersByProduct(orders, productsNames));
   };
 
   const handleToggleSubItem = (

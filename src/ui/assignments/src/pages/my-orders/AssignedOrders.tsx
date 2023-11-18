@@ -74,36 +74,27 @@ export const AssignedOrders = () => {
     }
   }, []);
 
-  const handleTilterByText = (searchText: string) => {
-    const filteredOrders = filterOrdersByText(myOrders, searchText);
-    if (filteredOrders != null) {
-      setMyOrders(filteredOrders);
-      setItemOffset(0); // reset paging
-    }
-  };
-
-  const handleFilterByType = (optionValue?: string) => {
-    const filteredOrders = filterOrdersByType(myOrders, optionValue);
-    if (filteredOrders != null) {
-      setMyOrders(filteredOrders);
-      setItemOffset(0); // reset paging
-    }
-  };
-
-  const handleFilterByProduct = (productNumbers: number[]) => {
-    const filteredOrders = filterOrdersByProduct(myOrders, productNumbers);
+  const _applyFilter = (filteredOrders: FilteredOrder[] | null) => {
     if (filteredOrders !== null) {
       setMyOrders(filteredOrders);
       setItemOffset(0); // reset paging
     }
   };
 
+  const handleTilterByText = (searchText: string) => {
+    _applyFilter(filterOrdersByText(myOrders, searchText));
+  };
+
+  const handleFilterByType = (optionValue?: string) => {
+    _applyFilter(filterOrdersByType(myOrders, optionValue));
+  };
+
+  const handleFilterByProduct = (productsNames: string[]) => {
+    _applyFilter(filterOrdersByProduct(myOrders, productsNames));
+  };
+
   const handleFilterByDone = (checked: boolean) => {
-    const filteredOrders = filterOrdersByDone(myOrders, checked);
-    if (filteredOrders != null) {
-      setMyOrders(filteredOrders);
-      setItemOffset(0); // reset paging
-    }
+    _applyFilter(filterOrdersByDone(myOrders, checked));
   };
 
   const handleSubItemStatusChange = (
