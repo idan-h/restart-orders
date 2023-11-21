@@ -11,6 +11,7 @@ first_ex = 'src/notebooks/dora/first_ex.xlsx'
 excel2 = 'src/notebooks/eti/excel2.xlsx'
 sewing_workshop_excel = 'src/notebooks/sew/sewing_workshop_excel.xlsx'
 weapons_excel = 'src/notebooks/weapons/amlahia6.11.23.xlsx'
+new_weapons_excel = 'src/notebooks/weapons/amlahia20.11.23.xlsx'
 
 
 def get_product_number(product_name, products):
@@ -266,8 +267,15 @@ def excel2_to_create_order_dto(input_file):
     return orders
 
 
-def weapons_sheet2_to_create_order_dto(input_file):
-    df = pd.read_excel(input_file, sheet_name=1).fillna('')
+def get_filtered_wepons_sheet_df(old_sheet_input_file: str, new_sheet_input_file: str):
+    df_old = pd.read_excel(old_sheet_input_file, sheet_name=1).fillna('')
+    df_new = pd.read_excel(new_sheet_input_file,).fillna('')
+    print(df_old.shape[0])
+    print(df_new.shape[0])
+    df_filtered = df_new[~df_new["שם מלא"].isin(df_old["שם מלא"])]
+    return df_filtered
+
+def weapons_df2_to_create_order_dto(df):
     df.replace(['-', pd.NaT], '', inplace=True)
     orders = []
     items = list(df.iloc[:, 6:].columns)
@@ -321,7 +329,16 @@ def weapons_sheet2_to_create_order_dto(input_file):
         orders.append(order)
 
     return orders
+    
 
+
+def weapons_sheet2_to_create_order_dto(input_file):
+    df = pd.read_excel(input_file, sheet_name=1).fillna('')
+    return weapons_df2_to_create_order_dto(df)
+
+def old_weapons_sheet_and_new_weapons_sheet2_to_create_order_dto(old, new):
+    df = get_filtered_wepons_sheet_df(old, new)
+    return weapons_df2_to_create_order_dto(df)
 
 # first_ex_orders = first_ex_to_create_order_dto(first_ex)
 # for o in first_ex_orders:
@@ -358,3 +375,10 @@ def weapons_sheet2_to_create_order_dto(input_file):
 #         create_order(API_KEY, o)
 #     except Exception as e:
 #         print(o, e)
+
+weapons_excel_orders2 = old_weapons_sheet_and_new_weapons_sheet2_to_create_order_dto(weapons_excel, new_weapons_excel)
+for o in weapons_excel_orders2:
+    try:
+        create_order(API_KEY, o)
+    except Exception as e:
+        print(o, e)
