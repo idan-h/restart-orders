@@ -1,54 +1,29 @@
-import { useEffect, useRef, useState } from "react";
-import {
-  tokens,
-  Card,
-  CardHeader,
-  CardPreview,
-  Button,
-  Subtitle1,
-} from "@fluentui/react-components";
+import React, { useEffect, useState } from "react";
+import { tokens, Button } from "@fluentui/react-components";
 
 import { useAuthenticationService } from "../../services/Authentication.service.ts";
-import { useOrdersService } from "../../services/Orders.srv.ts";
+import { useOrdersService } from "../../services/Orders.service.ts";
 import {
   FilteredOrder,
   FilteredSubItem,
-  isVisible,
   showOrder,
-  filterOrdersByText,
-  filterOrdersByType,
-  filterOrdersByProduct,
 } from "../../services/Filters.service.ts";
-import { AppHeader } from "../../components/AppHeader.tsx";
-import { Loading } from "../../components/Loading.tsx";
-import { SubHeader, SubHeader2 } from "../../components/SubHeader.tsx";
-import { Pagination } from "../../components/Pagination.tsx";
 import {
   ConfirmDialog,
   ConfirmDialogProps,
 } from "../../components/ConfirmDialog.tsx";
-import { Filters } from "../../components/filters/Filters.tsx";
-import { OrderComments, WithNote } from "../../components/OrderComments.tsx";
-import { ItemsCount } from "../../components/ItemsCount.tsx";
 import { SubItems } from "./SubItems.tsx";
+import { BasePage } from "../../components/BasePage.tsx";
 
-const PAGE_SIZE = 25;
-
-export const Orders = () => {
-  // all orders
-  const [orders, setOrders] = useState<(FilteredOrder & WithNote)[] | null>(
-    null
-  );
-
-  const [saving, setSaving] = useState(false); // saving state (used for saving spinner and block submit button)
-  const [itemOffset, setItemOffset] = useState(0); // paging offset, display items from this index
+export const Orders: React.FunctionComponent = () => {
+  const [orders, setOrders] = useState<FilteredOrder[] | null>(null); // orders list from the server
 
   const [confirmOpen, setConfirmOpen] = useState<boolean | undefined>(false);
   const [confirmProps, setConfirmProps] = useState<
     Omit<ConfirmDialogProps, "openState"> | undefined
   >();
 
-  const pageRef = useRef<HTMLDivElement>(null);
+  const [saving, setSaving] = useState(false); // saving state (used for saving spinner and block submit button)
 
   const { getUserId } = useAuthenticationService();
   const userId = getUserId();
@@ -67,25 +42,6 @@ export const Orders = () => {
       });
     }
   }, [ordersService]);
-
-  const _applyFilter = (filteredOrders: FilteredOrder[] | null) => {
-    if (filteredOrders !== null) {
-      setOrders(filteredOrders);
-      setItemOffset(0); // reset paging
-    }
-  };
-
-  const handleTilterByText = (searchText: string) => {
-    _applyFilter(filterOrdersByText(orders, searchText));
-  };
-
-  const handleFilterByType = (optionValue?: string) => {
-    _applyFilter(filterOrdersByType(orders, optionValue));
-  };
-
-  const handleFilterByProduct = (productsNames: string[]) => {
-    _applyFilter(filterOrdersByProduct(orders, productsNames));
-  };
 
   const handleToggleSubItem = (
     orderId: number,
@@ -117,34 +73,6 @@ export const Orders = () => {
     };
 
     setOrders([...orders]);
-  };
-
-  const toggleOpenNote = (orderId: number) => {
-    if (!orders) {
-      console.error("Orders::toggleOpenNote: orders empty");
-      return;
-    }
-
-    const orderIndex = orders.findIndex((order) => order.id === orderId);
-    if (orderIndex === -1) {
-      console.error("Orders::toggleOpenNote: order not found");
-      return;
-    }
-
-    orders[orderIndex].noteOpen = !orders[orderIndex].noteOpen;
-
-    orders.splice(orderIndex, 1, orders[orderIndex]);
-    setOrders([...orders]);
-  };
-
-  const handlePageClick = (pageIndex: number) => {
-    console.debug("Orders::handlePageClick", pageIndex);
-
-    const newOffset = (pageIndex * PAGE_SIZE) % filteredOrders.length;
-    setItemOffset(newOffset);
-
-    // scroll to top
-    pageRef.current?.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   const handleSubmit = async () => {
@@ -255,18 +183,6 @@ export const Orders = () => {
     setConfirmOpen(true);
   };
 
-  /** Orders match filter */
-  const filteredOrders = orders?.filter(isVisible) ?? [];
-
-  /** Orders to render on screen (based on paging) */
-  const visibleOrders = filteredOrders.slice(
-    itemOffset,
-    itemOffset + PAGE_SIZE
-  );
-
-  const pageNumber = Math.floor(itemOffset / PAGE_SIZE) + 1;
-  const pageCount = Math.ceil(filteredOrders.length / PAGE_SIZE);
-
   const selectedItems = orders?.reduce((acc, order) => {
     const selectedSubItems = order.subItems.filter(
       (subItem) => subItem.userId
@@ -276,79 +192,28 @@ export const Orders = () => {
 
   return (
     <>
-      {/* HEADER */}
-      <AppHeader />
-      {/* CONTENT */}
-      <div className="app-page" style={{ bottom: "44px" }} ref={pageRef}>
-        {/* SUB-HEADER */}
-        <SubHeader>בקשות</SubHeader>
-        {saving ? (
-          // SPINNER: ASSIGNING...
-          <Loading label="מעדכן..." />
-        ) : !orders ? (
-          // SPINNER: LOADING...
-          <Loading />
-        ) : (
-          <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-            {/* FILTERS */}
-            <Filters
-              onTextFilter={handleTilterByText}
-              onTypeFilter={handleFilterByType}
-              onProductFilter={handleFilterByProduct}
+      <BasePage
+        defaultOrders={orders}
+        title="בקשות"
+        loading={saving ? "מעדכן..." : undefined}
+        filters={{
+          text: true,
+          type: true,
+          product: true,
+        }}
+        itemRender={{
+          header: (order) => `איש קשר: ${order.name}`,
+          content: (order) => (
+            <SubItems
+              items={order.subItems}
+              onToggle={(subItem: FilteredSubItem, isChecked: boolean) =>
+                handleToggleSubItem(order.id, subItem, isChecked)
+              }
             />
-            {orders.length === 0 ? (
-              // EMPTY STATE: NO DATA
-              <SubHeader2>אין בקשות</SubHeader2>
-            ) : (
-              <>
-                {/* ITEMS COUNT */}
-                <ItemsCount
-                  itemName="בקשות"
-                  itemsCount={orders.length}
-                  filteredItemsCount={filteredOrders.length}
-                  pageNumber={pageNumber}
-                  pageCount={pageCount}
-                />
-                {/* ITEMS LIST */}
-                {visibleOrders.map((order, index) => (
-                  <Card key={index}>
-                    <CardHeader
-                      header={
-                        <Subtitle1>{order.unit ?? "(ללא כותרת)"}</Subtitle1>
-                      }
-                      description={`איש קשר: ${order.name}`}
-                    />
-                    <CardPreview>
-                      <SubItems
-                        items={order.subItems}
-                        onToggle={(
-                          subItem: FilteredSubItem,
-                          isChecked: boolean
-                        ) => handleToggleSubItem(order.id, subItem, isChecked)}
-                      />
-                      <OrderComments
-                        order={order}
-                        onToggleNote={toggleOpenNote}
-                      />
-                    </CardPreview>
-                  </Card>
-                ))}
-                {/* PAGINATION */}
-                {filteredOrders.length > PAGE_SIZE && (
-                  <Pagination
-                    pageCount={pageCount}
-                    onPageClick={handlePageClick}
-                  />
-                )}
-                {/* EMPTY STATE: NO FILTER RESULTS */}
-                {filteredOrders.length === 0 && (
-                  <SubHeader2>אין בקשות תואמת את הסינון</SubHeader2>
-                )}
-              </>
-            )}
-          </div>
-        )}
-      </div>
+          ),
+        }}
+        style={{ bottom: "44px" }}
+      />
       {/* BUTTON: ASSIGN */}
       {orders?.length && (
         <div
