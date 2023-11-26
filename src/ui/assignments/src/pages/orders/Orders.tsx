@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import { tokens, Button } from "@fluentui/react-components";
 
 import { useAuthenticationService } from "../../services/Authentication.service.ts";
 import { useOrdersService } from "../../services/Orders.service.ts";
@@ -12,8 +11,9 @@ import {
   ConfirmDialog,
   ConfirmDialogProps,
 } from "../../components/ConfirmDialog.tsx";
-import { SubItems } from "./SubItems.tsx";
 import { BasePage } from "../../components/BasePage.tsx";
+import { SubItems } from "./SubItems.tsx";
+import { OrdersFooter } from "./Footer.tsx";
 
 export const Orders: React.FunctionComponent = () => {
   const [orders, setOrders] = useState<FilteredOrder[] | null>(null); // orders list from the server
@@ -183,13 +183,6 @@ export const Orders: React.FunctionComponent = () => {
     setConfirmOpen(true);
   };
 
-  const selectedItems = orders?.reduce((acc, order) => {
-    const selectedSubItems = order.subItems.filter(
-      (subItem) => subItem.userId
-    ).length;
-    return acc + selectedSubItems;
-  }, 0);
-
   return (
     <>
       <BasePage
@@ -214,39 +207,12 @@ export const Orders: React.FunctionComponent = () => {
         }}
         style={{ bottom: "44px" }}
       />
-      {/* BUTTON: ASSIGN */}
-      {orders?.length && (
-        <div
-          style={{
-            backgroundColor: tokens.colorNeutralBackground1,
-            position: "fixed",
-            padding: "6px 24px",
-            bottom: 0,
-            left: 0,
-            right: 0,
-            display: "flex",
-            gap: "8px",
-            boxShadow: tokens.shadow28,
-          }}
-        >
-          <Button
-            appearance="primary"
-            style={{ flex: 3, whiteSpace: "nowrap" }}
-            onClick={handleSubmit}
-            disabled={!selectedItems || saving}
-          >
-            {`הוסף להזמנות שלי ${selectedItems ? `(${selectedItems})` : ""}`}
-          </Button>
-          <Button
-            appearance="outline"
-            style={{ flex: 1, whiteSpace: "nowrap" }}
-            onClick={confirmReset}
-            disabled={!selectedItems || saving}
-          >
-            אפס בחירה
-          </Button>
-        </div>
-      )}
+      <OrdersFooter
+        orders={orders}
+        disabled={saving}
+        onSubmit={handleSubmit}
+        onReset={confirmReset}
+      />
       {/* POPUP */}
       {confirmProps && (
         <ConfirmDialog
