@@ -195,7 +195,13 @@ export const Orders: React.FunctionComponent = () => {
           product: true,
         }}
         itemRender={{
-          header: (order) => `איש קשר: ${order.name}`,
+          header: (order) =>  (
+            <div style={{"width": "100%", display: "flex", "justify-content": "space-between"}}>
+              <div>איש קשר: {order.name}</div>
+              <div>תאריך יצירה: {new Date(order.createdAt).toLocaleDateString('en-GB')}</div>
+            </div>
+          )
+          ,
           content: (order) => (
             <SubItems
               items={order.subItems}
