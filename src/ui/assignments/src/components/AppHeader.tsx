@@ -1,6 +1,6 @@
 import React from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { Info24Regular, SignOut24Regular } from "@fluentui/react-icons";
+import { Question24Regular, Info24Regular, SignOut24Regular } from "@fluentui/react-icons";
 import { Button, tokens } from "@fluentui/react-components";
 
 import { useAuthenticationService } from "../services/Authentication.service";
@@ -29,6 +29,7 @@ export const AppHeader: React.FunctionComponent = () => {
 
   const loggedIn = isLoggedIn();
   const isAboutPage = location.pathname === ROUTES.ABOUT;
+  const contactPage = location.pathname === ROUTES.CONTACT;
 
   return (
     <div style={headerStyle}>
@@ -63,6 +64,13 @@ export const AppHeader: React.FunctionComponent = () => {
       </div>
       {/* Icon buttons */}
       <div>
+        {!contactPage && (
+          <Button
+            appearance="transparent"
+            onClick={() => navigate(ROUTES.CONTACT)}
+            icon={<Question24Regular />}
+          />
+        )}
         {!isAboutPage && (
           <Button
             appearance="transparent"
