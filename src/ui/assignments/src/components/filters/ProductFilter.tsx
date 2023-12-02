@@ -9,7 +9,7 @@ import {
   TagGroupProps,
 } from "@fluentui/react-components";
 
-import { useOrdersService } from "../../services/Orders.srv";
+import { useOrdersService } from "../../services/Orders.service";
 import { Dismiss12Regular } from "@fluentui/react-icons";
 
 export interface ProductFilterProps {
