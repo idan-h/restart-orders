@@ -24,6 +24,7 @@ import { LoginPage } from "./pages/login/Login.tsx";
 import { Orders } from "./pages/orders/Orders.tsx";
 import { AssignedOrders } from "./pages/my-orders/AssignedOrders.tsx";
 import { AboutUs } from "./pages/about/AboutUs.tsx";
+import { Contact } from "./pages/contact/Contact.tsx";
 import { ROUTES } from "./routes-const.ts";
 
 const appStyle: React.CSSProperties = {
@@ -52,6 +53,7 @@ function App() {
           <Router>
             <Routes>
               <Route path={ROUTES.LOGIN} Component={LoginPage} />
+              <Route path={ROUTES.CONTACT} Component={Contact} />
               <Route path={ROUTES.ABOUT} Component={AboutUs} />
               <Route path={ROUTES.MAIN}>
                 <Route
