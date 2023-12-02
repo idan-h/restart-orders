@@ -67,7 +67,7 @@ export const SubItems: React.FunctionComponent<SubItemsProps> = ({
     >
       <DataGridBody<FilteredSubItem>>
         {({ item, rowId }) => (
-          <DataGridRow<FilteredSubItem>
+         <DataGridRow<FilteredSubItem>
             key={rowId}
             onClick={() => {
               const isPrevChecked = Boolean(item.userId);

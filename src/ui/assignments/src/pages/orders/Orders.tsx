@@ -310,29 +310,36 @@ export const Orders = () => {
                   pageCount={pageCount}
                 />
                 {/* ITEMS LIST */}
-                {visibleOrders.map((order, index) => (
-                  <Card key={index}>
-                    <CardHeader
-                      header={
-                        <Subtitle1>{order.unit ?? "(ללא כותרת)"}</Subtitle1>
-                      }
-                      description={`איש קשר: ${order.name}`}
-                    />
-                    <CardPreview>
-                      <SubItems
-                        items={order.subItems}
-                        onToggle={(
-                          subItem: FilteredSubItem,
-                          isChecked: boolean
-                        ) => handleToggleSubItem(order.id, subItem, isChecked)}
+                {visibleOrders.map((order, index) => {
+                  let dt = new Date(order.createdAt)
+                  return (
+                    <Card key={index}>
+                      <CardHeader
+                        header={
+                          <Subtitle1>{order.unit ?? "(ללא כותרת)"}</Subtitle1>
+                        }
+                        description={
+                          <div style={{"width": "100%", display: "flex", "justify-content": "space-between"}}>
+                            <div>איש קשר: {order.name}</div>
+                            <div>תאריך יצירה: {dt.toLocaleDateString('en-GB')}</div>
+                          </div>
+                        }
                       />
-                      <OrderComments
-                        order={order}
-                        onToggleNote={toggleOpenNote}
-                      />
-                    </CardPreview>
-                  </Card>
-                ))}
+                      <CardPreview>
+                        <SubItems
+                          items={order.subItems}
+                          onToggle={(
+                            subItem: FilteredSubItem,
+                            isChecked: boolean
+                          ) => handleToggleSubItem(order.id, subItem, isChecked)}
+                        />
+                        <OrderComments
+                          order={order}
+                          onToggleNote={toggleOpenNote}
+                        />
+                      </CardPreview>
+                    </Card>
+                )})}
                 {/* PAGINATION */}
                 {filteredOrders.length > PAGE_SIZE && (
                   <Pagination
