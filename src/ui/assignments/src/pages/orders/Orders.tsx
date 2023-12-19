@@ -196,7 +196,7 @@ export const Orders: React.FunctionComponent = () => {
         }}
         itemRender={{
           header: (order) =>  (
-            <div style={{"width": "100%", display: "flex", "justify-content": "space-between"}}>
+            <div style={{"width": "100%", display: "flex", "justifyContent": "space-between"}}>
               <div>איש קשר: {order.name}</div>
               <div>תאריך יצירה: {new Date(order.createdAt).toLocaleDateString('en-GB')}</div>
             </div>
