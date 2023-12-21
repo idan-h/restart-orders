@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   Field,
   Option,
@@ -24,6 +24,8 @@ export const ProductFilter: React.FunctionComponent<ProductFilterProps> = ({
   const ordersService = useOrdersService();
   const [allProducts, setAllProducts] = useState<string[]>([]);
   const [selectedProducts, setSelectedProducts] = useState<string[]>([]);
+  const [inputWidth, setInputWidth] = useState<Number | undefined>(0)
+  const [dropdownWidth, setDropdownWidth] = useState<string>('')
 
   useEffect(() => {
     if (!ordersService) {
@@ -61,8 +63,24 @@ export const ProductFilter: React.FunctionComponent<ProductFilterProps> = ({
     _setSelectedProducts(newSelectedProducts);
   };
 
+  const comboboxRef = useRef<HTMLInputElement>(null)
+
+  const handleResize = () => {
+    setInputWidth(comboboxRef.current?.offsetWidth)
+  }
+
+  useEffect(() => {
+    window.addEventListener('resize', handleResize);
+    if (inputWidth) setDropdownWidth(`${inputWidth}px`)
+
+    return () => {
+      window.removeEventListener('resize', handleResize);
+    };
+  }, [inputWidth])
+
+
   return (
-    <div style={style}>
+    <div style={style} ref={comboboxRef}>
       <Field label="סינון לפי שם פריט">
         <Combobox
           placeholder="בחר פריטים"
@@ -70,7 +88,7 @@ export const ProductFilter: React.FunctionComponent<ProductFilterProps> = ({
           selectedOptions={selectedProducts}
           onOptionSelect={handleDropdownSelect}
           autoComplete="off"
-          listbox={{ style: { maxHeight: "240px" } }}
+          listbox={{ style: { maxHeight: "240px", width: dropdownWidth } }}
         >
           {allProducts.map((product, index) => (
             <Option key={index} value={product}>
