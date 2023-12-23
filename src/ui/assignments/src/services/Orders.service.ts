@@ -148,7 +148,8 @@ export class OrdersService {
       { method: "POST", body: JSON.stringify(request) }
     );
 
-    await response.json();
+    const jsonResponse = await response.json();
+    return jsonResponse
   }
 
   /** (Delete) Move item from my-orders to orders  */
