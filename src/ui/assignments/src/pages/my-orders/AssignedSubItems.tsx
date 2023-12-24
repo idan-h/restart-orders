@@ -114,7 +114,7 @@ export const AssignedSubItems: React.FunctionComponent<
       <DataGridHeader>
         <DataGridRow selectionCell={{ style: { display: "none" } }}>
           {({ renderHeaderCell }) => (
-            <DataGridHeaderCell>{renderHeaderCell()}</DataGridHeaderCell>
+            <DataGridHeaderCell style={{ fontWeight: "bold" }}>{renderHeaderCell()}</DataGridHeaderCell>
           )}
         </DataGridRow>
       </DataGridHeader>

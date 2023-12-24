@@ -161,3 +161,6 @@ cython_debug/
 test.txt
 */funcs/*/library
 */ssh-creds
+
+
+.vscode/*

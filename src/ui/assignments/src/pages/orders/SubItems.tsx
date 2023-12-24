@@ -8,6 +8,8 @@ import {
   DataGrid,
   DataGridRow,
   DataGridCell,
+  DataGridHeader,
+  DataGridHeaderCell,
 } from "@fluentui/react-components";
 
 import { FilteredSubItem, isVisible } from "../../services/Filters.service.ts";
@@ -25,6 +27,9 @@ export const SubItems: React.FunctionComponent<SubItemsProps> = ({
     // Info
     createTableColumn<FilteredSubItem>({
       columnId: "file",
+      renderHeaderCell: () => {
+        return "פריט";
+      },
       renderCell: (item: FilteredSubItem) => {
         return <TableCellLayout>{item.product.name}</TableCellLayout>;
       },
@@ -32,6 +37,9 @@ export const SubItems: React.FunctionComponent<SubItemsProps> = ({
     // Quantity
     createTableColumn<FilteredSubItem>({
       columnId: "quantity",
+      renderHeaderCell: () => {
+        return "כמות";
+      },
       renderCell: (item: FilteredSubItem) => {
         return <TableCellLayout>{item.quantity}</TableCellLayout>;
       },
@@ -65,9 +73,16 @@ export const SubItems: React.FunctionComponent<SubItemsProps> = ({
       getRowId={(item) => item.id}
       columnSizingOptions={columnSizing}
     >
+      <DataGridHeader>
+        <DataGridRow selectionCell={{ style: { display: "none" } }}>
+          {({ renderHeaderCell }) => (
+            <DataGridHeaderCell style={{ fontWeight: "bold" }}>{renderHeaderCell()}</DataGridHeaderCell>
+          )}
+        </DataGridRow>
+      </DataGridHeader>
       <DataGridBody<FilteredSubItem>>
         {({ item, rowId }) => (
-         <DataGridRow<FilteredSubItem>
+          <DataGridRow<FilteredSubItem>
             key={rowId}
             onClick={() => {
               const isPrevChecked = Boolean(item.userId);
